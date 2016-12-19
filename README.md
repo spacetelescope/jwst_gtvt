@@ -286,7 +286,7 @@ The observability windows will be printed to the terminal and a plot showing the
     2020-12-26    62.64  70.49    62.61  70.46   200.13 207.97    62.07  69.92    67.65  75.50    61.39  69.24
 
 
-![Example Plot](jwst_target_visibility.png "Example default plot output.")
+![Example Plot](docs/jwst_target_visibility.png "Example default plot output.")
 
 You can specify the instrument via the `--instrument` flag.
 
@@ -299,7 +299,7 @@ Setting the `--name` flag will add a target name to the plot title
 
 `python jwst_gtvt 0.0 0.0 --instrument nircam --name "My Target"`
 
-![Example Plot](nircam_target_visibility.png "Example plot output when specifying instrument.")
+![Example Plot](docs/nircam_target_visibility.png "Example plot output when specifying instrument.")
 
 You can save the ouput to a file instead of having it output to terminal with `--save_table`.  Likewise, you can save the plot with `--save_plot`.
 
