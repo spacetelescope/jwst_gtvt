@@ -86,7 +86,7 @@ If you only want to plot a specific range of dates, rather than the entire avail
 For example
 `jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240" --start_date 2019-01-01 --end_date 2020-01-01`
 
-![Example Plot](docs/nircam_target_visibility_2019.png "Example plot output when specifying start and end dates.")
+![Example Plot](docs/jwst_target_visibility_2019.png "Example plot output when specifying start and end dates.")
 
 Specifying the `--v3pa` will display the observing windows which contain the desired V3 position angle in the text output.
 
