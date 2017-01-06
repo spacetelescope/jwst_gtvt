@@ -98,11 +98,11 @@ def main(args):
     search_end = Time(args.end_date, format='iso').mjd if args.end_date is not None else 59579.0 # Dec 31, 2021
 
     if not (58119.0 <= search_start <= 59579.0) and args.start_date is not None:
-        raise ValueError('Search start date {} outside of available ephemeris {} to {}'.format(args.start_date, '2018-01-01', '2021-12-31'))
+        raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(args.start_date, '2018-01-01', '2021-12-31'))
     if not (58119.0 <= search_end <= 59579.0) and args.end_date is not None:
-        raise ValueError('Search end data {} outside of available ephemeris {} to {}'.format(args.end_date, '2018-01-01', '2021-12-31'))
+        raise ValueError('End date {} outside of available ephemeris {} to {}'.format(args.end_date, '2018-01-01', '2021-12-31'))
     if search_start > search_end:
-        raise ValueError('Search start date {} should be before end date {}'.format(args.start_date, args.end_date))
+        raise ValueError('Start date {} should be before end date {}'.format(args.start_date, args.end_date))
 
     if search_start < A_eph.amin:
         print("Warning, search start time is earlier than ephemeris start.", file=table_output)
@@ -136,8 +136,8 @@ def main(args):
     print("", file=table_output)
 
 
-    if args.pa is not None:
-        pa     = float(args.pa) * D2R
+    if args.v3pa is not None:
+        pa     = float(args.v3pa) * D2R
     print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot, 
         Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
     if pa == "X":

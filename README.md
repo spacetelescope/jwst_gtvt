@@ -24,39 +24,75 @@ Alternatively, you can download the .zip file or clone the respository from GitH
 # Usage
 To see the help info use
 
-    $ python jwst_gtvt -h
-        usage: jwst_gtvt [-h] [--pa PA] [--save_plot SAVE_PLOT]
+    $ jwst_gtvt -h
+        usage: jwst_gtvt [-h] [--v3pa V3PA] [--save_plot SAVE_PLOT]
                          [--save_table SAVE_TABLE] [--instrument INSTRUMENT]
                          [--name NAME] [--start_date START_DATE] [--end_date END_DATE]
                          ra dec
 
         positional arguments:
           ra                    Right Ascension of target in either sexagesimal
-                                (hh:mm:ss.s) or degrees
+                                (hh:mm:ss.s) or degrees.
           dec                   Declination of target in either sexagesimal
-                                (dd:mm:ss.s) or degrees
+                                (dd:mm:ss.s) or degrees.
 
         optional arguments:
           -h, --help            show this help message and exit
-          --pa PA               Specify a desired Position Angle
+          --v3pa V3PA           Specify a desired V3 (telescope frame) Position Angle.
           --save_plot SAVE_PLOT
-                                Path of file to save plot output
+                                Path of file to save plot output.
           --save_table SAVE_TABLE
-                                Path of file to save table output
+                                Path of file to save table output.
           --instrument INSTRUMENT
                                 If specified plot shows only windows for this
-                                instrument
-          --name NAME           Target Name to appear on plots
+                                instrument. Options: nircam, nirspec, niriss, miri,
+                                fgs, v3 (case insensitive).
+          --name NAME           Target Name to appear on plots. Names with space
+                                should use double quotes e.g. "NGC 6240".
           --start_date START_DATE
-                                Start date for visibility search in yyyy-mm-dd format
-          --end_date END_DATE   End date for visibility search in yyyy-mm-dd format
-
+                                Start date for visibility search in yyyy-mm-dd format.
+                                Earliest available is 2018-01-01.
+          --end_date END_DATE   End date for visibility search in yyyy-mm-dd format.
+                                Latest available is 2021-12-31.
 # Example
 
-By default you need only specify R.A. and Dec. 
+By default you need only specify R.A. and Dec. in either sexigesimal or degrees.
 The observability windows will be printed to the terminal and a plot showing the windows for each instrument will pop up.
+`jwst_gtvt 16:52:58.9 02:24:03`
+`jwst_gtvt 253.2458 2.4008`
 
-    $ python jwst_gtvt 0.0 0.0
+![Example Plot](docs/jwst_target_visibility.png "Example default plot output.")
+
+Setting the `--name` flag will add a target name to the plot title
+
+`jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240"`
+
+You can specify the instrument via the `--instrument` flag.
+
+`jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240" --instrument nircam`
+
+and the resulting plot will only contain the windows for the specified instrument.
+The allowed values for `--instrument` are 'nircam', 'nirspec', 'niriss', 'miri', 'fgs', and 'v3' (case insensitive).
+
+![Example Plot](docs/nircam_target_visibility.png "Example plot output when specifying instrument.")
+
+You can save the text ouput to a file instead of having it output to terminal with `--save_table`.  
+Likewise, you can save the plot with `--save_plot`.
+The plot can be saved in any format supported by matplotlib (.png, .jpeg, .pdf, .eps) by specifying the desired extension in the filename.
+
+`jwst_gtvt 16:52:58.9 02:24:03 --save_table visibility.txt --save_plot visibility.png`
+
+If you only want to plot a specific range of dates, rather than the entire available ephemeris you specify a `--start_date` or `--end_date` in ISO format (yyyy-mm-dd).
+For example
+`jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240" --start_date 2019-01-01 --end_date 2020-01-01`
+
+![Example Plot](docs/nircam_target_visibility_2019.png "Example plot output when specifying start and end dates.")
+
+Specifying the `--v3pa` will display the observing windows which contain the desired V3 position angle in the text output.
+
+Below is an example of the full text output
+`
+    $ jwst_gtvt 16:52:58.9 02:24:03
     Using Equatorial Coordinates
 
            Target
@@ -285,22 +321,3 @@ The observability windows will be printed to the terminal and a plot showing the
     2020-12-25    62.00  71.12    61.98  71.10   199.49 208.61    61.43  70.55    67.02  76.14    60.75  69.87
     2020-12-26    62.64  70.49    62.61  70.46   200.13 207.97    62.07  69.92    67.65  75.50    61.39  69.24
 
-
-![Example Plot](docs/jwst_target_visibility.png "Example default plot output.")
-
-You can specify the instrument via the `--instrument` flag.
-
-`python jwst_gtvt 0.0 0.0 --instrument nircam`
-
-and the resulting plot will only contain the windows for the specified instrument.
-The allowed values for `--instrument` are 'nircam', 'nirspec', 'niriss', 'miri', 'fgs', and 'v3' (case insensitive).
-
-Setting the `--name` flag will add a target name to the plot title
-
-`python jwst_gtvt 0.0 0.0 --instrument nircam --name "My Target"`
-
-![Example Plot](docs/nircam_target_visibility.png "Example plot output when specifying instrument.")
-
-You can save the ouput to a file instead of having it output to terminal with `--save_table`.  Likewise, you can save the plot with `--save_plot`.
-
-`python jwst_gtvt 0.0 0.0 --save_table visibility.txt --save_plot visibility.png`
