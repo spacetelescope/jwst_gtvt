@@ -58,18 +58,20 @@ To see the help info use
 
 By default you need only specify R.A. and Dec. in either sexigesimal or degrees.
 The observability windows will be printed to the terminal and a plot showing the windows for each instrument will pop up.
-`jwst_gtvt 16:52:58.9 02:24:03`
-`jwst_gtvt 253.2458 2.4008`
+
+`$ jwst_gtvt 16:52:58.9 02:24:03`
+
+`$ jwst_gtvt 253.2458 2.4008`
 
 ![Example Plot](docs/jwst_target_visibility.png "Example default plot output.")
 
 Setting the `--name` flag will add a target name to the plot title
 
-`jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240"`
+`$ jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240"`
 
 You can specify the instrument via the `--instrument` flag.
 
-`jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240" --instrument nircam`
+`$ jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240" --instrument nircam`
 
 and the resulting plot will only contain the windows for the specified instrument.
 The allowed values for `--instrument` are 'nircam', 'nirspec', 'niriss', 'miri', 'fgs', and 'v3' (case insensitive).
@@ -80,11 +82,12 @@ You can save the text ouput to a file instead of having it output to terminal wi
 Likewise, you can save the plot with `--save_plot`.
 The plot can be saved in any format supported by matplotlib (.png, .jpeg, .pdf, .eps) by specifying the desired extension in the filename.
 
-`jwst_gtvt 16:52:58.9 02:24:03 --save_table visibility.txt --save_plot visibility.png`
+`$ jwst_gtvt 16:52:58.9 02:24:03 --save_table visibility.txt --save_plot visibility.png`
 
 If you only want to plot a specific range of dates, rather than the entire available ephemeris you specify a `--start_date` or `--end_date` in ISO format (yyyy-mm-dd).
 For example
-`jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240" --start_date 2019-01-01 --end_date 2020-01-01`
+
+`$ jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240" --start_date 2019-01-01 --end_date 2020-01-01`
 
 ![Example Plot](docs/jwst_target_visibility_2019.png "Example plot output when specifying start and end dates.")
 
