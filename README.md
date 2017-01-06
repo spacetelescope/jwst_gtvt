@@ -91,7 +91,7 @@ For example
 Specifying the `--v3pa` will display the observing windows which contain the desired V3 position angle in the text output.
 
 Below is an example of the full text output
-`
+
     $ jwst_gtvt 16:52:58.9 02:24:03
     Using Equatorial Coordinates
 
