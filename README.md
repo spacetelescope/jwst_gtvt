@@ -16,7 +16,7 @@ This tool requires a few packages all of which are included in the Anaconda pyth
 # Installation
 
 You can install the tool using `pip` with 
-`pip install git+https://github.com/mattjhill/jwst_gtvt.git`
+`pip install git+https://github.com/spacetelescope/jwst_gtvt.git`
 
 Alternatively, you can download the .zip file or clone the respository from GitHub and install the tool from inside the resulting directory with
 `python setup.py install`

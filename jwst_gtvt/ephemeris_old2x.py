@@ -7,7 +7,6 @@ import sys
 #import time_extensionsx as time2
 from math import *
 from .rotationsx import *
-from .quaternionx import *
 from . import astro_funcx as astro_func
 
 D2R = pi/180.  #degrees to radians
