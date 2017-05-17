@@ -154,8 +154,8 @@ def main(args, fixed=True):
         dec = np.repeat(dec, span * scale + 1)
     else:
         assert len(args.ra) == span * scale + 1, "{} epochs retrieved for the moving target, but {} expected.".format(len(args.ra), span * scale + 1)
-        ra = args.ra
-        dec = args.dec
+        ra = args.ra * D2R
+        dec = args.dec * D2R
 
     print("", file=table_output)
     print("       Target", file=table_output)
