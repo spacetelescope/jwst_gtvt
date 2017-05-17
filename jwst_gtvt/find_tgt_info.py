@@ -78,7 +78,26 @@ def allowed_max_vehicle_roll(sun_ra, sun_dec, ra, dec):
     max_vehicle_roll = math.asin(unit_limit(math.sin(sun_roll)/math.cos(vehicle_pitch)))
     return max_vehicle_roll
 
-def main(args):
+def get_target_ephemeris(desg, start_date, end_date, smallbody=True):
+    """Ephemeris from JPL/HORIZONS.
+
+    smallbody : bool, optional
+      Set to `True` for comets, asteroids, and satellites, `False` for
+      planets or spacecraft.
+
+    Returns : target name from HORIZONS, RA, and Dec.
+
+    """
+
+    import callhorizons
+
+    # cap: current apparition (for comets)
+    q = callhorizons.query(desg, smallbody=smallbody, cap=True)
+    q.set_epochrange(start_date, end_date, '1d')  # 1 day step size
+    assert q.get_ephemerides('@jwst') > 0, 'Error retrieving ephemeris for "{}".  Check URL: {}'.format(desg, q.url)
+    return q['targetname'][0], q['RA'], q['DEC']
+
+def main(args, fixed=True):
 
     table_output=None
     if args.save_table is not None:
@@ -121,18 +140,29 @@ def main(args):
 
 
     pa = 'X'
-    if args.ra.find(':')>-1:  #format is hh:mm:ss.s or  dd:mm:ss.s  
-      ra  = convert_ddmmss_to_float(args.ra) * 15. * D2R
-      dec   = convert_ddmmss_to_float(args.dec) * D2R
-    else: #format is decimal
-      ra  = float(args.ra) * D2R
-      dec   = float(args.dec) * D2R
+    if fixed:
+        if args.ra.find(':')>-1:  #format is hh:mm:ss.s or  dd:mm:ss.s  
+          ra  = convert_ddmmss_to_float(args.ra) * 15. * D2R
+          dec   = convert_ddmmss_to_float(args.dec) * D2R
+        else: #format is decimal
+          ra  = float(args.ra) * D2R
+          dec   = float(args.dec) * D2R
+
+        # although the coordinates are fixed, we need an array for
+        # symmetry with moving target ephemerides
+        ra = np.repeat(ra, span * scale + 1)
+        dec = np.repeat(dec, span * scale + 1)
+    else:
+        assert len(args.ra) == span * scale + 1, "{} epochs retrieved for the moving target, but {} expected.".format(len(args.ra), span * scale + 1)
+        ra = args.ra
+        dec = args.dec
 
     print("", file=table_output)
     print("       Target", file=table_output)
-    print("                ecliptic", file=table_output)
-    print("RA      Dec     latitude", file=table_output)
-    print("%7.3f %7.3f %7.3f" % (ra*R2D,dec*R2D,calc_ecliptic_lat(ra, dec)*R2D), file=table_output)
+    if fixed:
+        print("                ecliptic", file=table_output)
+        print("RA      Dec     latitude", file=table_output)
+        print("%7.3f %7.3f %7.3f" % (ra[0]*R2D,dec[0]*R2D,calc_ecliptic_lat(ra[0], dec[0])*R2D), file=table_output)
     print("", file=table_output)
 
 
@@ -141,10 +171,10 @@ def main(args):
     print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot, 
         Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
     if pa == "X":
-        iflag_old = A_eph.in_FOR(search_start,ra,dec)
+        iflag_old = A_eph.in_FOR(search_start,ra[0],dec[0])
         print("|           Window [days]                 |    Normal V3 PA [deg]    |", file=table_output)
     else:
-        iflag_old = A_eph.is_valid(search_start,ra,dec,pa)
+        iflag_old = A_eph.is_valid(search_start,ra[0],dec[0],pa)
         print("|           Window [days]                 |              Specified V3 PA [deg]             |", file=table_output)
 
     print("   Start           End         Duration         Start         End          RA             Dec", file=table_output)
@@ -160,55 +190,55 @@ def main(args):
         adate = search_start + float(i)/float(scale)
         #iflag = A_eph.in_FOR(adate,ra,dec)
         if pa == "X":
-            iflag = A_eph.in_FOR(adate,ra,dec)
+            iflag = A_eph.in_FOR(adate,ra[i],dec[i])
         else:
-            iflag = A_eph.is_valid(adate,ra,dec,pa)
+            iflag = A_eph.is_valid(adate,ra[i],dec[i],pa)
         if iflag != iflag_old:
             iflip = True
             if iflag:
                 if pa == "X":
-                    twstart = A_eph.bisect_by_FOR(adate,adate-0.1,ra,dec)
+                    twstart = A_eph.bisect_by_FOR(adate,adate-0.1,ra[i],dec[i])
                 else:
-                    twstart = A_eph.bisect_by_attitude(adate,adate-0.1,ra,dec,pa)
+                    twstart = A_eph.bisect_by_attitude(adate,adate-0.1,ra[i],dec[i],pa)
             else:
                 if pa == "X":
-                    wend = A_eph.bisect_by_FOR(adate-0.1,adate,ra,dec)
+                    wend = A_eph.bisect_by_FOR(adate-0.1,adate,ra[i],dec[i])
                 else:
-                    wend = A_eph.bisect_by_attitude(adate-0.1,adate,ra,dec,pa)
+                    wend = A_eph.bisect_by_attitude(adate-0.1,adate,ra[i],dec[i],pa)
                 if twstart > 0.:
                     wstart = twstart #Only set wstart if wend is valid
                     if pa == "X":
-                        pa_start = A_eph.normal_pa(wstart,ra,dec)
-                        pa_end   = A_eph.normal_pa(wend,ra,dec)
+                        pa_start = A_eph.normal_pa(wstart,ra[0],dec[0])
+                        pa_end   = A_eph.normal_pa(wend,ra[-1],dec[-1])
                     else:
                         pa_start = pa
                         pa_end = pa
                     print(" {:15} {:11} {:11.2f} {:13.5f} {:13.5f} {:13.5f} {:13.5f} ".format(Time(wstart, format='mjd', out_subfmt='date').isot,
-                        Time(wend, format='mjd', out_subfmt='date').isot,wend-wstart,pa_start*R2D,pa_end*R2D,ra*R2D,dec*R2D), file=table_output)
+                        Time(wend, format='mjd', out_subfmt='date').isot,wend-wstart,pa_start*R2D,pa_end*R2D,ra[i]*R2D,dec[i]*R2D), file=table_output)
             iflag_old = iflag
 
     if iflip == True and iflag == True:
         if pa == "X":
-            pa_start = A_eph.normal_pa(twstart,ra,dec)
-            pa_end   = A_eph.normal_pa(adate,ra,dec)
+            pa_start = A_eph.normal_pa(twstart,ra[i],dec[i])
+            pa_end   = A_eph.normal_pa(adate,ra[i],dec[i])
         else:
             pa_start = pa
             pa_end = pa
         print(" {:15} {:11} {:11.2f} {:13.5f} {:13.5f} {:13.5f} {:13.5f} ".format(Time(twstart, format='mjd', out_subfmt='date').isot
-            ,Time(adate, format='mjd', out_subfmt='date').isot,adate-twstart,pa_start*R2D,pa_end*R2D,ra*R2D,dec*R2D), file=table_output)
+            ,Time(adate, format='mjd', out_subfmt='date').isot,adate-twstart,pa_start*R2D,pa_end*R2D,ra[i]*R2D,dec[i]*R2D), file=table_output)
 
     if iflip == False and iflag == True and pa == "X":
-        if dec >0.:
-            print("%13s %13s %11s %13.5f %13.5f %13.5f %13.5f " % ('CVZ','CVZ','CVZ',360.,0.,ra*R2D,dec*R2D), file=table_output)
+        if dec[i] >0.:
+            print("%13s %13s %11s %13.5f %13.5f %13.5f %13.5f " % ('CVZ','CVZ','CVZ',360.,0.,ra[i]*R2D,dec[i]*R2D), file=table_output)
         else:
-            print("%13s %13s %11s %13.5f %13.5f %13.5f %13.5f " % ('CVZ','CVZ','CVZ',0.,360.,ra*R2D,dec*R2D), file=table_output)
+            print("%13s %13s %11s %13.5f %13.5f %13.5f %13.5f " % ('CVZ','CVZ','CVZ',0.,360.,ra[i]*R2D,dec[i]*R2D), file=table_output)
 
     if 1==1:
         wstart = search_start
         wend = wstart + span
         istart = int(wstart)
         iend = int(wend)
-        iflag = A_eph.in_FOR(wstart,ra,dec)
+        iflag = A_eph.in_FOR(wstart,ra[0],dec[0])
         tgt_is_in = False
         if iflag:
           tgt_is_in = True
@@ -235,16 +265,16 @@ def main(args):
 
         for itime in range(istart,iend):
             atime = float(itime)
-            iflag = A_eph.in_FOR(atime,ra,dec)
+            iflag = A_eph.in_FOR(atime,ra[i],dec[i])
             #print atime,A_eph.in_FOR(atime,ra,dec)
             if iflag:
                 if not tgt_is_in:
                     print("", file=table_output)
                 tgt_is_in = True
                 
-                V3PA = A_eph.normal_pa(atime,ra,dec)*R2D
+                V3PA = A_eph.normal_pa(atime,ra[i],dec[i])*R2D
                 (sun_ra, sun_dec) = A_eph.sun_pos(atime)
-                max_boresight_roll = allowed_max_vehicle_roll(sun_ra, sun_dec, ra, dec) * R2D
+                max_boresight_roll = allowed_max_vehicle_roll(sun_ra, sun_dec, ra[i], dec[i]) * R2D
                 #sun_ang = angular_sep(sun_ra, sun_dec, ra, dec) * R2D
                 
                 minV3PA = bound_angle(V3PA - max_boresight_roll)
@@ -319,7 +349,8 @@ def main(args):
             for label in labels:
                 label.set_rotation(30)
 
-            axes[0,1].set_title('(R.A. = {}, Dec. = {})\n'.format(args.ra, args.dec)+"NIRCam")
+            if fixed:
+                axes[0,1].set_title('(R.A. = {}, Dec. = {})\n'.format(args.ra, args.dec)+"NIRCam")
             plot_single_instrument(axes[0,1], 'NIRCam', times, minNIRCam_PA_data, maxNIRCam_PA_data)
             axes[0,1].fmt_xdata = DateFormatter('%Y-%m-%d')
             axes[0,1].set_ylabel("Available Position Angle (Degree)")
@@ -397,7 +428,11 @@ def main(args):
             targname = args.name
         else:
             targname = ''
-        fig.suptitle(targname+" (RA = {}, DEC = {})".format(args.ra, args.dec), fontsize=18)               
+        if fixed:
+            suptitle = '{} (RA = {}, DEC = {})'.format(targname, args.ra, args.dec)
+        else:
+            suptitle = '{}'.format(targname, args.ra, args.dec)
+        fig.suptitle(suptitle, fontsize=18)               
         fig.tight_layout()
         fig.subplots_adjust(top=0.88)
 
