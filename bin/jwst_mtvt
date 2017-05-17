@@ -6,7 +6,7 @@ from jwst_gtvt.find_tgt_info import main, get_target_ephemeris
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('desg', nargs='*', help='Moving target designation.')
+    parser.add_argument('desg', nargs='+', help='Moving target designation.')
     parser.add_argument('--smallbody', action='store_true', help='Set if the designation is that of a comet or asteroid.  This is required for periodic comets with multiple orbit solutions in JPL/HORIZONS.')
     parser.add_argument('--v3pa', help='Specify a desired V3 (telescope frame) Position Angle.')
     parser.add_argument('--save_plot', help='Path of file to save plot output.')
