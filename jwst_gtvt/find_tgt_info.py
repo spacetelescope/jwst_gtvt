@@ -100,7 +100,7 @@ def get_target_ephemeris(desg, start_date, end_date, smallbody=True):
 def window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end, cvz=False):
     """Formats window summary data for fixed and moving targets."""
     if cvz:
-        line = " {0:15} {0:11} {0:11.2f} ".format('CVZ')
+        line = " {0:15} {0:11} {0:11} ".format('CVZ')
     else:
         line = " {:15} {:11} {:11.2f} ".format(Time(wstart, format='mjd', out_subfmt='date').isot,
                                                Time(wend, format='mjd', out_subfmt='date').isot,wend-wstart)
@@ -257,9 +257,9 @@ def main(args, fixed=True):
 
     if iflip == False and iflag == True and pa == "X":
         if dec[i] >0.:
-            print(window_summary_line(fixed, 0, 0, 0, 360., 0., ra[i], ra[i], dec[i], dec[i], cvz=True), file=table_output)
+            print(window_summary_line(fixed, 0, 0, 2 * np.pi, 0, ra[0], ra[-1], dec[0], dec[-1], cvz=True), file=table_output)
         else:
-            print(window_summary_line(fixed, 0, 0, 0, 0., 360., ra[i], ra[i], dec[i], dec[i], cvz=True), file=table_output)
+            print(window_summary_line(fixed, 0, 0, 0, 2 * np.pi, ra[0], ra[-1], dec[0], dec[-1], cvz=True), file=table_output)
 
     if 1==1:
         wstart = search_start
