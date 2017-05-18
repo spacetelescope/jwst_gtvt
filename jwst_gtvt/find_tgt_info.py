@@ -82,8 +82,8 @@ def get_target_ephemeris(desg, start_date, end_date, smallbody=True):
     """Ephemeris from JPL/HORIZONS.
 
     smallbody : bool, optional
-      Set to `True` for comets, asteroids, and satellites, `False` for
-      planets or spacecraft.
+      Set to `True` for comets and asteroids, `False` for planets,
+      spacecraft, or moons.
 
     Returns : target name from HORIZONS, RA, and Dec.
 
