@@ -97,6 +97,21 @@ def get_target_ephemeris(desg, start_date, end_date, smallbody=True):
     assert q.get_ephemerides('@jwst') > 0, 'Error retrieving ephemeris for "{}".  Check URL: {}'.format(desg, q.url)
     return q['targetname'][0], q['RA'], q['DEC']
 
+def window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end, cvz=False):
+    """Formats window summary data for fixed and moving targets."""
+    if cvz:
+        line = " {0:15} {0:11} {0:11.2f} ".format('CVZ')
+    else:
+        line = " {:15} {:11} {:11.2f} ".format(Time(wstart, format='mjd', out_subfmt='date').isot,
+                                               Time(wend, format='mjd', out_subfmt='date').isot,wend-wstart)
+    line += "{:13.5f} {:13.5f} ".format(pa_start*R2D,pa_end*R2D)
+    if fixed:
+        line += "{:13.5f} {:13.5f} ".format(ra_start*R2D, dec_start*R2D)
+    else:
+        line += "{:13.5f} {:13.5f} {:13.5f} {:13.5f} ".format(ra_start*R2D, ra_end*R2D, dec_start*R2D, dec_end*R2D)
+
+    return line
+
 def main(args, fixed=True):
 
     table_output=None
@@ -172,15 +187,26 @@ def main(args, fixed=True):
         Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
     if pa == "X":
         iflag_old = A_eph.in_FOR(search_start,ra[0],dec[0])
-        print("|           Window [days]                 |    Normal V3 PA [deg]    |", file=table_output)
+        print("|           Window [days]                 |    Normal V3 PA [deg]    |", end='', file=table_output)
     else:
         iflag_old = A_eph.is_valid(search_start,ra[0],dec[0],pa)
-        print("|           Window [days]                 |              Specified V3 PA [deg]             |", file=table_output)
+        print("|           Window [days]                 |              Specified V3 PA [deg]             |", end='', file=table_output)
 
-    print("   Start           End         Duration         Start         End          RA             Dec", file=table_output)
+    if fixed:
+        print('\n', end='', file=table_output)
+    else:
+        print('{:^27s}|{:^27s}|'.format('RA', 'Dec'), file=table_output)
+
+    print("   Start           End         Duration         Start         End    ", end='', file=table_output)
+    if fixed:
+        print("{:^13s} {:^13s}".format('RA', 'Dec'), file=table_output)
+    else:
+        print("{:^13s} {:^13s} {:^13s} {:^13s}".format('Start', 'End', 'Start', 'End'), file=table_output)
 
     if iflag_old:
       twstart = search_start
+      ra_start = ra[0]
+      dec_start = dec[0]
     else:
       twstart = -1.
     iflip = False
@@ -200,6 +226,8 @@ def main(args, fixed=True):
                     twstart = A_eph.bisect_by_FOR(adate,adate-0.1,ra[i],dec[i])
                 else:
                     twstart = A_eph.bisect_by_attitude(adate,adate-0.1,ra[i],dec[i],pa)
+                ra_start = ra[i]
+                dec_start = dec[i]
             else:
                 if pa == "X":
                     wend = A_eph.bisect_by_FOR(adate-0.1,adate,ra[i],dec[i])
@@ -213,8 +241,9 @@ def main(args, fixed=True):
                     else:
                         pa_start = pa
                         pa_end = pa
-                    print(" {:15} {:11} {:11.2f} {:13.5f} {:13.5f} {:13.5f} {:13.5f} ".format(Time(wstart, format='mjd', out_subfmt='date').isot,
-                        Time(wend, format='mjd', out_subfmt='date').isot,wend-wstart,pa_start*R2D,pa_end*R2D,ra[i]*R2D,dec[i]*R2D), file=table_output)
+                    ra_end = ra[i]
+                    dec_end = dec[i]
+                    print(window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end), file=table_output)
             iflag_old = iflag
 
     if iflip == True and iflag == True:
@@ -224,14 +253,13 @@ def main(args, fixed=True):
         else:
             pa_start = pa
             pa_end = pa
-        print(" {:15} {:11} {:11.2f} {:13.5f} {:13.5f} {:13.5f} {:13.5f} ".format(Time(twstart, format='mjd', out_subfmt='date').isot
-            ,Time(adate, format='mjd', out_subfmt='date').isot,adate-twstart,pa_start*R2D,pa_end*R2D,ra[i]*R2D,dec[i]*R2D), file=table_output)
+        print(window_summary_line(fixed, twstart, adate, pa_start, pa_end, ra[i], ra[i], dec[i], dec[i]), file=table_output)
 
     if iflip == False and iflag == True and pa == "X":
         if dec[i] >0.:
-            print("%13s %13s %11s %13.5f %13.5f %13.5f %13.5f " % ('CVZ','CVZ','CVZ',360.,0.,ra[i]*R2D,dec[i]*R2D), file=table_output)
+            print(window_summary_line(fixed, 0, 0, 0, 360., 0., ra[i], ra[i], dec[i], dec[i], cvz=True), file=table_output)
         else:
-            print("%13s %13s %11s %13.5f %13.5f %13.5f %13.5f " % ('CVZ','CVZ','CVZ',0.,360.,ra[i]*R2D,dec[i]*R2D), file=table_output)
+            print(window_summary_line(fixed, 0, 0, 0, 0., 360., ra[i], ra[i], dec[i], dec[i], cvz=True), file=table_output)
 
     if 1==1:
         wstart = search_start
