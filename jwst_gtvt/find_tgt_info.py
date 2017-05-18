@@ -273,10 +273,15 @@ def main(args, fixed=True):
 
         print("", file=table_output)
         print("", file=table_output)
-        print("                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
-        print("   Date      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
-              #58849.0 264.83 275.18 264.80 264.80  42.32  42.32 264.26 264.26 269.84 269.84 263.58 263.58
-        
+        if fixed:
+            fmt_repeats = 6
+            print("                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
+            print("   Date      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
+                  #58849.0 264.83 275.18 264.80 264.80  42.32  42.32 264.26 264.26 269.84 269.84 263.58 263.58
+        else:
+            fmt_repeats = 7
+            print("                                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
+            print("   Date      RA     Dec      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
         times = []
         minV3PA_data = []
         maxV3PA_data = []
@@ -293,6 +298,7 @@ def main(args, fixed=True):
 
         for itime in range(istart,iend):
             atime = float(itime)
+            i = int((atime - search_start) * float(scale))
             iflag = A_eph.in_FOR(atime,ra[i],dec[i])
             #print atime,A_eph.in_FOR(atime,ra,dec)
             if iflag:
@@ -332,11 +338,17 @@ def main(args, fixed=True):
                 minFGS_PA_data.append(minFGS_PA)
                 maxFGS_PA_data.append(maxFGS_PA)            
                 #print '%7.1f %6.2f %6.2f %6.2f' % (atime, V3PA, NIRCam_PA, NIRSpec_PA)
-                fmt = '{}' + '   {:6.2f} {:6.2f}'*6
-                print(fmt.format(
-                    Time(atime, format='mjd', out_subfmt='date').isot, minV3PA, maxV3PA,
-                    minNIRCam_PA, maxNIRCam_PA, minNIRSpec_PA, maxNIRSpec_PA, minNIRISS_PA,
-                    maxNIRISS_PA, minMIRI_PA, maxMIRI_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
+                fmt = '{}' + '   {:6.2f} {:6.2f}'*fmt_repeats
+                if fixed:
+                    print(fmt.format(
+                        Time(atime, format='mjd', out_subfmt='date').isot, minV3PA, maxV3PA,
+                        minNIRCam_PA, maxNIRCam_PA, minNIRSpec_PA, maxNIRSpec_PA, minNIRISS_PA,
+                        maxNIRISS_PA, minMIRI_PA, maxMIRI_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
+                else:
+                    print(fmt.format(
+                        Time(atime, format='mjd', out_subfmt='date').isot, ra[i]*R2D, dec[i]*R2D, minV3PA, maxV3PA,
+                        minNIRCam_PA, maxNIRCam_PA, minNIRSpec_PA, maxNIRSpec_PA, minNIRISS_PA,
+                        maxNIRISS_PA, minMIRI_PA, maxMIRI_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
             else:
                 tgt_is_in = False
                 times.append(Time(atime, format='mjd').datetime)
