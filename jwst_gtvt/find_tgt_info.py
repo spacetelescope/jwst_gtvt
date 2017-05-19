@@ -142,7 +142,7 @@ def main(args, fixed=True):
         print("Warning, search start time is earlier than ephemeris start.", file=table_output)
         search_start = A_eph.amin + 1
 
-    scale = 1
+    scale = 1  # Channging this value must be reflected in get_target_ephemeris
     span = int(search_end-search_start)
 
 
