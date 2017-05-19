@@ -13,6 +13,8 @@ This tool requires a few packages all of which are included in the Anaconda pyth
 
 * AstroPy
 
+The [callhorizons](https://pypi.python.org/pypi/CALLHORIZONS) module is required for moving target ephemerides (optional).
+
 # Installation
 
 You can install the tool using `pip` with 
@@ -22,7 +24,7 @@ Alternatively, you can download the .zip file or clone the respository from GitH
 `python setup.py install`
 
 # Usage
-To see the help info use
+There are two scripts available.  `jwst_gtvt` for fixed targets, and `jwst_mtvt` for moving targets.  To see the help info use
 
     $ jwst_gtvt -h
         usage: jwst_gtvt [-h] [--v3pa V3PA] [--save_plot SAVE_PLOT]
@@ -64,6 +66,22 @@ The observability windows will be printed to the terminal and a plot showing the
 `$ jwst_gtvt 253.2458 2.4008`
 
 ![Example Plot](docs/jwst_target_visibility.png "Example default plot output.")
+
+For moving targets, use `jwst_mtvt`
+
+`$ jwst_mtvt Ceres`
+
+Periodic comets and most asteroids benefit from using the `--smallbody` flag
+
+`$ jwst_mtvt 2`  # Venus (no windows)
+
+`$ jwst_mtvt 2 --smallbody`  # Vesta
+
+`$ jwst_mtvt 2P --smallbody`  # Comet Encke
+
+`$ jwst_mtvt C/2016 M1`
+
+![Example Plot](docs/jwst_moving_target_visibility.png "A moving target example.")
 
 Setting the `--name` flag will add a target name to the plot title
 

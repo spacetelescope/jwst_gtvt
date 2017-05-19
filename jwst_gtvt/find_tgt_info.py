@@ -89,7 +89,11 @@ def get_target_ephemeris(desg, start_date, end_date, smallbody=True):
 
     """
 
-    import callhorizons
+    try:
+        import callhorizons
+    except ImportError:
+        print("The callhorizons module cannot be loaded.  It is required for moving targets.")
+        sys.exit(1)
 
     # cap: current apparition (for comets)
     q = callhorizons.query(desg, smallbody=smallbody, cap=True)
