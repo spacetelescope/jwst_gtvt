@@ -13,7 +13,9 @@ This tool requires a few packages all of which are included in the Anaconda pyth
 
 * AstroPy
 
-The [callhorizons](https://pypi.python.org/pypi/CALLHORIZONS) module is required for moving target ephemerides (optional).
+For optional moving target support:
+
+* [callhorizons](https://pypi.python.org/pypi/CALLHORIZONS)
 
 # Installation
 
@@ -75,11 +77,11 @@ Periodic comets and most asteroids benefit from using the `--smallbody` flag
 
 `$ jwst_mtvt 2`  # Venus (no windows)
 
-`$ jwst_mtvt 2 --smallbody`  # Vesta
+`$ jwst_mtvt 2 --smallbody`  # Pallas
 
 `$ jwst_mtvt 2P --smallbody`  # Comet Encke
 
-`$ jwst_mtvt C/2016 M1`
+`$ jwst_mtvt C/2016 M1`  # works with or without --smallbody
 
 ![Example Plot](docs/jwst_moving_target_visibility.png "A moving target example.")
 
