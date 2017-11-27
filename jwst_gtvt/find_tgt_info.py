@@ -203,7 +203,7 @@ def main(args, fixed=True):
         print("|           Window [days]                 |    Normal V3 PA [deg]    |", end='', file=table_output)
     else:
         iflag_old = A_eph.is_valid(search_start,ra[0],dec[0],pa)
-        print("|           Window [days]                 |              Specified V3 PA [deg]             |", end='', file=table_output)
+        print("|           Window [days]                 |   Specified V3 PA [deg]  |", end='', file=table_output)
 
     if fixed:
         print('\n', end='', file=table_output)
@@ -249,8 +249,8 @@ def main(args, fixed=True):
                 if twstart > 0.:
                     wstart = twstart #Only set wstart if wend is valid
                     if pa == "X":
-                        pa_start = A_eph.normal_pa(wstart,ra[0],dec[0])
-                        pa_end   = A_eph.normal_pa(wend,ra[-1],dec[-1])
+                        pa_start = A_eph.normal_pa(wstart,ra_start,dec_start)
+                        pa_end   = A_eph.normal_pa(wend,ra[i],dec[i])
                     else:
                         pa_start = pa
                         pa_end = pa
