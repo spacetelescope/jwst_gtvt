@@ -1,0 +1,25 @@
+#!/usr/bin/env python
+import argparse
+import sys
+
+from jwst_gtvt.find_tgt_info import main, get_target_ephemeris
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('desg', nargs='+', help='Moving target designation.')
+    parser.add_argument('--smallbody', action='store_true', help='Set if the designation is that of a comet or asteroid.  This is required for periodic comets with multiple orbit solutions in JPL/HORIZONS.')
+    parser.add_argument('--v3pa', help='Specify a desired V3 (telescope frame) Position Angle.')
+    parser.add_argument('--save_plot', help='Path of file to save plot output.')
+    parser.add_argument('--save_table', help='Path of file to save table output.')
+    parser.add_argument('--instrument', help='If specified plot shows only windows for this instrument.  Options: nircam, nirspec, niriss, miri, fgs, v3 (case insensitive).')
+    parser.add_argument('--name', help='Target Name to appear on plots.  Names with space should use double quotes e.g. "NGC 6240".')
+    parser.add_argument('--start_date', default='2018-01-01', help='Start date for visibility search in yyyy-mm-dd format. Earliest available is 2018-01-01.')
+    parser.add_argument('--end_date', default='2021-12-31', help='End date for visibility search in yyyy-mm-dd format. Latest available is 2021-12-31.')
+    args = parser.parse_args()
+
+    name, args.ra, args.dec = get_target_ephemeris(
+        ' '.join(args.desg), args.start_date, args.end_date, smallbody=args.smallbody)
+    if args.name is None:
+        args.name = name
+
+    main(args, fixed=False)
