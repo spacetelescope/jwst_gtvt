@@ -24,8 +24,8 @@ if __name__ == '__main__':
     parser.add_argument('--save_table', help='Path of file to save table output.')
     parser.add_argument('--instrument', help='If specified plot shows only windows for this instrument.  Options: nircam, nirspec, niriss, miri, fgs, v3 (case insensitive).')
     parser.add_argument('--name', help='Target Name to appear on plots.  Names with space should use double quotes e.g. "NGC 6240".')
-    parser.add_argument('--start_date', help='Start date for visibility search in yyyy-mm-dd format. Earliest available is 2018-01-01.')
-    parser.add_argument('--end_date', help='End date for visibility search in yyyy-mm-dd format. Latest available is 2021-12-31.')
+    parser.add_argument('--start_date', help='Start date for visibility search in yyyy-mm-dd format. Earliest available is 2020-01-01.')
+    parser.add_argument('--end_date', help='End date for visibility search in yyyy-mm-dd format. Latest available is 2023-12-31.')
     args = parser.parse_args(arg_list)
 
     main(args)

@@ -139,15 +139,15 @@ def main(args, fixed=True):
 
     ECL_FLAG = False
 
-    A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_L2_wrt_Sun_2018_2022.txt"),ECL_FLAG)
+    A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG)
 
-    search_start = Time(args.start_date, format='iso').mjd if args.start_date is not None else 58119.0  #Jan 1, 2018
-    search_end = Time(args.end_date, format='iso').mjd if args.end_date is not None else 59579.0 # Dec 31, 2021
+    search_start = Time(args.start_date, format='iso').mjd if args.start_date is not None else 58849.0  #Jan 1, 2020
+    search_end = Time(args.end_date, format='iso').mjd if args.end_date is not None else 60309.0 # Dec 31, 2023
 
-    if not (58119.0 <= search_start <= 59579.0) and args.start_date is not None:
-        raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(args.start_date, '2018-01-01', '2021-12-31'))
-    if not (58119.0 <= search_end <= 59579.0) and args.end_date is not None:
-        raise ValueError('End date {} outside of available ephemeris {} to {}'.format(args.end_date, '2018-01-01', '2021-12-31'))
+    if not (58849.0 <= search_start <= 60309.0) and args.start_date is not None:
+        raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(args.start_date, '2020-01-01', '2023-12-31'))
+    if not (58849.0 <= search_end <= 60309.0) and args.end_date is not None:
+        raise ValueError('End date {} outside of available ephemeris {} to {}'.format(args.end_date, '2020-01-01', '2023-12-31'))
     if search_start > search_end:
         raise ValueError('Start date {} should be before end date {}'.format(args.start_date, args.end_date))
 

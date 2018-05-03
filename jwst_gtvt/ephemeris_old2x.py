@@ -42,7 +42,7 @@ class Ephemeris:
             ascale = 0.001
         else:
             ascale = 1.0
-        if afile.find("horizons_EM_L2")>-1:
+        if afile.find("horizons_EM")>-1:
             not_there = True
             istart = 0
             while fin[istart][:5] != "$$SOE":
