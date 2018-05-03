@@ -5,7 +5,6 @@ from __future__ import print_function
 import sys
 import math
 from . import ephemeris_old2x as EPH
-
 import argparse
 import warnings
 import matplotlib.pyplot as plt
@@ -139,7 +138,9 @@ def main(args, fixed=True):
 
     ECL_FLAG = False
 
-    A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG)
+    current_ephemeris = EPH.pull_ephemeris()
+
+    A_eph = EPH.Ephemeris(current_ephemeris, ECL_FLAG)
 
     search_start = Time(args.start_date, format='iso').mjd if args.start_date is not None else 58849.0  #Jan 1, 2020
     search_end = Time(args.end_date, format='iso').mjd if args.end_date is not None else 60309.0 # Dec 31, 2023
