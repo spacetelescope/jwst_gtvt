@@ -88,7 +88,7 @@ setup(
     # have to be included in MANIFEST.in as well.
     package_data={
         'jwst_gtvt': [
-            'horizons_EM_L2_wrt_Sun_2018_2022.txt'
+            'horizons_EM_jwst_wrt_sun_2020-2024.txt'
         ],
     },
 
