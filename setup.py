@@ -59,7 +59,7 @@ setup(
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
     packages=['jwst_gtvt'],
-    scripts=['bin/jwst_gtvt', 'bin/jwst_mtvt'],
+    # scripts=['bin/jwst_gtvt', 'bin/jwst_mtvt'],
 
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
@@ -69,6 +69,8 @@ setup(
          'numpy',
          'astropy',
          'matplotlib',
+         'astroquery',
+         'docopt',
      ],
 
     # List additional groups of dependencies here (e.g. development
@@ -95,10 +97,8 @@ setup(
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
     # pip to create the appropriate form of executable for the target platform.
-    # entry_points={
-    #     'gui_scripts': [
-    #         'jwst-coronagraph-visibility-gui=jwst_coronagraph_visibility.gui:run',
-    #     ],
-    # },
+    entry_points = {
+        'console_scripts': ['jwst_tvt=jwst_gtvt.find_tgt_info:main'],
+    },
     zip_safe=False
 )
