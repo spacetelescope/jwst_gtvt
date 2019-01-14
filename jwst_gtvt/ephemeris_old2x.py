@@ -245,4 +245,4 @@ class Ephemeris:
             #print "UU", mid_date
             icount = icount + 1
         #print " bisected >",icount
-        return mid_date
+        return mid_dateC
