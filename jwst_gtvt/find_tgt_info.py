@@ -1,11 +1,32 @@
 #! /usr/bin/env python
 
+"""Get target information for target visibility tool
+
+Usage:
+  jwst_tvt moving <targname> [--start_date=<t0>] [--end_date=<t_end>] [--instrument=<inst>] [--save_table=<st>] [--save_plot=<sp>] [--v3pa=<pa>]
+  jwst_tvt fixed <ra> <dec> <targname> [--start_date=<t0>] [--end_date=<t_end>] [--instrument=<inst>] [--save_table=<st>] [--save_plot=<sp>] [--v3pa=<pa>]
+  
+Arguments:
+  <targname>             Name of target
+  
+Options:
+  -h --help              Show this screen.
+  --version              Show version.
+  --start_date=<t0>      Start time of observation [default: 2020-01-01]
+  --end_date=<t_end>     End time of observation [default: 2023-12-31]
+  --instrument=<inst>    If specified plot shows only windows for this instrument.  Options: nircam, nirspec, niriss, miri, fgs, v3 (case insensitive).
+  --save_table=<st>      Path of file to save table output.
+  --save_plot=<sp>       Path of file to save plot output.
+"""
+
 from __future__ import print_function
 
 import sys
 import math
 from . import ephemeris_old2x as EPH
 import argparse
+from astroquery.jplhorizons import Horizons
+from docopt import docopt
 import warnings
 import matplotlib.pyplot as plt
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
@@ -88,26 +109,14 @@ def get_target_ephemeris(desg, start_date, end_date, smallbody=True):
 
     """
 
-    from urllib.request import urlopen
+    obj = Horizons(id=desg, location='500@-170',
+                   epochs={'start':start_date, 'stop':end_date,
+                   'step':'1d'})
     
-    try:
-        import callhorizons
-    except ImportError:
-        print("The callhorizons module cannot be loaded.  It is required for moving targets.")
-        sys.exit(1)
+    eph = obj.ephemerides()
 
-    # cap: current apparition (for comets)
-    q = callhorizons.query(desg, smallbody=smallbody, cap=True)
-    q.set_epochrange(start_date, end_date, '1d')  # 1 day step size
-    try:
-        n = q.get_ephemerides('@jwst')
-    except ValueError as e:
-        with urlopen(q.url) as horizons:
-            err = horizons.read().decode()
-
-        raise ValueError('Error retrieving ephemeris for "{}".  URL: {}\n{}'.format(desg, q.url, err))
+    return eph['targetname'][0], eph['RA'], eph['DEC']
         
-    return q['targetname'][0], q['RA'], q['DEC']
 
 def window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end, cvz=False):
     """Formats window summary data for fixed and moving targets."""
@@ -124,11 +133,13 @@ def window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end,
 
     return line
 
-def main(args, fixed=True):
+def main():
 
+    args = docopt(__doc__, version='0.1')
+    
     table_output=None
-    if args.save_table is not None:
-        table_output = open(args.save_table, 'w')
+    if args['--save_table'] is not None:
+        table_output = open(args['--save_table'], 'w')
         
     NRCALL_FULL_V2IdlYang = -0.0265
     NRS_FULL_MSA_V3IdlYang = 137.4874
@@ -142,15 +153,15 @@ def main(args, fixed=True):
 
     A_eph = EPH.Ephemeris(current_ephemeris, ECL_FLAG)
 
-    search_start = Time(args.start_date, format='iso').mjd if args.start_date is not None else 58849.0  #Jan 1, 2020
-    search_end = Time(args.end_date, format='iso').mjd if args.end_date is not None else 60309.0 # Dec 31, 2023
+    search_start = Time(args['--start_date'], format='iso').mjd if args['--start_date'] is not None else 58849.0  #Jan 1, 2020
+    search_end = Time(args['--end_date'], format='iso').mjd if args['--end_date'] is not None else 60309.0 # Dec 31, 2023
 
-    if not (58849.0 <= search_start <= 60309.0) and args.start_date is not None:
-        raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(args.start_date, '2020-01-01', '2023-12-31'))
-    if not (58849.0 <= search_end <= 60309.0) and args.end_date is not None:
-        raise ValueError('End date {} outside of available ephemeris {} to {}'.format(args.end_date, '2020-01-01', '2023-12-31'))
+    if not (58849.0 <= search_start <= 60309.0) and args['--start_date'] is not None:
+        raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(args['--start_date'], '2020-01-01', '2023-12-31'))
+    if not (58849.0 <= search_end <= 60309.0) and args['--end_date'] is not None:
+        raise ValueError('End date {} outside of available ephemeris {} to {}'.format(args['--end_date'], '2020-01-01', '2023-12-31'))
     if search_start > search_end:
-        raise ValueError('Start date {} should be before end date {}'.format(args.start_date, args.end_date))
+        raise ValueError('Start date {} should be before end date {}'.format(args['--start_date'], args['--end_date']))
 
     if search_start < A_eph.amin:
         print("Warning, search start time is earlier than ephemeris start.", file=table_output)
@@ -167,24 +178,26 @@ def main(args, fixed=True):
     #     Time(search_start+span/scale, format='mjd', out_subfmt='date').isot)
     #   sys.exit(1)
 
-
     pa = 'X'
-    if fixed:
-        if args.ra.find(':')>-1:  #format is hh:mm:ss.s or  dd:mm:ss.s  
-          ra  = convert_ddmmss_to_float(args.ra) * 15. * D2R
-          dec   = convert_ddmmss_to_float(args.dec) * D2R
+    if args['fixed']:
+        name = args['<targname>']
+        if args['<ra>'].find(':')>-1:  #format is hh:mm:ss.s or  dd:mm:ss.s  
+          ra  = convert_ddmmss_to_float(args['<ra>']) * 15. * D2R
+          dec = convert_ddmmss_to_float(args['<dec>']) * D2R
         else: #format is decimal
-          ra  = float(args.ra) * D2R
-          dec   = float(args.dec) * D2R
+          ra  = float(args['<ra>']) * D2R
+          dec = float(args['<dec>']) * D2R
 
         # although the coordinates are fixed, we need an array for
         # symmetry with moving target ephemerides
         ra = np.repeat(ra, span * scale + 1)
         dec = np.repeat(dec, span * scale + 1)
-    else:
-        assert len(args.ra) == span * scale + 1, "{} epochs retrieved for the moving target, but {} expected.".format(len(args.ra), span * scale + 1)
-        ra = args.ra * D2R
-        dec = args.dec * D2R
+    
+    elif args['moving']:
+        name, ra, dec = get_target_ephemeris(args['<targname>'], args['--start_date'], args['--end_date'])
+        assert len(ra) == span * scale + 1, "{} epochs retrieved for the moving target, but {} expected.".format(len(ra), span * scale + 1)
+        ra = ra * D2R
+        dec = dec * D2R
 
     print("", file=table_output)
     print("       Target", file=table_output)
@@ -195,8 +208,8 @@ def main(args, fixed=True):
     print("", file=table_output)
 
 
-    if args.v3pa is not None:
-        pa     = float(args.v3pa) * D2R
+    if args['--v3pa'] is not None:
+        pa = float(args['--v3pa']) * D2R
     print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot, 
         Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
     if pa == "X":
@@ -387,7 +400,7 @@ def main(args, fixed=True):
                 'MIRI min', 'MIRI max', 'FGS min', 'FGS max'))
 
         # Plot observing windows
-        if args.instrument is None:
+        if args['--instrument'] is None:
             years = YearLocator()
             months = MonthLocator()
             yearsFmt = DateFormatter('%Y')
@@ -404,7 +417,7 @@ def main(args, fixed=True):
                 label.set_rotation(30)
 
             if fixed:
-                axes[0,1].set_title('(R.A. = {}, Dec. = {})\n'.format(args.ra, args.dec)+"NIRCam")
+                axes[0,1].set_title('(R.A. = {}, Dec. = {})\n'.format(args['<ra>'], args['<dec>'])+"NIRCam")
             plot_single_instrument(axes[0,1], 'NIRCam', times, minNIRCam_PA_data, maxNIRCam_PA_data)
             axes[0,1].fmt_xdata = DateFormatter('%Y-%m-%d')
             axes[0,1].set_ylabel("Available Position Angle (Degree)")
@@ -443,57 +456,57 @@ def main(args, fixed=True):
                 label.set_rotation(30)
             # fig.autofmt_xdate()
 
-        elif args.instrument.lower() not in ['v3', 'nircam', 'miri', 'nirspec', 'niriss', 'fgs']:
+        elif args['--instrument'].lower() not in ['v3', 'nircam', 'miri', 'nirspec', 'niriss', 'fgs']:
             print()
-            print(args.instrument+" not recognized. --instrument should be one of: v3, nircam, miri, nirspec, niriss, fgs")
+            print(args['--instrument']+" not recognized. --instrument should be one of: v3, nircam, miri, nirspec, niriss, fgs")
             return
 
-        elif args.instrument.lower() == 'v3':
+        elif args['--instrument'].lower() == 'v3':
             fig, ax = plt.subplots(figsize=(14,8))
             plot_single_instrument(ax, 'Observatory V3', times, minV3PA_data, maxV3PA_data)
             ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
 
-        elif args.instrument.lower() == 'nircam':
+        elif args['--instrument'].lower() == 'nircam':
             fig, ax = plt.subplots(figsize=(14,8))
             plot_single_instrument(ax, 'NIRCam', times, minNIRCam_PA_data, maxNIRCam_PA_data)
             ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
 
-        elif args.instrument.lower() == 'miri':
+        elif args['--instrument'].lower() == 'miri':
             fig, ax = plt.subplots(figsize=(14,8))
             plot_single_instrument(ax, 'MIRI', times, minMIRI_PA_data, maxMIRI_PA_data)
             ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
 
-        elif args.instrument.lower() == 'nirspec':
+        elif args['--instrument'].lower() == 'nirspec':
             fig, ax = plt.subplots(figsize=(14,8))
             plot_single_instrument(ax, 'NIRSpec', times, minNIRSpec_PA_data, maxNIRSpec_PA_data)
             ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
 
-        elif args.instrument.lower() == 'niriss':
+        elif args['--instrument'].lower() == 'niriss':
             fig, ax = plt.subplots(figsize=(14,8))
             plot_single_instrument(ax, 'NIRISS', times, minNIRISS_PA_data, maxNIRISS_PA_data)
             ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
 
-        elif args.instrument.lower() == 'fgs':
+        elif args['--instrument'].lower() == 'fgs':
             fig, ax = plt.subplots(figsize=(14,8))
             plot_single_instrument(ax, 'FGS', times, minFGS_PA_data, maxFGS_PA_data)
             ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
         
-        if args.name is not None:
-            targname = args.name
+        if name is not None:
+            targname = name
         else:
             targname = ''
         if fixed:
-            suptitle = '{} (RA = {}, DEC = {})'.format(targname, args.ra, args.dec)
+            suptitle = '{} (RA = {}, DEC = {})'.format(targname, args['<ra>'], args['<dec>'])
         else:
-            suptitle = '{}'.format(targname, args.ra, args.dec)
+            suptitle = '{}'.format(targname, ra, dec)
         fig.suptitle(suptitle, fontsize=18)               
         fig.tight_layout()
         fig.subplots_adjust(top=0.88)
 
-        if args.save_plot is None:
+        if args['--save_plot'] is None:
             plt.show()
         else:
-            plt.savefig(args.save_plot)
+            plt.savefig(args['--save_plot'])
 
 
 def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
@@ -535,29 +548,3 @@ def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
         ax.set_ylabel("Available Position Angle (Degree)")
         ax.set_title(instrument_name)
         ax.fmt_xdata = DateFormatter('%Y-%m-%d')    
-
-if __name__ == '__main__':
-    try:
-        # see if there is a negative dec in sexagesimal coordinates
-        dec_index = [':' in arg and arg.startswith('-') for arg in sys.argv].index(True)
-        arg_list = sys.argv[1:]
-        dec = arg_list.pop(dec_index-1)
-        arg_list.append('--')
-        arg_list.append(dec)
-
-    except ValueError:
-        arg_list = sys.argv[1:]
-
-    parser = argparse.ArgumentParser(description='')
-    parser.add_argument('ra', help='Right Ascension of target in either sexagesimal (hh:mm:ss.s) or degrees')
-    parser.add_argument('dec', help='Declination of target in either sexagesimal (dd:mm:ss.s) or degrees')
-    parser.add_argument('--pa', help='Specify a desired Position Angle')
-    parser.add_argument('--save_plot', help='Path of file to save plot output')
-    parser.add_argument('--save_table', help='Path of file to save table output')
-    parser.add_argument('--instrument', help='If specified plot shows only windows for this instrument')
-    parser.add_argument('--name', help='Target Name to appear on plots')
-    parser.add_argument('--start_date', help='Start date for visibility search in yyyy-mm-dd format')
-    parser.add_argument('--end_date', help='End date for visibility search in yyyy-mm-dd format')
-    args = parser.parse_args(arg_list)
-
-    main(args)
