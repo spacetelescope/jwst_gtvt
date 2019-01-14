@@ -29,7 +29,6 @@ setup(
 
     # Author details
     author='Space Telescope Science Institute',
-    author_email='help@stsci.edu',
 
     # Choose your license
     license='BSD',
