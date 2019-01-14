@@ -191,6 +191,7 @@ def main():
         # symmetry with moving target ephemerides
         ra = np.repeat(ra, span * scale + 1)
         dec = np.repeat(dec, span * scale + 1)
+    
     elif args['moving']:
         name, ra, dec = get_target_ephemeris(args['<targname>'], args['--start_date'], args['--end_date'])
         assert len(ra) == span * scale + 1, "{} epochs retrieved for the moving target, but {} expected.".format(len(ra), span * scale + 1)
@@ -207,7 +208,7 @@ def main():
 
 
     if args['--v3pa'] is not None:
-        pa     = float(args['--v3pa']) * D2R
+        pa = float(args['--v3pa']) * D2R
     print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot, 
         Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
     if pa == "X":
