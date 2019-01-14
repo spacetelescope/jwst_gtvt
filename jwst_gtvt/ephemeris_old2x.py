@@ -10,6 +10,8 @@ import urllib
 from math import *
 from .rotationsx import *
 from . import astro_funcx as astro_func
+from astroquery.jplhorizons import Horizons
+import urllib
 
 D2R = pi/180.  #degrees to radians
 R2D = 180. / pi #radians to degrees 
@@ -24,94 +26,102 @@ obliquity_of_the_ecliptic *=  D2R
 Qecl2eci = QX(obliquity_of_the_ecliptic)
 
 
-
 class Ephemeris:
-    def __init__(self,afile,cnvrt=False):
+    def __init__(self,start_date,end_date,cnvrt=False):
         """Eph constructor, cnvrt True converts into Ecliptic frame """
         if cnvrt:
             print("Using Ecliptic Coordinates")
         else:
             print("Using Equatorial Coordinates")
-        self.datelist = []
-        self.xlist = []
-        self.ylist = []
-        self.zlist = []
-        self.amin=0.
-        self.amax=0.
-        aV = Vector(0.,0.,0.)
-        fin = open(afile,'r').readlines()
-        if afile.find("l2_halo_FDF_060619.trh")>-1:
-            ascale = 0.001
-        else:
-            ascale = 1.0
-        if afile.find("horizons_EM")>-1:
-            not_there = True
-            istart = 0
-            while fin[istart][:5] != "$$SOE":
-                if fin[istart].find('Center body name:') > -1: # Checks that the Sun is the central body!
-                    if fin[istart].find('Sun') > -1:
-                        not_there = False
-                    else:
-                        print(fin[istart])
-                istart += 1
-            istart += 1
-            if not_there:
-                print("This ephemeris does not use the Sun as the center body.  It should not be used.")
-                exit(-1)
+        
+        # aV = Vector(0.,0.,0.)
+        #######################################################################
+        obj = Horizons(id='jwst', id_type='id',  location=None, 
+                       epochs={'start':start_date, 'stop':end_date, 'step':'1d'})
+        
+        vectors = obj.vectors()
+
+        self.datelist = vectors['datetime_jd'] - 2400000.5
+        self.xlist = vectors['x']
+        self.ylist = vectors['y']
+        self.zlist = vectors['z']
+
+        self.amin = min(self.datelist)
+        self.amax = max(self.datelist)
+        
+        #######################################################################
+        # if afile.find("l2_halo_FDF_060619.trh")>-1:
+        #     ascale = 0.001
+        # else:
+        #     ascale = 1.0
+        # if afile.find("horizons_EM")>-1:
+        #     not_there = True
+        #     istart = 0
+        #     while fin[istart][:5].decode('utf-8') != "$$SOE":
+        #         if fin[istart].decode('utf-8').find('Center body name:') > -1: # Checks that the Sun is the central body!
+        #             if fin[istart].decode('utf-8').find('Sun') > -1:
+        #                 not_there = False
+        #             else:
+        #                 print(fin[istart])
+        #         istart += 1
+        #     istart += 1
+        #     if not_there:
+        #         print("This ephemeris does not use the Sun as the center body.  It should not be used.")
+        #         exit(-1)
                 
-            while fin[istart][:5] != "$$EOE":
-                item=fin[istart].strip()
-                item = item.split(',')
-                adate = float(item[0]) - 2400000.5  #represent dates as mjds
-                x = float(item[2])*ascale
-                y = float(item[3])*ascale
-                z = float(item[4])*ascale
-                if cnvrt:
-                    aV.set_eq(x,y,z)
-                    ll = aV.length()
-                    aV = aV/ll
-                    aV = Qecl2eci.inv_cnvrt(aV)
-                    aV = aV*ll
-                    x = aV.rx()
-                    y = aV.ry()
-                    z = aV.rz()
-                self.datelist.append(adate)
-                self.xlist.append(x)
-                self.ylist.append(y)
-                self.zlist.append(z)
-                if self.amin==0.:
-                    self.amin = adate
-                istart += 1
-        else:
-            for item in fin[2:]:
-                item=string.strip(item)
-                item = string.split(item)
-                adate = time2.mjd_from_string(item[0])  #represent dates as mjds
-                x = float(item[1])*ascale
-                y = float(item[2])*ascale
-                z = float(item[3])*ascale
-                if cnvrt:
-                    aV.set_eq(x,y,z)
-                    ll = aV.length()
-                    aV = aV/ll
-                    aV = Qecl2eci.inv_cnvrt(aV)
-                    aV = aV*ll
-                    x = aV.rx()
-                    y = aV.ry()
-                    z = aV.rz()
-                self.datelist.append(adate)
-                self.xlist.append(x)
-                self.ylist.append(y)
-                self.zlist.append(z)
-                if self.amin==0.:
-                    self.amin = adate 
-        self.amax = adate
+        #     while fin[istart][:5] != "$$EOE":
+        #         item=fin[istart].decode('utf-8').strip()
+        #         item = item.split(',')
+        #         adate = float(item[0]) - 2400000.5  #represent dates as mjds
+        #         x = float(item[2])*ascale
+        #         y = float(item[3])*ascale
+        #         z = float(item[4])*ascale
+        #         if cnvrt:
+        #             aV.set_eq(x,y,z)
+        #             ll = aV.length()
+        #             aV = aV/ll
+        #             aV = Qecl2eci.inv_cnvrt(aV)
+        #             aV = aV*ll
+        #             x = aV.rx()
+        #             y = aV.ry()
+        #             z = aV.rz()
+        #         self.datelist.append(adate)
+        #         self.xlist.append(x)
+        #         self.ylist.append(y)
+        #         self.zlist.append(z)
+        #         if self.amin==0.:
+        #             self.amin = adate
+        #         istart += 1
+        # else:
+        #     for item in fin[2:]:
+        #         item=string.strip(item)
+        #         item = string.split(item)
+        #         adate = time2.mjd_from_string(item[0])  #represent dates as mjds
+        #         x = float(item[1])*ascale
+        #         y = float(item[2])*ascale
+        #         z = float(item[3])*ascale
+        #         if cnvrt:
+        #             aV.set_eq(x,y,z)
+        #             ll = aV.length()
+        #             aV = aV/ll
+        #             aV = Qecl2eci.inv_cnvrt(aV)
+        #             aV = aV*ll
+        #             x = aV.rx()
+        #             y = aV.ry()
+        #             z = aV.rz()
+        #         self.datelist.append(adate)
+        #         self.xlist.append(x)
+        #         self.ylist.append(y)
+        #         self.zlist.append(z)
+        #         if self.amin==0.:
+        #             self.amin = adate 
+        # self.amax = adate
         ##yp = spline(xa,ya,0.,0.)
         #Saving spline parameters
         #self.xlistp = spline(self.datelist,self.xlist,1.e31,1.e31)
         #self.ylistp = spline(self.datelist,self.ylist,1.e31,1.e31)
         #self.zlistp = spline(self.datelist,self.zlist,1.e31,1.e31)
-        del fin
+        # del fin
         #print len(self.datelist),len(self.xlist),len(self.ylist),len(self.zlist)
         
     def report_ephemeris (self, limit=100000, pathname=None):
@@ -145,6 +155,7 @@ class Ephemeris:
         cal_days = adate - self.datelist[0]
         indx = int(cal_days)
         frac = cal_days - indx
+        len(self.xlist)
         x = (self.xlist[indx+1] - self.xlist[indx])*frac + self.xlist[indx]  
         y = (self.ylist[indx+1] - self.ylist[indx])*frac + self.ylist[indx]  
         z = (self.zlist[indx+1] - self.zlist[indx])*frac + self.zlist[indx]  

@@ -1,10 +1,11 @@
 #! /usr/bin/env python
 
-"""Get target information for target visibility tool
+"""Get target information for target visibility tool. This script creates the tables
+and plots that show a target visibility with JWST. This can be done for fixed or moving targets.
 
 Usage:
-  jwst_tvt moving <targname> [--start_date=<t0>] [--end_date=<t_end>] [--instrument=<inst>] [--save_table=<st>] [--save_plot=<sp>] [--v3pa=<pa>]
   jwst_tvt fixed <ra> <dec> <targname> [--start_date=<t0>] [--end_date=<t_end>] [--instrument=<inst>] [--save_table=<st>] [--save_plot=<sp>] [--v3pa=<pa>]
+  jwst_tvt moving <targname> [--start_date=<t0>] [--end_date=<t_end>] [--instrument=<inst>] [--save_table=<st>] [--save_plot=<sp>] [--v3pa=<pa>]
   
 Arguments:
   <targname>             Name of target
@@ -149,7 +150,8 @@ def main():
 
     ECL_FLAG = False
 
-    A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG)
+    
+    A_eph = EPH.Ephemeris(args['--start_date'], args['--end_date'], ECL_FLAG)
 
     search_start = Time(args['--start_date'], format='iso').mjd if args['--start_date'] is not None else 58849.0  #Jan 1, 2020
     search_end = Time(args['--end_date'], format='iso').mjd if args['--end_date'] is not None else 60309.0 # Dec 31, 2023
@@ -237,7 +239,8 @@ def main():
     iflip = False
 
     #Step througth the interval and find where target goes in/out of field of regard.
-    for i in range(1,span*scale+1):
+    # for i in range(1,span*scale+1):
+    for i in range(0,span*scale):
         adate = search_start + float(i)/float(scale)
         #iflag = A_eph.in_FOR(adate,ra,dec)
         if pa == "X":
