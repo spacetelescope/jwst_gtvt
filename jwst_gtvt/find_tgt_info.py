@@ -14,7 +14,7 @@ Options:
   -h --help              Show this screen.
   --version              Show version.
   --start_date=<t0>      Start time of observation [default: 2020-01-01]
-  --end_date=<t_end>     End time of observation [default: 2023-12-31]
+  --end_date=<t_end>     End time of observation [default: 2024-12-31]
   --instrument=<inst>    If specified plot shows only windows for this instrument.  Options: nircam, nirspec, niriss, miri, fgs, v3 (case insensitive).
   --save_table=<st>      Path of file to save table output.
   --save_plot=<sp>       Path of file to save plot output.
@@ -99,7 +99,7 @@ def allowed_max_vehicle_roll(sun_ra, sun_dec, ra, dec):
     max_vehicle_roll = math.asin(unit_limit(math.sin(sun_roll)/math.cos(vehicle_pitch)))
     return max_vehicle_roll
 
-def get_target_ephemeris(desg, start_date, end_date, smallbody=True):
+def get_target_ephemeris(desg, start_date, end_date):
     """Ephemeris from JPL/HORIZONS.
 
     smallbody : bool, optional
@@ -110,7 +110,7 @@ def get_target_ephemeris(desg, start_date, end_date, smallbody=True):
 
     """
 
-    obj = Horizons(id=desg, location='500@-170',
+    obj = Horizons(id=desg, location='500@-170', smallbody=True,
                    epochs={'start':start_date, 'stop':end_date,
                    'step':'1d'})
     
@@ -147,19 +147,16 @@ def main():
     NIS_V3IdlYang = -0.57
     MIRIM_FULL_V3IdlYang = 5.0152
     FGS1_FULL_V3IdlYang = -1.2508
-
-    ECL_FLAG = False
-
     
-    A_eph = EPH.Ephemeris(args['--start_date'], args['--end_date'], ECL_FLAG)
+    A_eph = EPH.Ephemeris(args['--start_date'], args['--end_date'])
 
     search_start = Time(args['--start_date'], format='iso').mjd if args['--start_date'] is not None else 58849.0  #Jan 1, 2020
-    search_end = Time(args['--end_date'], format='iso').mjd if args['--end_date'] is not None else 60309.0 # Dec 31, 2023
+    search_end = Time(args['--end_date'], format='iso').mjd if args['--end_date'] is not None else 60675.0 # Dec 31, 2024
 
-    if not (58849.0 <= search_start <= 60309.0) and args['--start_date'] is not None:
-        raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(args['--start_date'], '2020-01-01', '2023-12-31'))
-    if not (58849.0 <= search_end <= 60309.0) and args['--end_date'] is not None:
-        raise ValueError('End date {} outside of available ephemeris {} to {}'.format(args['--end_date'], '2020-01-01', '2023-12-31'))
+    if not (58849.0 <= search_start <= 60675.0) and args['--start_date'] is not None:
+        raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(args['--start_date'], '2020-01-01', '2024-12-31'))
+    if not (58849.0 <= search_end <= 60675.0) and args['--end_date'] is not None:
+        raise ValueError('End date {} outside of available ephemeris {} to {}'.format(args['--end_date'], '2020-01-01', '2024-12-31'))
     if search_start > search_end:
         raise ValueError('Start date {} should be before end date {}'.format(args['--start_date'], args['--end_date']))
 
@@ -170,23 +167,18 @@ def main():
     scale = 1  # Channging this value must be reflected in get_target_ephemeris
     span = int(search_end-search_start)
 
-
-    # if len(sys.argv) < 3:
-    #   print "proper usage:"
-    #   print "find_tgt_info.py ra dec [pa]"
-    #   print "finds full visibility windows over [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
-    #     Time(search_start+span/scale, format='mjd', out_subfmt='date').isot)
-    #   sys.exit(1)
-
     pa = 'X'
+
     if args['fixed']:
         name = args['<targname>']
-        if args['<ra>'].find(':')>-1:  #format is hh:mm:ss.s or  dd:mm:ss.s  
-          ra  = convert_ddmmss_to_float(args['<ra>']) * 15. * D2R
-          dec = convert_ddmmss_to_float(args['<dec>']) * D2R
-        else: #format is decimal
-          ra  = float(args['<ra>']) * D2R
-          dec = float(args['<dec>']) * D2R
+        # convert hh:mm:ss.s or dd:mm:ss.s to decimal  
+        if ':' in args['<ra>']:
+            ra  = convert_ddmmss_to_float(args['<ra>']) * 15. * D2R
+            dec = convert_ddmmss_to_float(args['<dec>']) * D2R
+        else:
+            # else, already in decimal format
+            ra  = float(args['<ra>']) * D2R
+            dec = float(args['<dec>']) * D2R
 
         # although the coordinates are fixed, we need an array for
         # symmetry with moving target ephemerides
@@ -195,6 +187,7 @@ def main():
     
     elif args['moving']:
         name, ra, dec = get_target_ephemeris(args['<targname>'], args['--start_date'], args['--end_date'])
+        # Why? Need to check assertion.
         assert len(ra) == span * scale + 1, "{} epochs retrieved for the moving target, but {} expected.".format(len(ra), span * scale + 1)
         ra = ra * D2R
         dec = dec * D2R
@@ -210,8 +203,10 @@ def main():
 
     if args['--v3pa'] is not None:
         pa = float(args['--v3pa']) * D2R
+    
     print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot, 
         Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
+    
     if pa == "X":
         iflag_old = A_eph.in_FOR(search_start,ra[0],dec[0])
         print("|           Window [days]                 |    Normal V3 PA [deg]    |", end='', file=table_output)
@@ -225,11 +220,13 @@ def main():
         print('{:^27s}|{:^27s}|'.format('RA', 'Dec'), file=table_output)
 
     print("   Start           End         Duration         Start         End    ", end='', file=table_output)
+    
     if args['fixed']:
         print("{:^13s} {:^13s}".format('RA', 'Dec'), file=table_output)
     else:
         print("{:^13s} {:^13s} {:^13s} {:^13s}".format('Start', 'End', 'Start', 'End'), file=table_output)
 
+    # Why?
     if iflag_old:
       twstart = search_start
       ra_start = ra[0]
@@ -238,17 +235,22 @@ def main():
       twstart = -1.
     iflip = False
 
-    #Step througth the interval and find where target goes in/out of field of regard.
-    # for i in range(1,span*scale+1):
+    ####################### Start Block 1 #######################
+
+    # i = time step. span = end_date - start_date
+
+    # Step througth the **time** interval and find where target goes in/out of field of regard.
     for i in range(0,span*scale):
         adate = search_start + float(i)/float(scale)
-        #iflag = A_eph.in_FOR(adate,ra,dec)
+
+        # pa = pitch angle
         if pa == "X":
             iflag = A_eph.in_FOR(adate,ra[i],dec[i])
         else:
             iflag = A_eph.is_valid(adate,ra[i],dec[i],pa)
+        
         if iflag != iflag_old:
-            iflip = True
+            iflip = True    
             if iflag:
                 if pa == "X":
                     twstart = A_eph.bisect_by_FOR(adate,adate-0.1,ra[i],dec[i])
@@ -261,18 +263,24 @@ def main():
                     wend = A_eph.bisect_by_FOR(adate-0.1,adate,ra[i],dec[i])
                 else:
                     wend = A_eph.bisect_by_attitude(adate-0.1,adate,ra[i],dec[i],pa)
+                
                 if twstart > 0.:
-                    wstart = twstart #Only set wstart if wend is valid
+                    wstart = twstart # Only set wstart if wend is valid
                     if pa == "X":
                         pa_start = A_eph.normal_pa(wstart,ra_start,dec_start)
                         pa_end   = A_eph.normal_pa(wend,ra[i],dec[i])
                     else:
                         pa_start = pa
                         pa_end = pa
+                    
                     ra_end = ra[i]
                     dec_end = dec[i]
+                    
                     print(window_summary_line(args['fixed'], wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end), file=table_output)
+            
             iflag_old = iflag
+        
+    ####################### End Block 1 #######################
 
     if iflip == True and iflag == True:
         if pa == "X":
@@ -281,6 +289,7 @@ def main():
         else:
             pa_start = pa
             pa_end = pa
+        
         print(window_summary_line(args['fixed'], twstart, adate, pa_start, pa_end, ra[i], ra[i], dec[i], dec[i]), file=table_output)
 
     if iflip == False and iflag == True and pa == "X":
