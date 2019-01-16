@@ -14,7 +14,7 @@ Options:
   -h --help              Show this screen.
   --version              Show version.
   --start_date=<t0>      Start time of observation [default: 2020-01-01]
-  --end_date=<t_end>     End time of observation [default: 2024-12-31]
+  --end_date=<t_end>     End time of observation [default: 2024-01-01]
   --instrument=<inst>    If specified plot shows only windows for this instrument.  Options: nircam, nirspec, niriss, miri, fgs, v3 (case insensitive).
   --save_table=<st>      Path of file to save table output.
   --save_plot=<sp>       Path of file to save plot output.
@@ -46,6 +46,7 @@ PI2 = 2. * math.pi   # 2 pi
 unit_limit = lambda x: min(max(-1.,x),1.) # forces value to be in [-1,1]
 
 def convert_ddmmss_to_float(astring):
+    # Maybe look into astropy.coordinates for conversion.
     aline = astring.split(':')
     d= float(aline[0])
     m= float(aline[1])

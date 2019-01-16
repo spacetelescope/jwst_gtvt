@@ -40,13 +40,15 @@ class Ephemeris:
         obj = Horizons(id='jwst', id_type='id',  location=None, 
                        epochs={'start':start_date, 'stop':end_date, 'step':'1d'})
         
-        vectors = obj.vectors()
-        au_to_km = 1.496e8
-
+        vectors = obj.vectors(refplane='earth')
+        
+        for position in ['x', 'y', 'z']:
+            vectors[position].convert_unit_to('km')
+        
         self.datelist = vectors['datetime_jd'] - 2400000.5
-        self.xlist = vectors['x'] * au_to_km
-        self.ylist = vectors['y'] * au_to_km
-        self.zlist = vectors['z'] * au_to_km
+        self.xlist = vectors['x']
+        self.ylist = vectors['y'] 
+        self.zlist = vectors['z']
 
         self.amin = min(self.datelist)
         self.amax = max(self.datelist)
