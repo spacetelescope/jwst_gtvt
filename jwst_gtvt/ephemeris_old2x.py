@@ -13,7 +13,7 @@ import urllib
 from .rotationsx import *
 from . import astro_funcx as astro_func
 
-from .jpl_horizons_monkey_patch import vectors_async_full
+from .jpl_horizons_patch import vectors_async_full
 
 D2R = pi/180.  # degrees to radians
 R2D = 180. / pi # radians to degrees 
@@ -40,6 +40,7 @@ class Ephemeris:
             Observation window max date in format YYYY-MM-DD
         """
 
+        # Patch for jplhorizons vectors class.
         HorizonsClass.vectors_async = vectors_async_full
         Horizons = HorizonsClass()
 
@@ -48,6 +49,7 @@ class Ephemeris:
         
         vectors = obj.vectors(refplane='earth')
         
+        # Convert units, the astroquery default is AU/day
         for position in ['x', 'y', 'z']:
             vectors[position].convert_unit_to('km')
         
