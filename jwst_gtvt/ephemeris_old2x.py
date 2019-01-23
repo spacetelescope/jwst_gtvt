@@ -2,7 +2,8 @@
 #Module ephemeris.py
 from __future__ import print_function
 
-from astroquery.jplhorizons import Horizons
+# from astroquery.jplhorizons import Horizons
+from astroquery.jplhorizons import HorizonsClass
 from math import *
 import numpy as np
 import urllib
@@ -11,6 +12,8 @@ import os
 import urllib
 from .rotationsx import *
 from . import astro_funcx as astro_func
+
+from .jpl_horizons_monkey_patch import vectors_async_full
 
 D2R = pi/180.  # degrees to radians
 R2D = 180. / pi # radians to degrees 
@@ -37,6 +40,9 @@ class Ephemeris:
             Observation window max date in format YYYY-MM-DD
         """
 
+        HorizonsClass.vectors_async = vectors_async_full
+        Horizons = HorizonsClass()
+
         obj = Horizons(id='jwst', id_type='id',  location=None, 
                        epochs={'start':start_date, 'stop':end_date, 'step':'1d'})
         
@@ -55,12 +61,13 @@ class Ephemeris:
 
 
     def pos(self,adate):
-        """Get positions
+        """Get positions of JWST at a specific time step.
         """
-        cal_days = adate - self.datelist[0]
-        indx = int(cal_days)
-        frac = cal_days - indx
+        cal_days = adate - self.datelist[0] # [time]
+        indx = int(cal_days) # [time]
+        frac = cal_days - indx # [time]
 
+        # Stepping position as a function of time (dx*t + x)?
         x = (self.xlist[indx+1] - self.xlist[indx])*frac + self.xlist[indx]  
         y = (self.ylist[indx+1] - self.ylist[indx])*frac + self.ylist[indx]  
         z = (self.zlist[indx+1] - self.zlist[indx])*frac + self.zlist[indx]  
@@ -81,7 +88,6 @@ class Ephemeris:
     def sun_pos(self,adate):
         """Calculate the sun's position?
         """
-        
         Vsun = self.Vsun_pos(adate)
         
         coord2 = np.arcsin(Vsun[2])
