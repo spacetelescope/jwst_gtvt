@@ -68,6 +68,7 @@ setup(
          'numpy',
          'astropy',
          'matplotlib',
+         'astroquery',
      ],
 
     # List additional groups of dependencies here (e.g. development

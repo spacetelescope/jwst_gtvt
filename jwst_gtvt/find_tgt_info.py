@@ -7,6 +7,7 @@ import math
 from . import ephemeris_old2x as EPH
 
 import argparse
+from astroquery.jplhorizons import Horizons
 import warnings
 import matplotlib.pyplot as plt
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
@@ -78,7 +79,7 @@ def allowed_max_vehicle_roll(sun_ra, sun_dec, ra, dec):
     max_vehicle_roll = math.asin(unit_limit(math.sin(sun_roll)/math.cos(vehicle_pitch)))
     return max_vehicle_roll
 
-def get_target_ephemeris(desg, start_date, end_date, smallbody=True):
+def get_target_ephemeris(desg, start_date, end_date, smallbody=False):
     """Ephemeris from JPL/HORIZONS.
 
     smallbody : bool, optional
@@ -89,26 +90,19 @@ def get_target_ephemeris(desg, start_date, end_date, smallbody=True):
 
     """
 
-    from urllib.request import urlopen
+    if smallbody:
+        bodytype='smallbody'
+    else:
+        bodytype='majorbody'
+
+    obj = Horizons(id=desg, location='500@-170', id_type=bodytype,
+                   epochs={'start':start_date, 'stop':end_date,
+                   'step':'1d'})
     
-    try:
-        import callhorizons
-    except ImportError:
-        print("The callhorizons module cannot be loaded.  It is required for moving targets.")
-        sys.exit(1)
+    eph = obj.ephemerides()
 
-    # cap: current apparition (for comets)
-    q = callhorizons.query(desg, smallbody=smallbody, cap=True)
-    q.set_epochrange(start_date, end_date, '1d')  # 1 day step size
-    try:
-        n = q.get_ephemerides('@jwst')
-    except ValueError as e:
-        with urlopen(q.url) as horizons:
-            err = horizons.read().decode()
-
-        raise ValueError('Error retrieving ephemeris for "{}".  URL: {}\n{}'.format(desg, q.url, err))
+    return eph['targetname'][0], eph['RA'], eph['DEC']
         
-    return q['targetname'][0], q['RA'], q['DEC']
 
 def window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end, cvz=False):
     """Formats window summary data for fixed and moving targets."""
