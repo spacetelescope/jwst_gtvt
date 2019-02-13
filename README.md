@@ -14,9 +14,7 @@ This tool requires a few packages all of which are included in the Anaconda pyth
 
 * AstroPy
 
-For optional moving target support:
-
-* [callhorizons](https://pypi.python.org/pypi/CALLHORIZONS)
+* Astroquery (For moving target support)
 
 # Installation
 
