@@ -183,8 +183,8 @@ def main(args, fixed=True):
     print("", file=table_output)
 
 
-    if v3pa is not None:
-        pa     = float(v3pa) * D2R
+    if args.v3pa is not None:
+        pa     = float(args.v3pa) * D2R
     print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
         Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
     if pa == "X":
@@ -485,32 +485,29 @@ def main(args, fixed=True):
 
 
 def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_table=None, v3pa=None, fixed=True):
-    """ getting the table.
-
-    autoreload test
+    """ Returns a table object with the PAs where the target is visible.
 
     parameters
     ----------
     ra : str
-        right ascension
+        Right Ascension
     dec : str
-        declination
+        Declination
     instrument : str
-        the instrument you wanna find the PAs for. can either be:
-        v3, nircam, miri, nirspec, niriss, fgs
+        Any of the JWST instruments
     start_date : float
     end_date : float
     save_table : str
         path of file to save plot output
     v3pa : str
-        the position angle of JWST i guess?
+        The position angle of the V3 axis.
     fixed : bool
-        whether or not the target is fixed. default = True
+        Whether or not the target is fixed. default = True
 
 
     returns
     -------
-    table
+    astropy.table Table object
     """
     table_output=None
     if save_table is not None:
