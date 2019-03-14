@@ -78,15 +78,12 @@ def allowed_max_vehicle_roll(sun_ra, sun_dec, ra, dec):
     max_vehicle_roll = math.asin(unit_limit(math.sin(sun_roll)/math.cos(vehicle_pitch)))
     return max_vehicle_roll
 
-def get_target_ephemeris(desg, start_date, end_date, smallbody=True):
+def get_target_ephemeris(desg, start_date, end_date, smallbody=False):
     """Ephemeris from JPL/HORIZONS.
-
     smallbody : bool, optional
       Set to `True` for comets and asteroids, `False` for planets,
       spacecraft, or moons.
-
     Returns : target name from HORIZONS, RA, and Dec.
-
     """
 
     if smallbody:
