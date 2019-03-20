@@ -21,7 +21,7 @@ warnings.filterwarnings('ignore', category=UserWarning, append=True)
 warnings.filterwarnings('ignore', category=RuntimeWarning, append=True)
 
 D2R = math.pi / 180.  #degrees to radians
-R2D = 180. / math.pi #radians to degrees 
+R2D = 180. / math.pi #radians to degrees
 PI2 = 2. * math.pi   # 2 pi
 unit_limit = lambda x: min(max(-1.,x),1.) # forces value to be in [-1,1]
 
@@ -81,13 +81,10 @@ def allowed_max_vehicle_roll(sun_ra, sun_dec, ra, dec):
 
 def get_target_ephemeris(desg, start_date, end_date, smallbody=False):
     """Ephemeris from JPL/HORIZONS.
-
     smallbody : bool, optional
       Set to `True` for comets and asteroids, `False` for planets,
       spacecraft, or moons.
-
     Returns : target name from HORIZONS, RA, and Dec.
-
     """
 
     if smallbody:
@@ -98,11 +95,11 @@ def get_target_ephemeris(desg, start_date, end_date, smallbody=False):
     obj = Horizons(id=desg, location='500@-170', id_type=bodytype,
                    epochs={'start':start_date, 'stop':end_date,
                    'step':'1d'})
-    
+
     eph = obj.ephemerides()
 
     return eph['targetname'][0], eph['RA'], eph['DEC']
-        
+
 
 def window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end, cvz=False):
     """Formats window summary data for fixed and moving targets."""
@@ -124,7 +121,7 @@ def main(args, fixed=True):
     table_output=None
     if args.save_table is not None:
         table_output = open(args.save_table, 'w')
-        
+
     NRCALL_FULL_V2IdlYang = -0.0265
     NRS_FULL_MSA_V3IdlYang = 137.4874
     NIS_V3IdlYang = -0.57
@@ -163,7 +160,7 @@ def main(args, fixed=True):
 
     pa = 'X'
     if fixed:
-        if args.ra.find(':')>-1:  #format is hh:mm:ss.s or  dd:mm:ss.s  
+        if args.ra.find(':')>-1:  #format is hh:mm:ss.s or  dd:mm:ss.s
           ra  = convert_ddmmss_to_float(args.ra) * 15. * D2R
           dec   = convert_ddmmss_to_float(args.dec) * D2R
         else: #format is decimal
@@ -190,7 +187,7 @@ def main(args, fixed=True):
 
     if args.v3pa is not None:
         pa     = float(args.v3pa) * D2R
-    print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot, 
+    print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
         Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
     if pa == "X":
         iflag_old = A_eph.in_FOR(search_start,ra[0],dec[0])
@@ -294,7 +291,7 @@ def main(args, fixed=True):
         maxV3PA_data = []
         minNIRCam_PA_data = []
         maxNIRCam_PA_data = []
-        minNIRSpec_PA_data = [] 
+        minNIRSpec_PA_data = []
         maxNIRSpec_PA_data = []
         minNIRISS_PA_data = []
         maxNIRISS_PA_data = []
@@ -312,12 +309,12 @@ def main(args, fixed=True):
                 if not tgt_is_in:
                     print("", file=table_output)
                 tgt_is_in = True
-                
+
                 V3PA = A_eph.normal_pa(atime,ra[i],dec[i])*R2D
                 (sun_ra, sun_dec) = A_eph.sun_pos(atime)
                 max_boresight_roll = allowed_max_vehicle_roll(sun_ra, sun_dec, ra[i], dec[i]) * R2D
                 #sun_ang = angular_sep(sun_ra, sun_dec, ra, dec) * R2D
-                
+
                 minV3PA = bound_angle(V3PA - max_boresight_roll)
                 maxV3PA = bound_angle(V3PA + max_boresight_roll)
                 minNIRCam_PA = bound_angle(V3PA - max_boresight_roll + NRCALL_FULL_V2IdlYang)
@@ -336,14 +333,14 @@ def main(args, fixed=True):
                 maxV3PA_data.append(maxV3PA)
                 minNIRCam_PA_data.append(minNIRCam_PA)
                 maxNIRCam_PA_data.append(maxNIRCam_PA)
-                minNIRSpec_PA_data.append(minNIRSpec_PA) 
+                minNIRSpec_PA_data.append(minNIRSpec_PA)
                 maxNIRSpec_PA_data.append(maxNIRSpec_PA)
                 minNIRISS_PA_data.append(minNIRISS_PA)
                 maxNIRISS_PA_data.append(maxNIRISS_PA)
                 minMIRI_PA_data.append(minMIRI_PA)
                 maxMIRI_PA_data.append(maxMIRI_PA)
                 minFGS_PA_data.append(minFGS_PA)
-                maxFGS_PA_data.append(maxFGS_PA)            
+                maxFGS_PA_data.append(maxFGS_PA)
                 #print '%7.1f %6.2f %6.2f %6.2f' % (atime, V3PA, NIRCam_PA, NIRSpec_PA)
                 fmt = '{}' + '   {:6.2f} {:6.2f}'*fmt_repeats
                 if fixed:
@@ -363,7 +360,7 @@ def main(args, fixed=True):
                 maxV3PA_data.append(np.nan)
                 minNIRCam_PA_data.append(np.nan)
                 maxNIRCam_PA_data.append(np.nan)
-                minNIRSpec_PA_data.append(np.nan) 
+                minNIRSpec_PA_data.append(np.nan)
                 maxNIRSpec_PA_data.append(np.nan)
                 minNIRISS_PA_data.append(np.nan)
                 maxNIRISS_PA_data.append(np.nan)
@@ -372,11 +369,11 @@ def main(args, fixed=True):
                 minFGS_PA_data.append(np.nan)
                 maxFGS_PA_data.append(np.nan)
 
-        tab = Table([times, minV3PA_data, maxV3PA_data, minNIRCam_PA_data, maxNIRCam_PA_data, 
-            minNIRSpec_PA_data, maxNIRSpec_PA_data, minNIRISS_PA_data, maxNIRISS_PA_data, 
-            minMIRI_PA_data, maxMIRI_PA_data, minFGS_PA_data, maxFGS_PA_data], 
-            names=('Date', 'V3PA min', 'V3PA max', 'NIRCam min', 'NIRCam max', 
-                'NIRSpec min', 'NIRSpec max', 'NIRISS min', 'NIRISS max', 
+        tab = Table([times, minV3PA_data, maxV3PA_data, minNIRCam_PA_data, maxNIRCam_PA_data,
+            minNIRSpec_PA_data, maxNIRSpec_PA_data, minNIRISS_PA_data, maxNIRISS_PA_data,
+            minMIRI_PA_data, maxMIRI_PA_data, minFGS_PA_data, maxFGS_PA_data],
+            names=('Date', 'V3PA min', 'V3PA max', 'NIRCam min', 'NIRCam max',
+                'NIRSpec min', 'NIRSpec max', 'NIRISS min', 'NIRISS max',
                 'MIRI min', 'MIRI max', 'FGS min', 'FGS max'))
 
         # Plot observing windows
@@ -470,7 +467,7 @@ def main(args, fixed=True):
             fig, ax = plt.subplots(figsize=(14,8))
             plot_single_instrument(ax, 'FGS', times, minFGS_PA_data, maxFGS_PA_data)
             ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-        
+
         if args.name is not None:
             targname = args.name
         else:
@@ -479,7 +476,7 @@ def main(args, fixed=True):
             suptitle = '{} (RA = {}, DEC = {})'.format(targname, args.ra, args.dec)
         else:
             suptitle = '{}'.format(targname, args.ra, args.dec)
-        fig.suptitle(suptitle, fontsize=18)               
+        fig.suptitle(suptitle, fontsize=18)
         fig.tight_layout()
         fig.subplots_adjust(top=0.88)
 
@@ -487,6 +484,322 @@ def main(args, fixed=True):
             plt.show()
         else:
             plt.savefig(args.save_plot)
+
+
+def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_table=None, v3pa=None, fixed=True):
+    """ Returns a table object with the PAs where the target is visible.
+
+    parameters
+    ----------
+    ra : str
+        Right Ascension
+    dec : str
+        Declination
+    instrument : str
+        Any of the JWST instruments
+    start_date : float
+    end_date : float
+    save_table : str
+        path of file to save plot output
+    v3pa : str
+        The position angle of the V3 axis.
+    fixed : bool
+        Whether or not the target is fixed. default = True
+
+
+    returns
+    -------
+    astropy.table Table object
+    """
+    table_output=None
+    if save_table is not None:
+        table_output = open(save_table, 'w')
+
+    NRCALL_FULL_V2IdlYang  = -0.0265
+    NRS_FULL_MSA_V3IdlYang = 137.4874
+    NIS_V3IdlYang          = -0.57
+    MIRIM_FULL_V3IdlYang   = 5.0152
+    FGS1_FULL_V3IdlYang    = -1.2508
+
+    ECL_FLAG = False
+
+    A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG)
+
+    search_start = Time(start_date, format='iso').mjd if start_date is not None else 58849.0  #Jan 1, 2020
+    search_end = Time(end_date, format='iso').mjd if end_date is not None else 60309.0 # Dec 31, 2023
+
+    if not (58849.0 <= search_start <= 60309.0) and start_date is not None:
+        raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(start_date, '2020-01-01', '2023-12-31'))
+    if not (58849.0 <= search_end <= 60309.0) and end_date is not None:
+        raise ValueError('End date {} outside of available ephemeris {} to {}'.format(end_date, '2020-01-01', '2023-12-31'))
+    if search_start > search_end:
+        raise ValueError('Start date {} should be before end date {}'.format(start_date, end_date))
+
+    if search_start < A_eph.amin:
+        print("Warning, search start time is earlier than ephemeris start.", file=table_output)
+        search_start = A_eph.amin + 1
+
+    scale = 1  # Channging this value must be reflected in get_target_ephemeris
+    span = int(search_end-search_start)
+
+
+    # if len(sys.argv) < 3:
+    #   print "proper usage:"
+    #   print "find_tgt_info.py ra dec [pa]"
+    #   print "finds full visibility windows over [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
+    #     Time(search_start+span/scale, format='mjd', out_subfmt='date').isot)
+    #   sys.exit(1)
+
+
+    pa = 'X'
+
+    if ra.find(':')>-1:  #format is hh:mm:ss.s or  dd:mm:ss.s
+      ra  = convert_ddmmss_to_float(ra) * 15. * D2R
+      dec   = convert_ddmmss_to_float(dec) * D2R
+    else: #format is decimal
+      ra  = float(ra) * D2R
+      dec   = float(dec) * D2R
+
+    # although the coordinates are fixed, we need an array for
+    # symmetry with moving target ephemerides
+    ra = np.repeat(ra, span * scale + 1)
+    dec = np.repeat(dec, span * scale + 1)
+
+
+    print("", file=table_output)
+    print("       Target", file=table_output)
+    if fixed:
+        print("                ecliptic", file=table_output)
+        print("RA      Dec     latitude", file=table_output)
+        print("%7.3f %7.3f %7.3f" % (ra[0]*R2D,dec[0]*R2D,calc_ecliptic_lat(ra[0], dec[0])*R2D), file=table_output)
+    print("", file=table_output)
+
+
+    if v3pa is not None:
+        pa     = float(v3pa) * D2R
+    print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
+        Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
+    if pa == "X":
+        iflag_old = A_eph.in_FOR(search_start,ra[0],dec[0])
+        print("|           Window [days]                 |    Normal V3 PA [deg]    |", end='', file=table_output)
+    else:
+        iflag_old = A_eph.is_valid(search_start,ra[0],dec[0],pa)
+        print("|           Window [days]                 |   Specified V3 PA [deg]  |", end='', file=table_output)
+
+    if fixed:
+        print('\n', end='', file=table_output)
+    else:
+        print('{:^27s}|{:^27s}|'.format('RA', 'Dec'), file=table_output)
+
+    print("   Start           End         Duration         Start         End    ", end='', file=table_output)
+    if fixed:
+        print("{:^13s} {:^13s}".format('RA', 'Dec'), file=table_output)
+    else:
+        print("{:^13s} {:^13s} {:^13s} {:^13s}".format('Start', 'End', 'Start', 'End'), file=table_output)
+
+    if iflag_old:
+      twstart = search_start
+      ra_start = ra[0]
+      dec_start = dec[0]
+    else:
+      twstart = -1.
+    iflip = False
+
+    #Step througth the interval and find where target goes in/out of field of regard.
+    for i in range(1,span*scale+1):
+        adate = search_start + float(i)/float(scale)
+        #iflag = A_eph.in_FOR(adate,ra,dec)
+        if pa == "X":
+            iflag = A_eph.in_FOR(adate,ra[i],dec[i])
+        else:
+            iflag = A_eph.is_valid(adate,ra[i],dec[i],pa)
+        if iflag != iflag_old:
+            iflip = True
+            if iflag:
+                if pa == "X":
+                    twstart = A_eph.bisect_by_FOR(adate,adate-0.1,ra[i],dec[i])
+                else:
+                    twstart = A_eph.bisect_by_attitude(adate,adate-0.1,ra[i],dec[i],pa)
+                ra_start = ra[i]
+                dec_start = dec[i]
+            else:
+                if pa == "X":
+                    wend = A_eph.bisect_by_FOR(adate-0.1,adate,ra[i],dec[i])
+                else:
+                    wend = A_eph.bisect_by_attitude(adate-0.1,adate,ra[i],dec[i],pa)
+                if twstart > 0.:
+                    wstart = twstart #Only set wstart if wend is valid
+                    if pa == "X":
+                        pa_start = A_eph.normal_pa(wstart,ra_start,dec_start)
+                        pa_end   = A_eph.normal_pa(wend,ra[i],dec[i])
+                    else:
+                        pa_start = pa
+                        pa_end = pa
+                    ra_end = ra[i]
+                    dec_end = dec[i]
+                    print(window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end), file=table_output)
+            iflag_old = iflag
+
+    if iflip == True and iflag == True:
+        if pa == "X":
+            pa_start = A_eph.normal_pa(twstart,ra[i],dec[i])
+            pa_end   = A_eph.normal_pa(adate,ra[i],dec[i])
+        else:
+            pa_start = pa
+            pa_end = pa
+        print(window_summary_line(fixed, twstart, adate, pa_start, pa_end, ra[i], ra[i], dec[i], dec[i]), file=table_output)
+
+    if iflip == False and iflag == True and pa == "X":
+        if dec[i] >0.:
+            print(window_summary_line(fixed, 0, 0, 2 * np.pi, 0, ra[0], ra[-1], dec[0], dec[-1], cvz=True), file=table_output)
+        else:
+            print(window_summary_line(fixed, 0, 0, 0, 2 * np.pi, ra[0], ra[-1], dec[0], dec[-1], cvz=True), file=table_output)
+
+    if 1==1:
+        wstart = search_start
+        wend = wstart + span
+        istart = int(wstart)
+        iend = int(wend)
+        iflag = A_eph.in_FOR(wstart,ra[0],dec[0])
+        tgt_is_in = False
+        if iflag:
+          tgt_is_in = True
+
+        print("", file=table_output)
+        print("", file=table_output)
+        if fixed:
+            fmt_repeats = 6
+            print("                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
+            print("   Date      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
+                  #58849.0 264.83 275.18 264.80 264.80  42.32  42.32 264.26 264.26 269.84 269.84 263.58 263.58
+        else:
+            fmt_repeats = 7
+            print("                                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
+            print("   Date      RA     Dec      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
+        times = []
+        V3PA_data = []
+        minV3PA_data = []
+        maxV3PA_data = []
+        minNIRCam_PA_data = []
+        maxNIRCam_PA_data = []
+        minNIRSpec_PA_data = []
+        maxNIRSpec_PA_data = []
+        minNIRISS_PA_data = []
+        maxNIRISS_PA_data = []
+        minMIRI_PA_data = []
+        maxMIRI_PA_data = []
+        minFGS_PA_data = []
+        maxFGS_PA_data = []
+
+        nomNIRCam_PA_data = []
+        nomNIRSpec_PA_data = []
+        nomNIRISS_PA_data = []
+        nomMIRI_PA_data = []
+        nomFGS_PA_data = []
+
+        for itime in range(istart,iend):
+            atime = float(itime)
+            i = int((atime - search_start) * float(scale))
+            iflag = A_eph.in_FOR(atime,ra[i],dec[i])
+            #print atime,A_eph.in_FOR(atime,ra,dec)
+            if iflag:
+                if not tgt_is_in:
+                    print("", file=table_output)
+                tgt_is_in = True
+
+                V3PA = A_eph.normal_pa(atime,ra[i],dec[i])*R2D
+                (sun_ra, sun_dec) = A_eph.sun_pos(atime)
+                max_boresight_roll = allowed_max_vehicle_roll(sun_ra, sun_dec, ra[i], dec[i]) * R2D
+                #sun_ang = angular_sep(sun_ra, sun_dec, ra, dec) * R2D
+
+                minV3PA = bound_angle(V3PA - max_boresight_roll)
+                maxV3PA = bound_angle(V3PA + max_boresight_roll)
+                minNIRCam_PA = bound_angle(V3PA - max_boresight_roll + NRCALL_FULL_V2IdlYang)
+                maxNIRCam_PA = bound_angle(V3PA + max_boresight_roll + NRCALL_FULL_V2IdlYang)
+                minNIRSpec_PA = bound_angle(V3PA - max_boresight_roll + NRS_FULL_MSA_V3IdlYang)
+                maxNIRSpec_PA = bound_angle(V3PA + max_boresight_roll + NRS_FULL_MSA_V3IdlYang)
+                minNIRISS_PA = bound_angle(V3PA - max_boresight_roll + NIS_V3IdlYang)
+                maxNIRISS_PA = bound_angle(V3PA + max_boresight_roll + NIS_V3IdlYang)
+                minMIRI_PA = bound_angle(V3PA - max_boresight_roll + MIRIM_FULL_V3IdlYang)
+                maxMIRI_PA = bound_angle(V3PA + max_boresight_roll + MIRIM_FULL_V3IdlYang)
+                minFGS_PA = bound_angle(V3PA - max_boresight_roll + FGS1_FULL_V3IdlYang)
+                maxFGS_PA = bound_angle(V3PA + max_boresight_roll + FGS1_FULL_V3IdlYang)
+
+                nomNIRCam_PA = bound_angle(V3PA + NRCALL_FULL_V2IdlYang)
+                nomNIRSpec_PA = bound_angle(V3PA + NRS_FULL_MSA_V3IdlYang)
+                nomNIRISS_PA = bound_angle(V3PA + NIS_V3IdlYang)
+                nomMIRI_PA = bound_angle(V3PA + MIRIM_FULL_V3IdlYang)
+                nomFGS_PA = bound_angle(V3PA + FGS1_FULL_V3IdlYang)
+
+                times.append(Time(atime, format='mjd').datetime)
+                V3PA_data.append(V3PA)
+                minV3PA_data.append(minV3PA)
+                maxV3PA_data.append(maxV3PA)
+                minNIRCam_PA_data.append(minNIRCam_PA)
+                maxNIRCam_PA_data.append(maxNIRCam_PA)
+                minNIRSpec_PA_data.append(minNIRSpec_PA)
+                maxNIRSpec_PA_data.append(maxNIRSpec_PA)
+                minNIRISS_PA_data.append(minNIRISS_PA)
+                maxNIRISS_PA_data.append(maxNIRISS_PA)
+                minMIRI_PA_data.append(minMIRI_PA)
+                maxMIRI_PA_data.append(maxMIRI_PA)
+                minFGS_PA_data.append(minFGS_PA)
+                maxFGS_PA_data.append(maxFGS_PA)
+
+                nomNIRCam_PA_data.append(nomNIRCam_PA)
+                nomNIRSpec_PA_data.append(nomNIRSpec_PA)
+                nomNIRISS_PA_data.append(nomNIRISS_PA)
+                nomMIRI_PA_data.append(nomMIRI_PA)
+                nomFGS_PA_data.append(nomFGS_PA)
+                #print '%7.1f %6.2f %6.2f %6.2f' % (atime, V3PA, NIRCam_PA, NIRSpec_PA)
+                fmt = '{}' + '   {:6.2f} {:6.2f}'*fmt_repeats
+                if fixed:
+                    print(fmt.format(
+                        Time(atime, format='mjd', out_subfmt='date').isot, V3PA, minV3PA, maxV3PA,
+                        nomNIRCam_PA, minNIRCam_PA, maxNIRCam_PA, nomNIRSpec_PA, minNIRSpec_PA, maxNIRSpec_PA,
+                        nomNIRISS_PA, minNIRISS_PA, maxNIRISS_PA, nomMIRI_PA, minMIRI_PA, maxMIRI_PA,
+                        nomFGS_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
+                else:
+                    print(fmt.format(
+                        Time(atime, format='mjd', out_subfmt='date').isot, ra[i]*R2D, dec[i]*R2D, V3PA, minV3PA, maxV3PA,
+                        nomNIRCam_PA, minNIRCam_PA, maxNIRCam_PA, nomNIRSpec_PA, minNIRSpec_PA, maxNIRSpec_PA,
+                        nomNIRISS_PA, minNIRISS_PA, maxNIRISS_PA, nomMIRI_PA, minMIRI_PA, maxMIRI_PA,
+                        nomFGS_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
+            else:
+                tgt_is_in = False
+                times.append(Time(atime, format='mjd').datetime)
+                V3PA_data.append(np.nan)
+                minV3PA_data.append(np.nan)
+                maxV3PA_data.append(np.nan)
+                minNIRCam_PA_data.append(np.nan)
+                maxNIRCam_PA_data.append(np.nan)
+                minNIRSpec_PA_data.append(np.nan)
+                maxNIRSpec_PA_data.append(np.nan)
+                minNIRISS_PA_data.append(np.nan)
+                maxNIRISS_PA_data.append(np.nan)
+                minMIRI_PA_data.append(np.nan)
+                maxMIRI_PA_data.append(np.nan)
+                minFGS_PA_data.append(np.nan)
+                maxFGS_PA_data.append(np.nan)
+
+                nomNIRCam_PA_data.append(np.nan)
+                nomNIRSpec_PA_data.append(np.nan)
+                nomNIRISS_PA_data.append(np.nan)
+                nomMIRI_PA_data.append(np.nan)
+                nomFGS_PA_data.append(np.nan)
+
+
+        tab = Table([times, V3PA_data, minV3PA_data, maxV3PA_data, nomNIRCam_PA_data, minNIRCam_PA_data, maxNIRCam_PA_data,
+            nomNIRSpec_PA_data, minNIRSpec_PA_data, maxNIRSpec_PA_data, nomNIRISS_PA_data, minNIRISS_PA_data, maxNIRISS_PA_data,
+            nomMIRI_PA_data, minMIRI_PA_data, maxMIRI_PA_data, nomFGS_PA_data, minFGS_PA_data, maxFGS_PA_data],
+            names=('Date', 'V3PA', 'V3PA min', 'V3PA max', 'NIRCam nom', 'NIRCam min', 'NIRCam max',
+                'NIRSpec nom', 'NIRSpec min', 'NIRSpec max', 'NIRISS nom', 'NIRISS min', 'NIRISS max',
+                'MIRI nom', 'MIRI min', 'MIRI max', 'FGS nom', 'FGS min', 'FGS max'))
+
+    return tab
+
+
+
 
 
 def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
@@ -498,7 +811,7 @@ def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
     if np.any(min_pa > max_pa):
         minpa_lt_maxpa = min_pa < max_pa
         minpa_gt_maxpa = min_pa > max_pa
-        
+
         max_pa_upper = np.copy(max_pa)
         min_pa_upper = np.copy(min_pa)
         max_pa_upper[minpa_gt_maxpa] = 360
@@ -520,14 +833,14 @@ def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
         ax.fill_between(t, min_pa, max_pa, edgecolor='.7', facecolor='.7', lw=2)
         ax.set_ylabel("Available Position Angle (Degree)")
         ax.set_title(instrument_name)
-        ax.fmt_xdata = DateFormatter('%Y-%m-%d')    
+        ax.fmt_xdata = DateFormatter('%Y-%m-%d')
 
 
     else:
         ax.fill_between(t, min_pa, max_pa, edgecolor='none', facecolor='.7')
         ax.set_ylabel("Available Position Angle (Degree)")
         ax.set_title(instrument_name)
-        ax.fmt_xdata = DateFormatter('%Y-%m-%d')    
+        ax.fmt_xdata = DateFormatter('%Y-%m-%d')
 
 if __name__ == '__main__':
     try:
