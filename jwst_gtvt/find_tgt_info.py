@@ -7,6 +7,7 @@ import math
 from . import ephemeris_old2x as EPH
 
 import argparse
+from astroquery.jplhorizons import Horizons
 import warnings
 import matplotlib.pyplot as plt
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
@@ -98,6 +99,7 @@ def get_target_ephemeris(desg, start_date, end_date, smallbody=False):
     eph = obj.ephemerides()
 
     return eph['targetname'][0], eph['RA'], eph['DEC']
+
 
 def window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end, cvz=False):
     """Formats window summary data for fixed and moving targets."""

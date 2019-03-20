@@ -29,7 +29,6 @@ setup(
 
     # Author details
     author='Space Telescope Science Institute',
-    author_email='help@stsci.edu',
 
     # Choose your license
     license='BSD',
@@ -69,6 +68,7 @@ setup(
          'numpy',
          'astropy',
          'matplotlib',
+         'astroquery',
      ],
 
     # List additional groups of dependencies here (e.g. development

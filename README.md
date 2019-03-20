@@ -2,6 +2,7 @@
 
 JWST requires shielding from the sun for operation, which limits the available position angles observable at a given time.  
 This script calculates the allowed position angle for a given Right Ascension and Declination for each instrument on the telescope.
+To report any issues, please use the JWST help portal https://jwsthelp.stsci.edu 
 
 # Dependencies
 
@@ -13,9 +14,7 @@ This tool requires a few packages all of which are included in the Anaconda pyth
 
 * AstroPy
 
-For optional moving target support:
-
-* [callhorizons](https://pypi.python.org/pypi/CALLHORIZONS)
+* Astroquery (For moving target support)
 
 # Installation
 
