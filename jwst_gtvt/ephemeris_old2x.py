@@ -2,10 +2,13 @@
 #Module ephemeris.py
 from __future__ import print_function
 
-import sys
-#import time
-#import time_extensionsx as time2
+from astroquery.jplhorizons import Horizons
 from math import *
+import numpy as np
+import urllib
+import sys
+import os
+import urllib
 from .rotationsx import *
 from . import astro_funcx as astro_func
 
@@ -22,95 +25,34 @@ obliquity_of_the_ecliptic *=  D2R
 Qecl2eci = QX(obliquity_of_the_ecliptic)
 
 
-
 class Ephemeris:
-    def __init__(self,afile,cnvrt=False):
-        """Eph constructor, cnvrt True converts into Ecliptic frame """
-        if cnvrt:
-            print("Using Ecliptic Coordinates")
-        else:
-            print("Using Equatorial Coordinates")
-        self.datelist = []
-        self.xlist = []
-        self.ylist = []
-        self.zlist = []
-        self.amin=0.
-        self.amax=0.
-        aV = Vector(0.,0.,0.)
-        fin = open(afile,'r').readlines()
-        if afile.find("l2_halo_FDF_060619.trh")>-1:
-            ascale = 0.001
-        else:
-            ascale = 1.0
-        if afile.find("horizons_EM")>-1:
-            not_there = True
-            istart = 0
-            while fin[istart][:5] != "$$SOE":
-                if fin[istart].find('Center body name:') > -1: # Checks that the Sun is the central body!
-                    if fin[istart].find('Sun') > -1:
-                        not_there = False
-                    else:
-                        print(fin[istart])
-                istart += 1
-            istart += 1
-            if not_there:
-                print("This ephemeris does not use the Sun as the center body.  It should not be used.")
-                exit(-1)
-                
-            while fin[istart][:5] != "$$EOE":
-                item=fin[istart].strip()
-                item = item.split(',')
-                adate = float(item[0]) - 2400000.5  #represent dates as mjds
-                x = float(item[2])*ascale
-                y = float(item[3])*ascale
-                z = float(item[4])*ascale
-                if cnvrt:
-                    aV.set_eq(x,y,z)
-                    ll = aV.length()
-                    aV = aV/ll
-                    aV = Qecl2eci.inv_cnvrt(aV)
-                    aV = aV*ll
-                    x = aV.rx()
-                    y = aV.ry()
-                    z = aV.rz()
-                self.datelist.append(adate)
-                self.xlist.append(x)
-                self.ylist.append(y)
-                self.zlist.append(z)
-                if self.amin==0.:
-                    self.amin = adate
-                istart += 1
-        else:
-            for item in fin[2:]:
-                item=string.strip(item)
-                item = string.split(item)
-                adate = time2.mjd_from_string(item[0])  #represent dates as mjds
-                x = float(item[1])*ascale
-                y = float(item[2])*ascale
-                z = float(item[3])*ascale
-                if cnvrt:
-                    aV.set_eq(x,y,z)
-                    ll = aV.length()
-                    aV = aV/ll
-                    aV = Qecl2eci.inv_cnvrt(aV)
-                    aV = aV*ll
-                    x = aV.rx()
-                    y = aV.ry()
-                    z = aV.rz()
-                self.datelist.append(adate)
-                self.xlist.append(x)
-                self.ylist.append(y)
-                self.zlist.append(z)
-                if self.amin==0.:
-                    self.amin = adate 
-        self.amax = adate
-        ##yp = spline(xa,ya,0.,0.)
-        #Saving spline parameters
-        #self.xlistp = spline(self.datelist,self.xlist,1.e31,1.e31)
-        #self.ylistp = spline(self.datelist,self.ylist,1.e31,1.e31)
-        #self.zlistp = spline(self.datelist,self.zlist,1.e31,1.e31)
-        del fin
-        #print len(self.datelist),len(self.xlist),len(self.ylist),len(self.zlist)
+    def __init__(self, start_date, end_date):
+        """Eph constructor using astroquery.jplhorizons.
+        
+        Parameters
+        ----------
+        start_date : str
+            Observation window min date in format YYYY-MM-DD
+        end_date : str
+            Observation window max date in format YYYY-MM-DD
+        """
+
+        obj = Horizons(id='jwst', id_type='id',  location=None, 
+                       epochs={'start':start_date, 'stop':end_date, 'step':'1d'})
+        
+        vectors = obj.vectors(refplane='earth')
+        
+        # Convert units, the astroquery default is AU/day
+        for position in ['x', 'y', 'z']:
+            vectors[position].convert_unit_to('km')
+        
+        self.datelist = vectors['datetime_jd'] - 2400000.5
+        self.xlist = vectors['x']
+        self.ylist = vectors['y'] 
+        self.zlist = vectors['z']
+
+        self.amin = min(self.datelist)
+        self.amax = max(self.datelist)
         
     def report_ephemeris (self, limit=100000, pathname=None):
         """Prints a formatted report of the ephemeris.
@@ -162,6 +104,8 @@ class Ephemeris:
         Vsun = -1. * self.pos(adate)
         Vsun = Vsun / Vsun.length()
         return Vsun
+
+
     def sun_pos(self,adate):
         Vsun = -1. * self.pos(adate)
         Vsun = Vsun / Vsun.length()
@@ -170,6 +114,7 @@ class Ephemeris:
         if coord1 < 0.: coord1 += PI2
         return (coord1,coord2)
 
+
     def normal_pa(self,adate,tgt_c1,tgt_c2):
         (sun_c1, sun_c2) = self.sun_pos(adate)
         sun_pa = astro_func.pa(tgt_c1,tgt_c2,sun_c1,sun_c2)
@@ -177,6 +122,7 @@ class Ephemeris:
         if V3_pa < 0. : V3_pa += PI2
         if V3_pa >= PI2 : V3_pa -= PI2
         return V3_pa
+
 
     def is_valid(self,date,coord_1,coord_2,V3pa):
         """Indicates whether an attitude is valid at a given date."""
@@ -200,6 +146,7 @@ class Ephemeris:
                 return True
         return False
 
+
     def in_FOR(self,adate,coord_1,coord_2):
         (sun_1,sun_2) = self.sun_pos(adate)
         d = astro_func.dist(coord_1,coord_2,sun_1,sun_2)
@@ -208,6 +155,7 @@ class Ephemeris:
         if (d<MIN_SUN_ANGLE or d>MAX_SUN_ANGLE):
             return False
         return True
+
 
     def bisect_by_FOR(self,in_date,out_date,coord_1,coord_2):#in and out of FOR, assumes only one "root" in interval
         delta_days = 200.
@@ -227,6 +175,7 @@ class Ephemeris:
         else:
             mid_date = mid_date - 0.000001
         return mid_date
+
 
     def bisect_by_attitude(self,in_date,out_date,coord_1,coord_2,pa):#in and out of FOR, assumes only one "root" in interval
         icount = 0
