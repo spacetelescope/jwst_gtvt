@@ -85,9 +85,11 @@ class Ephemeris:
         cal_days = adate - self.datelist[0]
         indx = int(cal_days)
         frac = cal_days - indx
+        
         x = (self.xlist[indx+1] - self.xlist[indx])*frac + self.xlist[indx]  
         y = (self.ylist[indx+1] - self.ylist[indx])*frac + self.ylist[indx]  
         z = (self.zlist[indx+1] - self.zlist[indx])*frac + self.zlist[indx]  
+        
         return Vector(x,y,z)
         #alower = float(int(adate - 0.5)) + 0.5
         #if alower>= self.amin and adate>= self.amin and adate<=self.amax:
