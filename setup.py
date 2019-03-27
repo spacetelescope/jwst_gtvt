@@ -68,8 +68,13 @@ setup(
          'numpy',
          'astropy',
          'matplotlib',
-         'astroquery',
      ],
+
+    # Using bleeding edge of astroquery to get my changes for retrieving JWST ephemeris
+     dependency_links=[
+        'git+https://github.com/astropy/astroquery/'
+    ],
+
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
