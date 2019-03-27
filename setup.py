@@ -72,7 +72,7 @@ setup(
 
     # Using bleeding edge of astroquery to get my changes for retrieving JWST ephemeris
      dependency_links=[
-        'git+https://github.com/astropy/astroquery/'
+        'https://github.com/astropy/astroquery/'
     ],
 
 
