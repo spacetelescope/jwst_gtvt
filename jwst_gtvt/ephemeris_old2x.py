@@ -37,6 +37,10 @@ class Ephemeris:
             Observation window max date in format YYYY-MM-DD
         """
 
+        # if start_date == None or end_date == None:
+        #     start_date = '2020-01-01'
+        #     end_date = '2023-12-31'
+         
         obj = Horizons(id='jwst', id_type='id',  location=None, 
                        epochs={'start':start_date, 'stop':end_date, 'step':'1d'})
         
@@ -195,7 +199,3 @@ class Ephemeris:
             icount = icount + 1
         #print " bisected >",icount
         return mid_date
-
-
-
-    

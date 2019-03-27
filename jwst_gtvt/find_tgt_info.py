@@ -135,13 +135,9 @@ def main(args, fixed=True):
 
     A_eph = EPH.Ephemeris(args.start_date, args.end_date)
 
-    search_start = Time(args.start_date, format='iso').mjd if args.start_date is not None else 58849.0  #Jan 1, 2020
-    search_end = Time(args.end_date, format='iso').mjd if args.end_date is not None else 60309.0 # Dec 31, 2023
+    search_start = Time(args.start_date, format='iso').mjd #Jan 1, 2020
+    search_end = Time(args.end_date, format='iso').mjd # Dec 31, 2025
 
-    if not (58849.0 <= search_start <= 60309.0) and args.start_date is not None:
-        raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(args.start_date, '2020-01-01', '2023-12-31'))
-    if not (58849.0 <= search_end <= 60309.0) and args.end_date is not None:
-        raise ValueError('End date {} outside of available ephemeris {} to {}'.format(args.end_date, '2020-01-01', '2023-12-31'))
     if search_start > search_end:
         raise ValueError('Start date {} should be before end date {}'.format(args.start_date, args.end_date))
 
