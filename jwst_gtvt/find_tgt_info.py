@@ -9,7 +9,11 @@ from . import ephemeris_old2x as EPH
 import argparse
 from astroquery.jplhorizons import Horizons
 import warnings
+
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
+
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
 from astropy.time import Time
 from astropy.table import Table
