@@ -68,6 +68,7 @@ setup(
          'numpy',
          'astropy',
          'matplotlib',
+         'requests',
      ],
 
     # Using bleeding edge of astroquery to get my changes for retrieving JWST ephemeris

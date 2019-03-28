@@ -26,7 +26,7 @@ Qecl2eci = QX(obliquity_of_the_ecliptic)
 
 
 class Ephemeris:
-    def __init__(self, start_date, end_date):
+    def __init__(self, start_date, end_date, old_eph=False):
         """Eph constructor using astroquery.jplhorizons.
         
         Parameters
@@ -36,11 +36,7 @@ class Ephemeris:
         end_date : str
             Observation window max date in format YYYY-MM-DD
         """
-
-        # if start_date == None or end_date == None:
-        #     start_date = '2020-01-01'
-        #     end_date = '2023-12-31'
-         
+        
         obj = Horizons(id='jwst', id_type='id',  location=None, 
                        epochs={'start':start_date, 'stop':end_date, 'step':'1d'})
         
@@ -50,6 +46,7 @@ class Ephemeris:
         for position in ['x', 'y', 'z']:
             vectors[position].convert_unit_to('km')
         
+        self.old_eph = old_eph
         self.datelist = vectors['datetime_jd'] - 2400000.5
         self.xlist = vectors['x']
         self.ylist = vectors['y'] 
@@ -84,7 +81,8 @@ class Ephemeris:
             
         if (pathname):
             dest.close()   #Clean up
-           
+
+         
     def pos(self,adate):
         cal_days = adate - self.datelist[0]
         indx = int(cal_days)
@@ -95,16 +93,7 @@ class Ephemeris:
         z = (self.zlist[indx+1] - self.zlist[indx])*frac + self.zlist[indx]  
         
         return Vector(x,y,z)
-        #alower = float(int(adate - 0.5)) + 0.5
-        #if alower>= self.amin and adate>= self.amin and adate<=self.amax:
-##            x = spline_interp(adate,self.datelist,self.xlist)
-##            y = spline_interp(adate,self.datelist,self.ylist)
-##            z = spline_interp(adate,self.datelist,self.zlist)
-##        x = splint(self.datelist,self.xlist,self.xlistp,adate)
-##        y = splint(self.datelist,self.ylist,self.ylistp,adate)
-##        z = splint(self.datelist,self.zlist,self.zlistp,adate)
-##        #splint(xa,ya,yp,x)
-##        return Vector(x,y,z)
+
 
     def Vsun_pos(self,adate):
         Vsun = -1. * self.pos(adate)
@@ -199,3 +188,86 @@ class Ephemeris:
             icount = icount + 1
         #print " bisected >",icount
         return mid_date
+
+class OldEphemeris(Ephemeris):
+    def __init__(self, afile, start_date, end_date, old_eph=True):
+        """Eph constructor, cnvrt True converts into Ecliptic frame """
+    
+        super().__init__(start_date, end_date)
+
+        self.old_eph = old_eph
+        self.datelist = []
+        self.xlist = []
+        self.ylist = []
+        self.zlist = []
+        self.amin=0.
+        self.amax=0.
+        aV = Vector(0.,0.,0.)
+        fin = open(afile,'r').readlines()
+        if afile.find("l2_halo_FDF_060619.trh")>-1:
+            ascale = 0.001
+        else:
+            ascale = 1.0
+        if afile.find("horizons_EM")>-1:
+            not_there = True
+            istart = 0
+            while fin[istart][:5] != "$$SOE":
+                if fin[istart].find('Center body name:') > -1: # Checks that the Sun is the central body!
+                    if fin[istart].find('Sun') > -1:
+                        not_there = False
+                    else:
+                        print(fin[istart])
+                istart += 1
+            istart += 1
+            if not_there:
+                print("This ephemeris does not use the Sun as the center body.  It should not be used.")
+                exit(-1)
+                
+            while fin[istart][:5] != "$$EOE":
+                item=fin[istart].strip()
+                item = item.split(',')
+                adate = float(item[0]) - 2400000.5  #represent dates as mjds
+                x = float(item[2])*ascale
+                y = float(item[3])*ascale
+                z = float(item[4])*ascale
+                # if cnvrt:
+                #     aV.set_eq(x,y,z)
+                #     ll = aV.length()
+                #     aV = aV/ll
+                #     aV = Qecl2eci.inv_cnvrt(aV)
+                #     aV = aV*ll
+                #     x = aV.rx()
+                #     y = aV.ry()
+                #     z = aV.rz()
+                self.datelist.append(adate)
+                self.xlist.append(x)
+                self.ylist.append(y)
+                self.zlist.append(z)
+                if self.amin==0.:
+                    self.amin = adate
+                istart += 1
+        else:
+            for item in fin[2:]:
+                item=string.strip(item)
+                item = string.split(item)
+                adate = time2.mjd_from_string(item[0])  #represent dates as mjds
+                x = float(item[1])*ascale
+                y = float(item[2])*ascale
+                z = float(item[3])*ascale
+                # if cnvrt:
+                #     aV.set_eq(x,y,z)
+                #     ll = aV.length()
+                #     aV = aV/ll
+                #     aV = Qecl2eci.inv_cnvrt(aV)
+                #     aV = aV*ll
+                #     x = aV.rx()
+                #     y = aV.ry()
+                #     z = aV.rz()
+                self.datelist.append(adate)
+                self.xlist.append(x)
+                self.ylist.append(y)
+                self.zlist.append(z)
+                if self.amin==0.:
+                    self.amin = adate 
+        self.amax = adate
+        del fin

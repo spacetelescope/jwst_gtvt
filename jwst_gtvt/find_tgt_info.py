@@ -4,7 +4,7 @@ from __future__ import print_function
 
 import sys
 import math
-from . import ephemeris_old2x as EPH
+from .ephemeris_old2x import Ephemeris, OldEphemeris
 
 import argparse
 from astroquery.jplhorizons import Horizons
@@ -19,6 +19,9 @@ from astropy.time import Time
 from astropy.table import Table
 import numpy as np
 from os.path import join, abspath, dirname
+import requests
+import time
+import warnings
 
 # ignore astropy warning that Date after 2020-12-30 is "dubious"
 warnings.filterwarnings('ignore', category=UserWarning, append=True)
@@ -123,6 +126,26 @@ def window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end,
 
     return line
 
+def check_internet():
+    """Check network connection
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    Bool
+    """
+    url='http://www.google.com/'
+    timeout=5
+    try:
+        _ = requests.get(url, timeout=timeout)
+        return True
+    except requests.ConnectionError:
+        print("No internet, using local ephemeris")
+        return False
+
 def main(args, fixed=True):
 
     table_output=None
@@ -137,21 +160,26 @@ def main(args, fixed=True):
 
     ECL_FLAG = False
 
-    A_eph = EPH.Ephemeris(args.start_date, args.end_date)
+    # Check for internet connectivity
+    internet = check_internet()
 
+    # If you are connected to the internet, we will use the astroquery framework
+    # Else, we will read the ephemeris that is local to the package.
+    if internet:
+        A_eph = Ephemeris(args.start_date, args.end_date)
+    else:
+        A_eph = A_eph = OldEphemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),
+                                     args.start_date,
+                                     args.end_date)
+    
     search_start = Time(args.start_date, format='iso').mjd #Jan 1, 2020
-    search_end = Time(args.end_date, format='iso').mjd # Dec 31, 2025
+    search_end = Time(args.end_date, format='iso').mjd # Dec 31, 2023
 
     if search_start > search_end:
         raise ValueError('Start date {} should be before end date {}'.format(args.start_date, args.end_date))
 
-    if search_start < A_eph.amin:
-        print("Warning, search start time is earlier than ephemeris start.", file=table_output)
-        search_start = A_eph.amin + 1
-
     scale = 1  # Channging this value must be reflected in get_target_ephemeris
     span = int(search_end-search_start)
-
 
     # if len(sys.argv) < 3:
     #   print "proper usage:"
@@ -159,7 +187,6 @@ def main(args, fixed=True):
     #   print "finds full visibility windows over [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
     #     Time(search_start+span/scale, format='mjd', out_subfmt='date').isot)
     #   sys.exit(1)
-
 
     pa = 'X'
     if fixed:
@@ -219,7 +246,13 @@ def main(args, fixed=True):
     iflip = False
 
     #Step througth the interval and find where target goes in/out of field of regard.
-    for i in range(0,span*scale):
+    if A_eph.old_eph:
+        start,stop = 1, span*scale + 1
+    else:
+        start,stop = 0, span*scale
+    
+    print(start, stop, len(A_eph.xlist))
+    for i in range(start, stop):
         adate = search_start + float(i)/float(scale)
         #iflag = A_eph.in_FOR(adate,ra,dec)
         if pa == "X":
