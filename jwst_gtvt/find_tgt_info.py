@@ -143,7 +143,8 @@ def check_internet():
         _ = requests.get(url, timeout=timeout)
         return True
     except requests.ConnectionError:
-        print("No internet, using local ephemeris")
+        print("No network access!")
+        print("If using the GTVT, proceeding with local JWST ephemeris.")
         return False
 
 def main(args, fixed=True):
@@ -245,13 +246,13 @@ def main(args, fixed=True):
       twstart = -1.
     iflip = False
 
-    #Step througth the interval and find where target goes in/out of field of regard.
+    # Step througth the interval and find where target goes in/out of field of regard.
+    # Still don't know why the start stop for the old ephemeris is indexed starting at 1...
     if A_eph.old_eph:
         start,stop = 1, span*scale + 1
     else:
         start,stop = 0, span*scale
     
-    print(start, stop, len(A_eph.xlist))
     for i in range(start, stop):
         adate = search_start + float(i)/float(scale)
         #iflag = A_eph.in_FOR(adate,ra,dec)
