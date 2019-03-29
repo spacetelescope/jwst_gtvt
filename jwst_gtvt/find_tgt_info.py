@@ -143,8 +143,15 @@ def check_internet():
         _ = requests.get(url, timeout=timeout)
         return True
     except requests.ConnectionError:
-        print("No network access!")
+        print('='*60)
+        print('*'*60)
+        print('='*60)
+        print("Looks like you are not connected to the internet!")
         print("If using the GTVT, proceeding with local JWST ephemeris.")
+        print('='*60)
+        print('*'*60)
+        print('='*60)
+        time.sleep(5.0)
         return False
 
 def main(args, fixed=True):
