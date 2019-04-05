@@ -176,7 +176,7 @@ def main(args, fixed=True):
     if internet:
         A_eph = Ephemeris(args.start_date, args.end_date)
     else:
-        A_eph = A_eph = OldEphemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),
+        A_eph = A_eph = OldEphemeris(join(dirname(abspath(__file__)), "horizons_EM_l2_wrt_sun_2020-2024.txt"),
                                      args.start_date,
                                      args.end_date)
     
