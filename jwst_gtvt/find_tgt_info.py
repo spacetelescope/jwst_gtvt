@@ -18,10 +18,7 @@ matplotlib.use('TkAgg')
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
 import numpy as np
 from os.path import join, abspath, dirname
-import warnings
-
-from . import ephemeris_old2x as EPH
-
+import pysiaf
 
 # ignore astropy warning that Date after 2020-12-30 is "dubious"
 warnings.filterwarnings('ignore', category=UserWarning, append=True)
@@ -130,10 +127,11 @@ def main(args, fixed=True):
         table_output = open(args.save_table, 'w')
 
     NRCALL_FULL_V2IdlYang = -0.0265
-    NRS_FULL_MSA_V3IdlYang = 137.4874
-    NIS_V3IdlYang = -0.57
-    MIRIM_FULL_V3IdlYang = 5.0152
-    FGS1_FULL_V3IdlYang = -1.2508
+    NRCALL_FULL_V2IdlYang = -0.0265
+    NRS_FULL_MSA_V3IdlYang = get_angle('NIRSPEC', 'NRS_FULL_MSA', 'V3IdlYAngle')
+    NIS_V3IdlYang = get_angle('NIRISS', 'NIS_CEN', 'V3IdlYAngle')
+    MIRIM_FULL_V3IdlYang = get_angle('MIRI', 'MIRIM_FULL', 'V3IdlYAngle')
+    FGS1_FULL_V3IdlYang = get_angle('MIRI', 'FGS1_FULL', 'V3IdlYAngle')
 
     ECL_FLAG = False
 
@@ -523,10 +521,11 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
         table_output = open(save_table, 'w')
 
     NRCALL_FULL_V2IdlYang  = -0.0265
-    NRS_FULL_MSA_V3IdlYang = 137.4874
-    NIS_V3IdlYang          = -0.57
-    MIRIM_FULL_V3IdlYang   = 5.0152
-    FGS1_FULL_V3IdlYang    = -1.2508
+    NRCALL_FULL_V2IdlYang = -0.0265
+    NRS_FULL_MSA_V3IdlYang = get_angle('NIRSPEC', 'NRS_FULL_MSA', 'V3IdlYAngle')
+    NIS_V3IdlYang = get_angle('NIRISS', 'NIS_CEN', 'V3IdlYAngle')
+    MIRIM_FULL_V3IdlYang = get_angle('MIRI', 'MIRIM_FULL', 'V3IdlYAngle')
+    FGS1_FULL_V3IdlYang = get_angle('MIRI', 'FGS1_FULL', 'V3IdlYAngle')
 
     ECL_FLAG = False
 
@@ -848,6 +847,32 @@ def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
         ax.set_ylabel("Available Position Angle (Degree)")
         ax.set_title(instrument_name)
         ax.fmt_xdata = DateFormatter('%Y-%m-%d')
+
+def get_angle(instrument, mode, angle_name):
+    """Get angle requested by user
+
+    Parameters
+    ----------
+    instrument : JWST instrument of interest
+        type : str
+    
+    mode : instrument observing mode
+        type : str
+
+    angle_name : angle of interest
+        type : str
+
+    Returns
+    -------
+    angle : the angle obtained from the SIAF.
+        type : float
+    """
+    
+    siaf = pysiaf.Siaf(instrument)
+    meta = siaf[mode]
+    angle = getattr(meta, angle_name)
+
+    return angle
 
 if __name__ == '__main__':
     try:
