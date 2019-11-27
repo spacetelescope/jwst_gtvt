@@ -130,7 +130,7 @@ def main(args, fixed=True):
     NRS_FULL_MSA_V3IdlYang = get_angle('NIRSPEC', 'NRS_FULL_MSA', 'V3IdlYAngle')
     NIS_V3IdlYang = get_angle('NIRISS', 'NIS_CEN', 'V3IdlYAngle')
     MIRIM_FULL_V3IdlYang = get_angle('MIRI', 'MIRIM_FULL', 'V3IdlYAngle')
-    FGS1_FULL_V3IdlYang = get_angle('MIRI', 'FGS1_FULL', 'V3IdlYAngle')
+    FGS1_FULL_V3IdlYang = get_angle('FGS', 'FGS1_FULL', 'V3IdlYAngle')
 
     ECL_FLAG = False
 
@@ -523,7 +523,7 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
     NRS_FULL_MSA_V3IdlYang = get_angle('NIRSPEC', 'NRS_FULL_MSA', 'V3IdlYAngle')
     NIS_V3IdlYang = get_angle('NIRISS', 'NIS_CEN', 'V3IdlYAngle')
     MIRIM_FULL_V3IdlYang = get_angle('MIRI', 'MIRIM_FULL', 'V3IdlYAngle')
-    FGS1_FULL_V3IdlYang = get_angle('MIRI', 'FGS1_FULL', 'V3IdlYAngle')
+    FGS1_FULL_V3IdlYang = get_angle('FGS', 'FGS1_FULL', 'V3IdlYAngle')
 
     ECL_FLAG = False
 
