@@ -124,7 +124,6 @@ def main(args, fixed=True):
         table_output = open(args.save_table, 'w')
 
     NRCALL_FULL_V2IdlYang = -0.0265
-    NRCALL_FULL_V2IdlYang = -0.0265
     NRS_FULL_MSA_V3IdlYang = get_angle('NIRSPEC', 'NRS_FULL_MSA', 'V3IdlYAngle')
     NIS_V3IdlYang = get_angle('NIRISS', 'NIS_CEN', 'V3IdlYAngle')
     MIRIM_FULL_V3IdlYang = get_angle('MIRI', 'MIRIM_FULL', 'V3IdlYAngle')
@@ -517,7 +516,6 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
     if save_table is not None:
         table_output = open(save_table, 'w')
 
-    NRCALL_FULL_V2IdlYang  = -0.0265
     NRCALL_FULL_V2IdlYang = -0.0265
     NRS_FULL_MSA_V3IdlYang = get_angle('NIRSPEC', 'NRS_FULL_MSA', 'V3IdlYAngle')
     NIS_V3IdlYang = get_angle('NIRISS', 'NIS_CEN', 'V3IdlYAngle')
