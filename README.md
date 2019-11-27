@@ -8,13 +8,15 @@ To report any issues, please use the JWST help portal https://jwsthelp.stsci.edu
 
 This tool requires a few packages all of which are included in the Anaconda python distribution.
 
-* NumPy
+* numpy
 
-* Maplotlib
+* maplotlib
 
-* AstroPy
+* astropy
 
-* Astroquery (For moving target support)
+* astroquery (For moving target support)
+
+* pysiaf
 
 # Installation
 

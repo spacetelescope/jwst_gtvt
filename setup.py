@@ -69,6 +69,7 @@ setup(
          'astropy',
          'matplotlib',
          'astroquery',
+         'pysiaf',
      ],
 
     # List additional groups of dependencies here (e.g. development
