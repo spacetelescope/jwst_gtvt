@@ -1,18 +1,18 @@
-# JWST General Target Visbility Tool (jwst_gtvt)
+# JWST General Target Visibility Tool (jwst_gtvt)
 
-JWST requires shielding from the sun for operation, which limits the available position angles observable at a given time.  
+JWST requires shielding from the Sun for operation, which limits the available position angles observable at a given time.  
 This script calculates the allowed position angle for a given Right Ascension and Declination for each instrument on the telescope.
-To report any issues, please use the JWST help portal https://jwsthelp.stsci.edu 
+To report any issues, please use the JWST help portal https://jwsthelp.stsci.edu .
 
 # Dependencies
 
-This tool requires a few packages all of which are included in the Anaconda python distribution.
+This tool requires a few packages all of which are included in the Anaconda Python distribution.
 
 * NumPy
 
 * Maplotlib
 
-* AstroPy
+* Astropy
 
 * Astroquery (For moving target support)
 
@@ -21,7 +21,7 @@ This tool requires a few packages all of which are included in the Anaconda pyth
 You can install the tool using `pip` with 
 `pip install git+https://github.com/spacetelescope/jwst_gtvt.git`
 
-Alternatively, you can download the .zip file or clone the respository from GitHub and install the tool from inside the resulting directory with
+Alternatively, you can download the ZIP file or clone the respository from GitHub and install the tool from inside the resulting directory with
 `python setup.py install`
 
 # Usage
