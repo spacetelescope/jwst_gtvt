@@ -2,7 +2,7 @@
 
 JWST requires shielding from the sun for operation, which limits the available position angles observable at a given time.  
 This script calculates the allowed position angle for a given Right Ascension and Declination for each instrument on the telescope.
-To report any issues, please use the JWST help portal https://jwsthelp.stsci.edu 
+To report any issues, please use the JWST help portal https://jwsthelp.stsci.edu or feel free to open a github issue https://github.com/spacetelescope/jwst_gtvt/issues
 
 # Dependencies
 
