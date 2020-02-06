@@ -4,18 +4,24 @@ from __future__ import print_function
 
 import sys
 import math
-from . import ephemeris_old2x as EPH
+
 
 import argparse
-from astroquery.jplhorizons import Horizons
-import warnings
-import matplotlib.pyplot as plt
-from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
 from astropy.time import Time
 from astropy.table import Table
+from astroquery.jplhorizons import Horizons
+import matplotlib.pyplot as plt
+
+import matplotlib
+matplotlib.use('TkAgg')
+
+from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
 import numpy as np
 from os.path import join, abspath, dirname
 import pysiaf
+import warnings
+
+from . import ephemeris_old2x as EPH
 
 # ignore astropy warning that Date after 2020-12-30 is "dubious"
 warnings.filterwarnings('ignore', category=UserWarning, append=True)
