@@ -4,4 +4,4 @@ python: 3.7.5
 jobs:
   include:
     - name: build
-      script: python setup.py install
+      script: easy_install .
