@@ -19,6 +19,12 @@ from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
 import numpy as np
 from os.path import join, abspath, dirname
 import pysiaf
+<<<<<<< HEAD
+=======
+import warnings
+
+from . import ephemeris_old2x as EPH
+>>>>>>> 8465fd339897f597205dc1a044338b2e707e44cd
 
 # ignore astropy warning that Date after 2020-12-30 is "dubious"
 warnings.filterwarnings('ignore', category=UserWarning, append=True)
