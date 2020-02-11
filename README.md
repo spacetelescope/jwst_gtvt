@@ -627,3 +627,9 @@ when changes are made upstream at JPL. To find and clear the cache, you can use 
 
 This will print where astropy is caching all of it's data. If astroquery has been used to search for targets in the past,
 `<value_of_path>/astroquery/Horizons/` will exist. Now you have the full path and can remove it manually.
+
+You can also use our `delete_cache` utility function. After the software is installed you can enter:
+   
+   $ delete_cache
+
+If cached results exist you will be prompted whether you want to delete the cache folder or not.
