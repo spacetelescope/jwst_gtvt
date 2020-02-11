@@ -8,13 +8,13 @@ To report any issues, please use the JWST help portal https://jwsthelp.stsci.edu
 
 This tool requires a few packages all of which are included in the Anaconda Python distribution.
 
-* NumPy
+* numpy
 
-* Maplotlib
+* maplotlib
 
-* Astropy
+* astropy
 
-* Astroquery (For moving target support)
+* astroquery (For moving target support)
 
 # Installation
 
@@ -22,7 +22,7 @@ You can install the tool using `pip` with
 `pip install git+https://github.com/spacetelescope/jwst_gtvt.git`
 
 Alternatively, you can download the ZIP file or clone the respository from GitHub and install the tool from inside the resulting directory with
-`python setup.py install`
+`easy_install .`
 
 # Usage
 There are two scripts available.  `jwst_gtvt` for fixed targets, and `jwst_mtvt` for moving targets.  To see the help info use
@@ -616,3 +616,14 @@ Below is an example of the full text output
     2023-09-09    91.38  99.63    91.36  99.60   228.87 237.11    90.81  99.06    96.40 104.64    90.13  98.37
     2023-09-10    91.53  98.67    91.50  98.65   229.01 236.16    90.96  98.10    96.54 103.69    90.28  97.42
 
+# Troubleshooting
+
+Unless specified, astroquery will cache queries to Horizons. This can cause some issues when trying to query targets
+when changes are made upstream at JPL. To find and clear the cache, you can use the astropy.
+
+  >>> import astropy
+  >>> path = astropy.config.get_cache_dir()
+  >>> print(path)
+
+This will print where astropy is caching all of it's data. If astroquery has been used to search for targets in the past,
+`<value_of_path>/astroquery/Horizons/` will exist. Now you have the full path and can remove it manually.
