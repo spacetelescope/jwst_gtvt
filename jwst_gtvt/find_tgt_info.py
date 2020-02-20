@@ -103,7 +103,7 @@ def get_target_ephemeris(desg, start_date, end_date, smallbody=False):
                    epochs={'start':start_date, 'stop':end_date,
                    'step':'1d'})
 
-    eph = obj.ephemerides(cache=False)
+    eph = obj.ephemerides(cache=False, quantities=(1))
 
     return eph['targetname'][0], eph['RA'], eph['DEC']
 
