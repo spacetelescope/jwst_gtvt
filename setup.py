@@ -70,6 +70,8 @@ setup(
          'matplotlib',
          'astroquery',
      ],
+     
+     python_requires='<=3.7.0',
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
