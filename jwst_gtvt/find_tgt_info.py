@@ -137,7 +137,7 @@ def main(args, fixed=True):
 
     ECL_FLAG = False
 
-    A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG)
+    A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG, verbose=args.verbose)
 
     search_start = Time(args.start_date, format='iso').mjd if args.start_date is not None else 58849.0  #Jan 1, 2020
     search_end = Time(args.end_date, format='iso').mjd if args.end_date is not None else 60309.0 # Dec 31, 2023
@@ -183,36 +183,47 @@ def main(args, fixed=True):
         ra = args.ra * D2R
         dec = args.dec * D2R
 
-    print("", file=table_output)
-    print("       Target", file=table_output)
+    if not args.verbose:
+        print("", file=table_output)
+        print("       Target", file=table_output)
     if fixed:
-        print("                ecliptic", file=table_output)
-        print("RA      Dec     latitude", file=table_output)
-        print("%7.3f %7.3f %7.3f" % (ra[0]*R2D,dec[0]*R2D,calc_ecliptic_lat(ra[0], dec[0])*R2D), file=table_output)
-    print("", file=table_output)
+        if not args.verbose:
+            print("                ecliptic", file=table_output)
+            print("RA      Dec     latitude", file=table_output)
+            print("%7.3f %7.3f %7.3f" % (ra[0]*R2D,dec[0]*R2D,calc_ecliptic_lat(ra[0], dec[0])*R2D), file=table_output)
 
+    if not args.verbose:
+        print("", file=table_output)
 
     if args.v3pa is not None:
         pa     = float(args.v3pa) * D2R
-    print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
-        Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
+    if not args.verbose:
+        print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
+            Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
     if pa == "X":
         iflag_old = A_eph.in_FOR(search_start,ra[0],dec[0])
-        print("|           Window [days]                 |    Normal V3 PA [deg]    |", end='', file=table_output)
+        if not args.verbose:
+            print("|           Window [days]                 |    Normal V3 PA [deg]    |", end='', file=table_output)
     else:
         iflag_old = A_eph.is_valid(search_start,ra[0],dec[0],pa)
-        print("|           Window [days]                 |   Specified V3 PA [deg]  |", end='', file=table_output)
+        if not args.verbose:
+            print("|           Window [days]                 |   Specified V3 PA [deg]  |", end='', file=table_output)
 
     if fixed:
-        print('\n', end='', file=table_output)
+        if not args.verbose:
+            print('\n', end='', file=table_output)
     else:
-        print('{:^27s}|{:^27s}|'.format('RA', 'Dec'), file=table_output)
+        if not args.verbose:
+            print('{:^27s}|{:^27s}|'.format('RA', 'Dec'), file=table_output)
 
-    print("   Start           End         Duration         Start         End    ", end='', file=table_output)
+    if not args.verbose:
+        print("   Start           End         Duration         Start         End    ", end='', file=table_output)
     if fixed:
-        print("{:^13s} {:^13s}".format('RA', 'Dec'), file=table_output)
+        if not args.verbose:
+            print("{:^13s} {:^13s}".format('RA', 'Dec'), file=table_output)
     else:
-        print("{:^13s} {:^13s} {:^13s} {:^13s}".format('Start', 'End', 'Start', 'End'), file=table_output)
+        if not args.verbose:
+            print("{:^13s} {:^13s} {:^13s} {:^13s}".format('Start', 'End', 'Start', 'End'), file=table_output)
 
     if iflag_old:
       twstart = search_start
@@ -254,7 +265,8 @@ def main(args, fixed=True):
                         pa_end = pa
                     ra_end = ra[i]
                     dec_end = dec[i]
-                    print(window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end), file=table_output)
+                    if not args.verbose:
+                        print(window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end), file=table_output)
             iflag_old = iflag
 
     if iflip == True and iflag == True:
@@ -264,13 +276,16 @@ def main(args, fixed=True):
         else:
             pa_start = pa
             pa_end = pa
-        print(window_summary_line(fixed, twstart, adate, pa_start, pa_end, ra[i], ra[i], dec[i], dec[i]), file=table_output)
+        if not args.verbose:
+            print(window_summary_line(fixed, twstart, adate, pa_start, pa_end, ra[i], ra[i], dec[i], dec[i]), file=table_output)
 
     if iflip == False and iflag == True and pa == "X":
         if dec[i] >0.:
-            print(window_summary_line(fixed, 0, 0, 2 * np.pi, 0, ra[0], ra[-1], dec[0], dec[-1], cvz=True), file=table_output)
+            if not args.verbose:
+                print(window_summary_line(fixed, 0, 0, 2 * np.pi, 0, ra[0], ra[-1], dec[0], dec[-1], cvz=True), file=table_output)
         else:
-            print(window_summary_line(fixed, 0, 0, 0, 2 * np.pi, ra[0], ra[-1], dec[0], dec[-1], cvz=True), file=table_output)
+            if not args.verbose:
+                print(window_summary_line(fixed, 0, 0, 0, 2 * np.pi, ra[0], ra[-1], dec[0], dec[-1], cvz=True), file=table_output)
 
     if 1==1:
         wstart = search_start
@@ -282,17 +297,22 @@ def main(args, fixed=True):
         if iflag:
           tgt_is_in = True
 
-        print("", file=table_output)
-        print("", file=table_output)
+        if not args.verbose:
+            print("", file=table_output)
+            print("", file=table_output)
+
         if fixed:
             fmt_repeats = 6
-            print("                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
-            print("   Date      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
-                  #58849.0 264.83 275.18 264.80 264.80  42.32  42.32 264.26 264.26 269.84 269.84 263.58 263.58
+            if not args.verbose:
+                print("                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
+                print("   Date      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
+                    #58849.0 264.83 275.18 264.80 264.80  42.32  42.32 264.26 264.26 269.84 269.84 263.58 263.58
         else:
             fmt_repeats = 7
-            print("                                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
-            print("   Date      RA     Dec      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
+            if not args.verbose:
+                print("                                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
+                print("   Date      RA     Dec      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
+        
         times = []
         minV3PA_data = []
         maxV3PA_data = []
@@ -314,7 +334,8 @@ def main(args, fixed=True):
             #print atime,A_eph.in_FOR(atime,ra,dec)
             if iflag:
                 if not tgt_is_in:
-                    print("", file=table_output)
+                    if not args.verbose:
+                        print("", file=table_output)
                 tgt_is_in = True
 
                 V3PA = A_eph.normal_pa(atime,ra[i],dec[i])*R2D
@@ -351,15 +372,17 @@ def main(args, fixed=True):
                 #print '%7.1f %6.2f %6.2f %6.2f' % (atime, V3PA, NIRCam_PA, NIRSpec_PA)
                 fmt = '{}' + '   {:6.2f} {:6.2f}'*fmt_repeats
                 if fixed:
-                    print(fmt.format(
-                        Time(atime, format='mjd', out_subfmt='date').isot, minV3PA, maxV3PA,
-                        minNIRCam_PA, maxNIRCam_PA, minNIRSpec_PA, maxNIRSpec_PA, minNIRISS_PA,
-                        maxNIRISS_PA, minMIRI_PA, maxMIRI_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
+                    if not args.verbose:
+                        print(fmt.format(
+                            Time(atime, format='mjd', out_subfmt='date').isot, minV3PA, maxV3PA,
+                            minNIRCam_PA, maxNIRCam_PA, minNIRSpec_PA, maxNIRSpec_PA, minNIRISS_PA,
+                            maxNIRISS_PA, minMIRI_PA, maxMIRI_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
                 else:
-                    print(fmt.format(
-                        Time(atime, format='mjd', out_subfmt='date').isot, ra[i]*R2D, dec[i]*R2D, minV3PA, maxV3PA,
-                        minNIRCam_PA, maxNIRCam_PA, minNIRSpec_PA, maxNIRSpec_PA, minNIRISS_PA,
-                        maxNIRISS_PA, minMIRI_PA, maxMIRI_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
+                    if not args.verbose:
+                        print(fmt.format(
+                            Time(atime, format='mjd', out_subfmt='date').isot, ra[i]*R2D, dec[i]*R2D, minV3PA, maxV3PA,
+                            minNIRCam_PA, maxNIRCam_PA, minNIRSpec_PA, maxNIRSpec_PA, minNIRISS_PA,
+                            maxNIRISS_PA, minMIRI_PA, maxMIRI_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
             else:
                 tgt_is_in = False
                 times.append(Time(atime, format='mjd').datetime)
@@ -493,7 +516,7 @@ def main(args, fixed=True):
             plt.savefig(args.save_plot)
 
 
-def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_table=None, v3pa=None, fixed=True):
+def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_table=None, v3pa=None, fixed=True, verbose=True):
     """ Returns a table object with the PAs where the target is visible.
 
     parameters
@@ -530,7 +553,7 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
 
     ECL_FLAG = False
 
-    A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG)
+    A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG, verbose=verbose)
 
     search_start = Time(start_date, format='iso').mjd if start_date is not None else 58849.0  #Jan 1, 2020
     search_end = Time(end_date, format='iso').mjd if end_date is not None else 60309.0 # Dec 31, 2023
@@ -549,14 +572,12 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
     scale = 1  # Channging this value must be reflected in get_target_ephemeris
     span = int(search_end-search_start)
 
-
     # if len(sys.argv) < 3:
     #   print "proper usage:"
     #   print "find_tgt_info.py ra dec [pa]"
     #   print "finds full visibility windows over [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
     #     Time(search_start+span/scale, format='mjd', out_subfmt='date').isot)
     #   sys.exit(1)
-
 
     pa = 'X'
 
@@ -572,37 +593,47 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
     ra = np.repeat(ra, span * scale + 1)
     dec = np.repeat(dec, span * scale + 1)
 
-
-    print("", file=table_output)
-    print("       Target", file=table_output)
-    if fixed:
-        print("                ecliptic", file=table_output)
-        print("RA      Dec     latitude", file=table_output)
-        print("%7.3f %7.3f %7.3f" % (ra[0]*R2D,dec[0]*R2D,calc_ecliptic_lat(ra[0], dec[0])*R2D), file=table_output)
-    print("", file=table_output)
+    if verbose:
+        print("", file=table_output)
+        print("       Target", file=table_output)
+    
+    if verbose:
+        if fixed:
+            print("                ecliptic", file=table_output)
+            print("RA      Dec     latitude", file=table_output)
+            print("%7.3f %7.3f %7.3f" % (ra[0]*R2D,dec[0]*R2D,calc_ecliptic_lat(ra[0], dec[0])*R2D), file=table_output)
+        print("", file=table_output)
 
 
     if v3pa is not None:
         pa     = float(v3pa) * D2R
-    print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
-        Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
+    if verbose:
+        print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
+            Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
     if pa == "X":
         iflag_old = A_eph.in_FOR(search_start,ra[0],dec[0])
-        print("|           Window [days]                 |    Normal V3 PA [deg]    |", end='', file=table_output)
+        if verbose:
+            print("|           Window [days]                 |    Normal V3 PA [deg]    |", end='', file=table_output)
     else:
         iflag_old = A_eph.is_valid(search_start,ra[0],dec[0],pa)
-        print("|           Window [days]                 |   Specified V3 PA [deg]  |", end='', file=table_output)
+        if verbose:
+            print("|           Window [days]                 |   Specified V3 PA [deg]  |", end='', file=table_output)
 
     if fixed:
-        print('\n', end='', file=table_output)
+        if verbose:
+            print('\n', end='', file=table_output)
     else:
-        print('{:^27s}|{:^27s}|'.format('RA', 'Dec'), file=table_output)
+        if verbose:
+            print('{:^27s}|{:^27s}|'.format('RA', 'Dec'), file=table_output)
 
-    print("   Start           End         Duration         Start         End    ", end='', file=table_output)
+    if verbose:
+        print("   Start           End         Duration         Start         End    ", end='', file=table_output)
     if fixed:
-        print("{:^13s} {:^13s}".format('RA', 'Dec'), file=table_output)
+        if verbose:
+            print("{:^13s} {:^13s}".format('RA', 'Dec'), file=table_output)
     else:
-        print("{:^13s} {:^13s} {:^13s} {:^13s}".format('Start', 'End', 'Start', 'End'), file=table_output)
+        if verbose:
+            print("{:^13s} {:^13s} {:^13s} {:^13s}".format('Start', 'End', 'Start', 'End'), file=table_output)
 
     if iflag_old:
       twstart = search_start
@@ -644,7 +675,8 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
                         pa_end = pa
                     ra_end = ra[i]
                     dec_end = dec[i]
-                    print(window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end), file=table_output)
+                    if verbose:
+                        print(window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end), file=table_output)
             iflag_old = iflag
 
     if iflip == True and iflag == True:
@@ -654,13 +686,16 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
         else:
             pa_start = pa
             pa_end = pa
-        print(window_summary_line(fixed, twstart, adate, pa_start, pa_end, ra[i], ra[i], dec[i], dec[i]), file=table_output)
+        if verbose:
+            print(window_summary_line(fixed, twstart, adate, pa_start, pa_end, ra[i], ra[i], dec[i], dec[i]), file=table_output)
 
     if iflip == False and iflag == True and pa == "X":
         if dec[i] >0.:
-            print(window_summary_line(fixed, 0, 0, 2 * np.pi, 0, ra[0], ra[-1], dec[0], dec[-1], cvz=True), file=table_output)
+            if verbose:
+                print(window_summary_line(fixed, 0, 0, 2 * np.pi, 0, ra[0], ra[-1], dec[0], dec[-1], cvz=True), file=table_output)
         else:
-            print(window_summary_line(fixed, 0, 0, 0, 2 * np.pi, ra[0], ra[-1], dec[0], dec[-1], cvz=True), file=table_output)
+            if verbose:
+                print(window_summary_line(fixed, 0, 0, 0, 2 * np.pi, ra[0], ra[-1], dec[0], dec[-1], cvz=True), file=table_output)
 
     if 1==1:
         wstart = search_start
@@ -672,17 +707,21 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
         if iflag:
           tgt_is_in = True
 
-        print("", file=table_output)
-        print("", file=table_output)
+        if verbose:
+            print("", file=table_output)
+            print("", file=table_output)
         if fixed:
             fmt_repeats = 6
-            print("                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
-            print("   Date      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
-                  #58849.0 264.83 275.18 264.80 264.80  42.32  42.32 264.26 264.26 269.84 269.84 263.58 263.58
+            if verbose:
+                print("                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
+                print("   Date      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
+                    #58849.0 264.83 275.18 264.80 264.80  42.32  42.32 264.26 264.26 269.84 269.84 263.58 263.58
         else:
             fmt_repeats = 7
-            print("                                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
-            print("   Date      RA     Dec      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
+            if verbose:
+                print("                                V3PA          NIRCam           NIRSpec         NIRISS           MIRI          FGS", file=table_output)
+                print("   Date      RA     Dec      min    max      min    max       min    max     min    max      min    max      min    max", file=table_output)
+        
         times = []
         V3PA_data = []
         minV3PA_data = []
@@ -711,7 +750,8 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
             #print atime,A_eph.in_FOR(atime,ra,dec)
             if iflag:
                 if not tgt_is_in:
-                    print("", file=table_output)
+                    if verbose:
+                        print("", file=table_output)
                 tgt_is_in = True
 
                 V3PA = A_eph.normal_pa(atime,ra[i],dec[i])*R2D
@@ -761,17 +801,19 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
                 #print '%7.1f %6.2f %6.2f %6.2f' % (atime, V3PA, NIRCam_PA, NIRSpec_PA)
                 fmt = '{}' + '   {:6.2f} {:6.2f}'*fmt_repeats
                 if fixed:
-                    print(fmt.format(
-                        Time(atime, format='mjd', out_subfmt='date').isot, V3PA, minV3PA, maxV3PA,
-                        nomNIRCam_PA, minNIRCam_PA, maxNIRCam_PA, nomNIRSpec_PA, minNIRSpec_PA, maxNIRSpec_PA,
-                        nomNIRISS_PA, minNIRISS_PA, maxNIRISS_PA, nomMIRI_PA, minMIRI_PA, maxMIRI_PA,
-                        nomFGS_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
+                    if verbose:
+                        print(fmt.format(
+                            Time(atime, format='mjd', out_subfmt='date').isot, V3PA, minV3PA, maxV3PA,
+                            nomNIRCam_PA, minNIRCam_PA, maxNIRCam_PA, nomNIRSpec_PA, minNIRSpec_PA, maxNIRSpec_PA,
+                            nomNIRISS_PA, minNIRISS_PA, maxNIRISS_PA, nomMIRI_PA, minMIRI_PA, maxMIRI_PA,
+                            nomFGS_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
                 else:
-                    print(fmt.format(
-                        Time(atime, format='mjd', out_subfmt='date').isot, ra[i]*R2D, dec[i]*R2D, V3PA, minV3PA, maxV3PA,
-                        nomNIRCam_PA, minNIRCam_PA, maxNIRCam_PA, nomNIRSpec_PA, minNIRSpec_PA, maxNIRSpec_PA,
-                        nomNIRISS_PA, minNIRISS_PA, maxNIRISS_PA, nomMIRI_PA, minMIRI_PA, maxMIRI_PA,
-                        nomFGS_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
+                    if verbose:
+                        print(fmt.format(
+                            Time(atime, format='mjd', out_subfmt='date').isot, ra[i]*R2D, dec[i]*R2D, V3PA, minV3PA, maxV3PA,
+                            nomNIRCam_PA, minNIRCam_PA, maxNIRCam_PA, nomNIRSpec_PA, minNIRSpec_PA, maxNIRSpec_PA,
+                            nomNIRISS_PA, minNIRISS_PA, maxNIRISS_PA, nomMIRI_PA, minMIRI_PA, maxMIRI_PA,
+                            nomFGS_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
             else:
                 tgt_is_in = False
                 times.append(Time(atime, format='mjd').datetime)
@@ -871,6 +913,7 @@ if __name__ == '__main__':
     parser.add_argument('--name', help='Target Name to appear on plots')
     parser.add_argument('--start_date', help='Start date for visibility search in yyyy-mm-dd format')
     parser.add_argument('--end_date', help='End date for visibility search in yyyy-mm-dd format')
+    parser.add_argument('--verbose', help='Print table output to screen', type=bool)
     args = parser.parse_args(arg_list)
 
     main(args)
