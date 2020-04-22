@@ -1,7 +1,7 @@
 language: python
-python: 3.7.5
+python: 3.6.10
 
 jobs:
   include:
     - name: build
-      script: easy_install .
+      script: python setup.py install
