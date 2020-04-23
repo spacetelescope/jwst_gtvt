@@ -19,10 +19,10 @@ This tool requires a few packages all of which are included in the Anaconda Pyth
 # Installation
 
 You can install the tool using `pip` with 
-`pip install git+https://github.com/spacetelescope/jwst_gtvt.git`
+`pip install jwst-gtvt`
 
-Alternatively, you can download the ZIP file or clone the respository from GitHub and install the tool from inside the resulting directory with
-`easy_install .`
+Alternatively, you can clone the respository from GitHub and install the tool from inside the resulting directory with
+`python setup.py install`
 
 # Usage
 There are two scripts available.  `jwst_gtvt` for fixed targets, and `jwst_mtvt` for moving targets.  To see the help info use
