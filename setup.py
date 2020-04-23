@@ -1,4 +1,4 @@
-"""Setup definition for the JWST Coronagraph Visibility Tool
+"""Setup definition for the JWST General Target Visibility Tool
 (Based on https://github.com/pypa/sampleproject)
 """
 
@@ -20,12 +20,12 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.1.1',
+    version='0.1.2',
 
     description='JWST General Target Visibility Tool',
 
     # The project's main homepage.
-    url='https://github.com/mattjhill/jwst_gtvt',
+    url='https://github.com/spacetelescope/jwst_gtvt',
 
     # Author details
     author='Space Telescope Science Institute',
@@ -50,6 +50,7 @@ setup(
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.7',
     ],
 
     # What does your project relate to?
@@ -65,13 +66,13 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
      install_requires=[
-         'numpy',
-         'astropy',
-         'matplotlib',
-         'astroquery',
+            'numpy',
+            'astropy',
+            'matplotlib',
+            'astroquery',
      ],
      
-     python_requires='<=3.7.0',
+     python_requires='<=3.7',
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
