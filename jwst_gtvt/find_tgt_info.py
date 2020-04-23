@@ -913,7 +913,7 @@ if __name__ == '__main__':
     parser.add_argument('--name', help='Target Name to appear on plots')
     parser.add_argument('--start_date', help='Start date for visibility search in yyyy-mm-dd format')
     parser.add_argument('--end_date', help='End date for visibility search in yyyy-mm-dd format')
-    parser.add_argument('--no_verbose', help='Print table output to screen', type=bool)
+    parser.add_argument('--no_verbose', help='Suppress table output to screen', type=bool)
     args = parser.parse_args(arg_list)
 
     main(args)
