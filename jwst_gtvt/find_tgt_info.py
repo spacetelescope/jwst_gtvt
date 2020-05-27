@@ -553,7 +553,7 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
 
     ECL_FLAG = False
 
-    A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG, verbose=args.no_verbose)
+    A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG, verbose=verbose)
 
     search_start = Time(start_date, format='iso').mjd if start_date is not None else 58849.0  #Jan 1, 2020
     search_end = Time(end_date, format='iso').mjd if end_date is not None else 60309.0 # Dec 31, 2023
