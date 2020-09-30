@@ -13,7 +13,9 @@ from astroquery.jplhorizons import Horizons
 import matplotlib.pyplot as plt
 
 import matplotlib
-matplotlib.use('TkAgg')
+# Use TkAgg backend by default, but don't change backend if called from a Jupyter notebook with inline plots
+if 'module://ipykernel.pylab.backend_inline' not in matplotlib.rcParams['backend']:
+    matplotlib.use('TkAgg')
 
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
 import numpy as np
