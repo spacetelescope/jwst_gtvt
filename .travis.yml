@@ -1,7 +1,11 @@
 language: python
-python: 3.6.10
-
-jobs:
-  include:
-    - name: build
-      script: python setup.py install
+python:
+  - "3.5"
+  - "3.6"      # current default Python on Travis CI
+  - "3.7"
+# command to install dependencies
+install:
+  - python setup.py install
+# command to run tests
+script:
+  - pytest

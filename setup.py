@@ -70,6 +70,7 @@ setup(
             'astropy',
             'matplotlib',
             'astroquery',
+            'pytest',
      ],
      
      python_requires='<=3.7',
