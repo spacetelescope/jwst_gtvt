@@ -635,3 +635,10 @@ You can also use our `delete_cache` utility function. After the software is inst
     $ delete_cache
 
 If cached results exist you will be prompted whether you want to delete the cache folder or not.
+
+
+# Contributing
+
+The `jwst_gtvt` follows the STScI ["forking workflow"](https://github.com/spacetelescope/style-guides/blob/master/guides/git-workflow.md#forking-workflow).
+
+# 
