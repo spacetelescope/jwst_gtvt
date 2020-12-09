@@ -5,6 +5,6 @@ jobs:
   include:
     - name: build
       script: python setup.py install
-    -name: unit-tests
+    - name: unit tests
       script: pytest
 
