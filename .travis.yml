@@ -1,9 +1,11 @@
 language: python
 python: 3.6.10
 
+install:
+  - python setup.py install
+
 jobs:
   include:
-    - name: build and unit tests
-      script: python setup.py install
+    - name: unit tests
       script: pytest
 
