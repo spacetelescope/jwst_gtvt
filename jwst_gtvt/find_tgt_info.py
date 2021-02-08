@@ -115,8 +115,8 @@ def window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end,
     if cvz:
         line = " {0:15} {0:11} {0:11} ".format('CVZ')
     else:
-        line = " {:15} {:11} {:11.2f} ".format(Time(wstart, format='mjd', out_subfmt='date').isot,
-                                               Time(wend, format='mjd', out_subfmt='date').isot,wend-wstart)
+        line = " {:15} {:11} {:11.2f} ".format(Time(wstart, format='mjd').isot,
+                                               Time(wend, format='mjd').isot,wend-wstart)
     line += "{:13.5f} {:13.5f} ".format(pa_start*R2D,pa_end*R2D)
     if fixed:
         line += "{:13.5f} {:13.5f} ".format(ra_start*R2D, dec_start*R2D)
@@ -162,8 +162,8 @@ def main(args, fixed=True):
     # if len(sys.argv) < 3:
     #   print "proper usage:"
     #   print "find_tgt_info.py ra dec [pa]"
-    #   print "finds full visibility windows over [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
-    #     Time(search_start+span/scale, format='mjd', out_subfmt='date').isot)
+    #   print "finds full visibility windows over [{}, {}]".format(Time(search_start, format='mjd').isot,
+    #     Time(search_start+span/scale, format='mjd').isot)
     #   sys.exit(1)
 
 
@@ -200,8 +200,8 @@ def main(args, fixed=True):
     if args.v3pa is not None:
         pa     = float(args.v3pa) * D2R
     if not args.no_verbose:
-        print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
-            Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
+        print("Checked interval [{}, {}]".format(Time(search_start, format='mjd').isot,
+            Time(search_start+span, format='mjd').isot), file=table_output)
     if pa == "X":
         iflag_old = A_eph.in_FOR(search_start,ra[0],dec[0])
         if not args.no_verbose:
@@ -376,13 +376,13 @@ def main(args, fixed=True):
                 if fixed:
                     if not args.no_verbose:
                         print(fmt.format(
-                            Time(atime, format='mjd', out_subfmt='date').isot, minV3PA, maxV3PA,
+                            Time(atime, format='mjd').isot, minV3PA, maxV3PA,
                             minNIRCam_PA, maxNIRCam_PA, minNIRSpec_PA, maxNIRSpec_PA, minNIRISS_PA,
                             maxNIRISS_PA, minMIRI_PA, maxMIRI_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
                 else:
                     if not args.no_verbose:
                         print(fmt.format(
-                            Time(atime, format='mjd', out_subfmt='date').isot, ra[i]*R2D, dec[i]*R2D, minV3PA, maxV3PA,
+                            Time(atime, format='mjd').isot, ra[i]*R2D, dec[i]*R2D, minV3PA, maxV3PA,
                             minNIRCam_PA, maxNIRCam_PA, minNIRSpec_PA, maxNIRSpec_PA, minNIRISS_PA,
                             maxNIRISS_PA, minMIRI_PA, maxMIRI_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
             else:
@@ -577,8 +577,8 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
     # if len(sys.argv) < 3:
     #   print "proper usage:"
     #   print "find_tgt_info.py ra dec [pa]"
-    #   print "finds full visibility windows over [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
-    #     Time(search_start+span/scale, format='mjd', out_subfmt='date').isot)
+    #   print "finds full visibility windows over [{}, {}]".format(Time(search_start, format='mjd').isot,
+    #     Time(search_start+span/scale, format='mjd').isot)
     #   sys.exit(1)
 
     pa = 'X'
@@ -610,8 +610,8 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
     if v3pa is not None:
         pa     = float(v3pa) * D2R
     if verbose:
-        print("Checked interval [{}, {}]".format(Time(search_start, format='mjd', out_subfmt='date').isot,
-            Time(search_start+span, format='mjd', out_subfmt='date').isot), file=table_output)
+        print("Checked interval [{}, {}]".format(Time(search_start, format='mjd').isot,
+            Time(search_start+span, format='mjd').isot), file=table_output)
     if pa == "X":
         iflag_old = A_eph.in_FOR(search_start,ra[0],dec[0])
         if verbose:
@@ -805,14 +805,14 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
                 if fixed:
                     if verbose:
                         print(fmt.format(
-                            Time(atime, format='mjd', out_subfmt='date').isot, V3PA, minV3PA, maxV3PA,
+                            Time(atime, format='mjd').isot, V3PA, minV3PA, maxV3PA,
                             nomNIRCam_PA, minNIRCam_PA, maxNIRCam_PA, nomNIRSpec_PA, minNIRSpec_PA, maxNIRSpec_PA,
                             nomNIRISS_PA, minNIRISS_PA, maxNIRISS_PA, nomMIRI_PA, minMIRI_PA, maxMIRI_PA,
                             nomFGS_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
                 else:
                     if verbose:
                         print(fmt.format(
-                            Time(atime, format='mjd', out_subfmt='date').isot, ra[i]*R2D, dec[i]*R2D, V3PA, minV3PA, maxV3PA,
+                            Time(atime, format='mjd').isot, ra[i]*R2D, dec[i]*R2D, V3PA, minV3PA, maxV3PA,
                             nomNIRCam_PA, minNIRCam_PA, maxNIRCam_PA, nomNIRSpec_PA, minNIRSpec_PA, maxNIRSpec_PA,
                             nomNIRISS_PA, minNIRISS_PA, maxNIRISS_PA, nomMIRI_PA, minMIRI_PA, maxMIRI_PA,
                             nomFGS_PA, minFGS_PA, maxFGS_PA), file=table_output)#,sun_ang
