@@ -641,3 +641,9 @@ If cached results exist you will be prompted whether you want to delete the cach
 
 The `jwst_gtvt` follows the STScI ["forking workflow"](https://github.com/spacetelescope/style-guides/blob/master/guides/git-workflow.md#forking-workflow).
 
+
+# Citation
+
+If you use the JWST General Target Visibility Tool (GTVT) or JWST Moving Target Visibility Tool (MTVT) for work/research presented in a publication, or as a dependency in a software package, we recommend and encourage the following acknowledgment:
+
+This work made use of the JWST General Target Visibility Tool (GTVT) and/or the JWST Moving Target Visibility Tool (MTVT) originally written by Matthew Hill, expanded for moving targets by Michael Kelley, and maintained by Mees Fix.
