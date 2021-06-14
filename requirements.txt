@@ -1,5 +1,5 @@
-astropy==3.2.3
-astroquery==0.4.dev5750
-matplotlib==3.1.2
-numpy==1.17.3
-pysiaf==0.6.2
+astropy>=4.0
+astroquery>=0.4.dev0
+matplotlib>=3.2.1
+numpy>=1.18.2
+pysiaf>=0.6.2
