@@ -10,13 +10,12 @@ import argparse
 from astropy.time import Time
 from astropy.table import Table
 from astroquery.jplhorizons import Horizons
-import matplotlib.pyplot as plt
 
-import matplotlib
 # Use TkAgg backend by default, but don't change backend if called from a Jupyter notebook with inline plots
-if 'module://ipykernel.pylab.backend_inline' not in matplotlib.rcParams['backend']:
-    matplotlib.use('TkAgg')
+# if 'module://ipykernel.pylab.backend_inline' not in matplotlib.rcParams['backend']:
+#     matplotlib.use('TkAgg')
 
+import matplotlib.pyplot as plt
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
 import numpy as np
 from os.path import join, abspath, dirname
@@ -126,7 +125,6 @@ def window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end,
     return line
 
 def main(args, fixed=True):
-
     table_output=None
     if args.save_table is not None:
         table_output = open(args.save_table, 'w')
@@ -514,6 +512,8 @@ def main(args, fixed=True):
 
         if args.save_plot is None:
             plt.show()
+        elif args.save_plot == 'test':
+            plt.close()
         else:
             plt.savefig(args.save_plot)
 
