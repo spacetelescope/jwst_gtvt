@@ -1,8 +1,6 @@
 # JWST General Target Visibility Tool (jwst_gtvt)
 
-JWST requires shielding from the Sun for operation, which limits the available position angles observable at a given time.  
-This script calculates the allowed position angle for a given Right Ascension and Declination for each instrument on the telescope.
-To report any issues, please use the JWST help portal https://jwsthelp.stsci.edu or feel free to open a github issue https://github.com/spacetelescope/jwst_gtvt/issues .
+JWST requires shielding from the Sun for operation, which limits the available position angles observable at a given time. This script calculates the allowed position angle for a given Right Ascension and Declination for each instrument on the telescope.To report any issues, please use the JWST help portal https://jwsthelp.stsci.edu or feel free to open a github issue https://github.com/spacetelescope/jwst_gtvt/issues.
 
 # Dependencies
 
@@ -21,44 +19,48 @@ This tool requires a few packages all of which are included in the Anaconda Pyth
 # Installation
 
 You can install the tool using `pip` with 
-`pip install git+https://github.com/spacetelescope/jwst_gtvt.git`
+`pip install jwst-gtvt`
 
-Alternatively, you can download the ZIP file or clone the respository from GitHub and install the tool from inside the resulting directory with
-`easy_install .`
+Alternatively, you can clone the respository from GitHub and install the tool from inside the resulting directory with
+`python setup.py install`
 
 # Usage
+
 There are two scripts available.  `jwst_gtvt` for fixed targets, and `jwst_mtvt` for moving targets.  To see the help info use
 
     $ jwst_gtvt -h
         usage: jwst_gtvt [-h] [--v3pa V3PA] [--save_plot SAVE_PLOT]
-                         [--save_table SAVE_TABLE] [--instrument INSTRUMENT]
-                         [--name NAME] [--start_date START_DATE] [--end_date END_DATE]
-                         ra dec
+                 [--save_table SAVE_TABLE] [--instrument INSTRUMENT]
+                 [--name NAME] [--start_date START_DATE] [--end_date END_DATE]
+                 [--no_verbose]
+                 ra dec
 
         positional arguments:
-          ra                    Right Ascension of target in either sexagesimal
+        ra                    Right Ascension of target in either sexagesimal
                                 (hh:mm:ss.s) or degrees.
-          dec                   Declination of target in either sexagesimal
+        dec                   Declination of target in either sexagesimal
                                 (dd:mm:ss.s) or degrees.
 
         optional arguments:
-          -h, --help            show this help message and exit
-          --v3pa V3PA           Specify a desired V3 (telescope frame) Position Angle.
-          --save_plot SAVE_PLOT
+        -h, --help            show this help message and exit
+        --v3pa V3PA           Specify a desired V3 (telescope frame) Position Angle.
+        --save_plot SAVE_PLOT
                                 Path of file to save plot output.
-          --save_table SAVE_TABLE
+        --save_table SAVE_TABLE
                                 Path of file to save table output.
-          --instrument INSTRUMENT
+        --instrument INSTRUMENT
                                 If specified plot shows only windows for this
                                 instrument. Options: nircam, nirspec, niriss, miri,
                                 fgs, v3 (case insensitive).
-          --name NAME           Target Name to appear on plots. Names with space
+        --name NAME           Target Name to appear on plots. Names with space
                                 should use double quotes e.g. "NGC 6240".
-          --start_date START_DATE
+        --start_date START_DATE
                                 Start date for visibility search in yyyy-mm-dd format.
                                 Earliest available is 2020-01-01.
-          --end_date END_DATE   End date for visibility search in yyyy-mm-dd format.
+        --end_date END_DATE   End date for visibility search in yyyy-mm-dd format.
                                 Latest available is 2023-12-31.
+        --no_verbose          Suppress table output to screen
+
 # Example
 
 By default you need only specify R.A. and Dec. in either sexigesimal or degrees.
@@ -635,3 +637,15 @@ You can also use our `delete_cache` utility function. After the software is inst
     $ delete_cache
 
 If cached results exist you will be prompted whether you want to delete the cache folder or not.
+
+
+# Contributing
+
+The `jwst_gtvt` follows the STScI ["forking workflow"](https://github.com/spacetelescope/style-guides/blob/master/guides/git-workflow.md#forking-workflow).
+
+
+# Citation
+
+If you use the JWST General Target Visibility Tool (GTVT) or JWST Moving Target Visibility Tool (MTVT) for work/research presented in a publication, or as a dependency in a software package, we recommend and encourage the following acknowledgment:
+
+This work made use of the JWST General Target Visibility Tool (GTVT) and/or the JWST Moving Target Visibility Tool (MTVT) originally written by Matthew Hill, expanded for moving targets by Michael Kelley, and maintained by Mees Fix.

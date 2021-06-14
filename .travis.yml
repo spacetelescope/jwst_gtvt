@@ -1,7 +1,0 @@
-language: python
-python: 3.7.5
-
-jobs:
-  include:
-    - name: build
-      script: easy_install .
