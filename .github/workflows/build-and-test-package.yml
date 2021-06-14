@@ -1,6 +1,6 @@
-name: Test
+name: jwst-gtvt ci
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   Test-GTVT:
