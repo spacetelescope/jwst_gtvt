@@ -47,6 +47,8 @@ setup(
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
     ],
 
     # What does your project relate to?
@@ -69,7 +71,7 @@ setup(
          'pysiaf',
      ],
      
-     python_requires='<=3.7',
+     python_requires='>=3.7',
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
