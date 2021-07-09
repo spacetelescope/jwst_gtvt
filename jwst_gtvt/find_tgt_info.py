@@ -894,7 +894,7 @@ def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
         ax.fmt_xdata = DateFormatter('%Y-%m-%d')
 
 
-def get_angle(instrument, mode, angle_name):
+def get_angle(instrument, aperture, angle_name):
     """Get angle requested by user
 
     Parameters
@@ -902,7 +902,7 @@ def get_angle(instrument, mode, angle_name):
     instrument : JWST instrument of interest
         type : str
     
-    mode : instrument observing mode
+    aperture : instrument observing aperture
         type : str
 
     angle_name : angle of interest
@@ -915,7 +915,7 @@ def get_angle(instrument, mode, angle_name):
     """
     
     siaf = pysiaf.Siaf(instrument)
-    meta = siaf[mode]
+    meta = siaf[aperture]
     angle = getattr(meta, angle_name)
 
     return angle
