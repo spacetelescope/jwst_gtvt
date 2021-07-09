@@ -129,7 +129,7 @@ def main(args, fixed=True):
     if args.save_table is not None:
         table_output = open(args.save_table, 'w')
 
-    NRCALL_FULL_V3IdlYang = get_angle('NIRCAM', 'NRCALL', 'V3IdlYAngle')
+    NRCALL_FULL_V3IdlYang = get_angle('NIRCAM', 'NRCALL_FULL', 'V3IdlYAngle')
     NRS_FULL_MSA_V3IdlYang = get_angle('NIRSPEC', 'NRS_FULL_MSA', 'V3IdlYAngle')
     NIS_V3IdlYang = get_angle('NIRISS', 'NIS_CEN', 'V3IdlYAngle')
     MIRIM_FULL_V3IdlYang = get_angle('MIRI', 'MIRIM_FULL', 'V3IdlYAngle')
@@ -345,8 +345,8 @@ def main(args, fixed=True):
 
                 minV3PA = bound_angle(V3PA - max_boresight_roll)
                 maxV3PA = bound_angle(V3PA + max_boresight_roll)
-                minNIRCam_PA = bound_angle(V3PA - max_boresight_roll + NRCALL_FULL_V2IdlYang)
-                maxNIRCam_PA = bound_angle(V3PA + max_boresight_roll + NRCALL_FULL_V2IdlYang)
+                minNIRCam_PA = bound_angle(V3PA - max_boresight_roll + NRCALL_FULL_V3IdlYang)
+                maxNIRCam_PA = bound_angle(V3PA + max_boresight_roll + NRCALL_FULL_V3IdlYang)
                 minNIRSpec_PA = bound_angle(V3PA - max_boresight_roll + NRS_FULL_MSA_V3IdlYang)
                 maxNIRSpec_PA = bound_angle(V3PA + max_boresight_roll + NRS_FULL_MSA_V3IdlYang)
                 minNIRISS_PA = bound_angle(V3PA - max_boresight_roll + NIS_V3IdlYang)
@@ -547,7 +547,7 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
     if save_table is not None:
         table_output = open(save_table, 'w')
 
-    NRCALL_FULL_V2IdlYang = get_angle('NIRCAM', 'NRCALL', 'V3IdlYAngle')
+    NRCALL_FULL_V3IdlYang = get_angle('NIRCAM', 'NRCALL_FULL', 'V3IdlYAngle')
     NRS_FULL_MSA_V3IdlYang = get_angle('NIRSPEC', 'NRS_FULL_MSA', 'V3IdlYAngle')
     NIS_V3IdlYang = get_angle('NIRISS', 'NIS_CEN', 'V3IdlYAngle')
     MIRIM_FULL_V3IdlYang = get_angle('MIRI', 'MIRIM_FULL', 'V3IdlYAngle')
@@ -763,8 +763,8 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
 
                 minV3PA = bound_angle(V3PA - max_boresight_roll)
                 maxV3PA = bound_angle(V3PA + max_boresight_roll)
-                minNIRCam_PA = bound_angle(V3PA - max_boresight_roll + NRCALL_FULL_V2IdlYang)
-                maxNIRCam_PA = bound_angle(V3PA + max_boresight_roll + NRCALL_FULL_V2IdlYang)
+                minNIRCam_PA = bound_angle(V3PA - max_boresight_roll + NRCALL_FULL_V3IdlYang)
+                maxNIRCam_PA = bound_angle(V3PA + max_boresight_roll + NRCALL_FULL_V3IdlYang)
                 minNIRSpec_PA = bound_angle(V3PA - max_boresight_roll + NRS_FULL_MSA_V3IdlYang)
                 maxNIRSpec_PA = bound_angle(V3PA + max_boresight_roll + NRS_FULL_MSA_V3IdlYang)
                 minNIRISS_PA = bound_angle(V3PA - max_boresight_roll + NIS_V3IdlYang)
@@ -774,7 +774,7 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
                 minFGS_PA = bound_angle(V3PA - max_boresight_roll + FGS1_FULL_V3IdlYang)
                 maxFGS_PA = bound_angle(V3PA + max_boresight_roll + FGS1_FULL_V3IdlYang)
 
-                nomNIRCam_PA = bound_angle(V3PA + NRCALL_FULL_V2IdlYang)
+                nomNIRCam_PA = bound_angle(V3PA + NRCALL_FULL_V3IdlYang)
                 nomNIRSpec_PA = bound_angle(V3PA + NRS_FULL_MSA_V3IdlYang)
                 nomNIRISS_PA = bound_angle(V3PA + NIS_V3IdlYang)
                 nomMIRI_PA = bound_angle(V3PA + MIRIM_FULL_V3IdlYang)
@@ -893,6 +893,7 @@ def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
         ax.set_title(instrument_name)
         ax.fmt_xdata = DateFormatter('%Y-%m-%d')
 
+
 def get_angle(instrument, mode, angle_name):
     """Get angle requested by user
 
@@ -918,6 +919,7 @@ def get_angle(instrument, mode, angle_name):
     angle = getattr(meta, angle_name)
 
     return angle
+
 
 if __name__ == '__main__':
     try:
