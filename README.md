@@ -14,6 +14,8 @@ This tool requires a few packages all of which are included in the Anaconda Pyth
 
 * astroquery (For moving target support)
 
+* pysiaf
+
 # Installation
 
 You can install the tool using `pip` with 

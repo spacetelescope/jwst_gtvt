@@ -64,10 +64,11 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
      install_requires=[
-            'numpy',
-            'astropy',
-            'matplotlib',
-            'astroquery',
+         'numpy',
+         'astropy',
+         'matplotlib',
+         'astroquery',
+         'pysiaf',
      ],
      
      python_requires='>=3.7',
