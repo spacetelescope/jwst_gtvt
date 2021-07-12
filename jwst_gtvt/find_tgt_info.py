@@ -185,7 +185,7 @@ def main(args, fixed=True):
 
     if not args.no_verbose:
         print("", file=table_output)
-        print("       Target", file=table_output)
+        print("", file=table_output)
     if fixed:
         if not args.no_verbose:
             print("                ecliptic", file=table_output)
