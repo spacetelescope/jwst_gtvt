@@ -10,11 +10,7 @@ import argparse
 from astropy.time import Time
 from astropy.table import Table
 from astroquery.jplhorizons import Horizons
-
-# Use TkAgg backend by default, but don't change backend if called from a Jupyter notebook with inline plots
-# if 'module://ipykernel.pylab.backend_inline' not in matplotlib.rcParams['backend']:
-#     matplotlib.use('TkAgg')
-
+from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
 import numpy as np
@@ -139,7 +135,13 @@ def main(args, fixed=True):
 
     A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG, verbose=args.no_verbose)
 
-    search_start = Time(args.start_date, format='iso').mjd if args.start_date is not None else 58849.0  #Jan 1, 2020
+    #  If start_date not provided, just use today's date.
+    if not args.start_date:
+        today = datetime.today().strftime('%Y-%m-%d')
+        search_start = Time(today, format='iso').mjd
+    else:
+        search_start = Time(args.start_date, format='iso').mjd
+
     search_end = Time(args.end_date, format='iso').mjd if args.end_date is not None else 60309.0 # Dec 31, 2023
 
     if not (58849.0 <= search_start <= 60309.0) and args.start_date is not None:
