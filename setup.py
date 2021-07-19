@@ -14,13 +14,15 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+VERSION = '0.2.0'
+
 setup(
     name='jwst-gtvt',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.2.0',
+    version=VERSION,
 
     description='JWST General Target Visibility Tool',
 
