@@ -1,18 +1,3 @@
-import os
 import pkg_resources
 
-module_path = pkg_resources.resource_filename('jwst_gtvt', '')
-setup_path = os.path.normpath(os.path.join(module_path, '../setup.py'))
-
-try:
-    with open(setup_path) as f:
-        data = f.readlines()
-
-    for line in data:
-        if 'VERSION =' in line:
-            __version__ = line.split(' ')[-1].replace("'", "").strip()
-
-
-except FileNotFoundError:
-    print('Could not determine jwst_gtvt version')
-    __version__ = '0.0.0'
+__version__ = pkg_resources.get_distribution("jwst_gtvt").version
