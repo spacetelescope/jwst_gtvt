@@ -9,6 +9,7 @@ import math
 import argparse
 from astropy.time import Time
 from astropy.table import Table
+from astropy.table import join as astropy_join
 from astroquery.jplhorizons import Horizons
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -19,6 +20,7 @@ import pysiaf
 import warnings
 
 from . import ephemeris_old2x as EPH
+from .background_utils import construct_target_background_for_gtvt, compare_and_match_visibility_and_background_data
 
 # ignore astropy warning that Date after 2020-12-30 is "dubious"
 warnings.filterwarnings('ignore', category=UserWarning, append=True)
@@ -28,6 +30,7 @@ D2R = math.pi / 180.  #degrees to radians
 R2D = 180. / math.pi #radians to degrees
 PI2 = 2. * math.pi   # 2 pi
 unit_limit = lambda x: min(max(-1.,x),1.) # forces value to be in [-1,1]
+
 
 def convert_ddmmss_to_float(astring):
     aline = astring.split(':')
@@ -413,6 +416,9 @@ def main(args, fixed=True):
             names=('Date', 'V3PA min', 'V3PA max', 'NIRCam min', 'NIRCam max',
                 'NIRSpec min', 'NIRSpec max', 'NIRISS min', 'NIRISS max',
                 'MIRI min', 'MIRI max', 'FGS min', 'FGS max'))
+
+        # bkg_table = construct_target_background_for_gtvt(ra[0], dec[0])
+        # compare_and_match_visibility_and_background_data(bkg_table, tab)
 
         # Plot observing windows
         if args.instrument is None:

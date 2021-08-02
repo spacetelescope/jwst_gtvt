@@ -69,6 +69,7 @@ setup(
          'matplotlib',
          'astroquery',
          'pysiaf',
+         'jwst-backgrounds'
      ],
      
      python_requires='>=3.7',
