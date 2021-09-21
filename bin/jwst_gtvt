@@ -19,6 +19,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('ra', help='Right Ascension of target in either sexagesimal (hh:mm:ss.s) or degrees.')
     parser.add_argument('dec', help='Declination of target in either sexagesimal (dd:mm:ss.s) or degrees.')
+    parser.add_argument('--bkg_cutoff', help='Background limit cut off for visibility')
     parser.add_argument('--v3pa', help='Specify a desired V3 (telescope frame) Position Angle.')
     parser.add_argument('--save_plot', help='Path of file to save plot output.')
     parser.add_argument('--save_table', help='Path of file to save table output.')

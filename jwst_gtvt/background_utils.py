@@ -57,6 +57,7 @@ def compare_and_match_visibility_and_background_data(bkg_table, visibility_table
             bkg_column.append(0.0)
 
     mytable_no_nan['bkg'] = bkg_column
+    
     return mytable_no_nan
 
 

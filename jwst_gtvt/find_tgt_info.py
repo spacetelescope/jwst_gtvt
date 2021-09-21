@@ -417,8 +417,14 @@ def main(args, fixed=True):
                 'NIRSpec min', 'NIRSpec max', 'NIRISS min', 'NIRISS max',
                 'MIRI min', 'MIRI max', 'FGS min', 'FGS max'))
 
-        # bkg_table = construct_target_background_for_gtvt(ra[0], dec[0])
-        # compare_and_match_visibility_and_background_data(bkg_table, tab)
+        if args.bkg_cutoff:
+            print('Matching background and visibility... This can take a couple of seconds...')
+            bkg_table = construct_target_background_for_gtvt(ra[0], dec[0])
+            tab = compare_and_match_visibility_and_background_data(bkg_table, tab)
+
+            # replace tab variable here for plotting
+            tab = tab[tab['bkg'] >= float(args.bkg_cutoff)]
+            plot_all_instrument_visibility(tab, args)
 
         # Plot observing windows
         if args.instrument is None:
@@ -530,6 +536,29 @@ def main(args, fixed=True):
             plt.close()
         else:
             plt.savefig(args.save_plot)
+
+
+def plot_all_instrument_visibility(visibility_table, args):
+    """Plot each instrument in panel"""
+
+    instruments = ['NIRCam', 'NIRSpec', 'NIRISS', 'MIRI', 'FGS', 'V3PA']
+
+    fig, axs = plt.subplots(2, 3, figsize=(14,8))
+
+    for ax, instrument in zip(axs.reshape(-1), instruments):
+        minimum_visibility_angles, maximim_visibility_angles = filter_and_scale_pitch_angles(visibility_table[instrument + ' min'], visibility_table[instrument + ' max'])
+        ax.fill_between(visibility_table['Date'], minimum_visibility_angles, maximim_visibility_angles, facecolor='.7', edgecolor='.7', lw=2)
+        plt.suptitle('RA {}, DEC {}'.format(args.ra, args.dec), fontsize=20)
+        ax.set_title(instrument)
+        ax.set_ylabel("Available Position Angle (Degree)")
+        ax.fmt_xdata = DateFormatter('%Y-%m-%d')
+
+    # rotate x label
+    labels = ax.get_xticklabels()
+    for label in labels:
+        label.set_rotation(30)
+
+    fig.show()
 
 
 def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_table=None, v3pa=None, fixed=True, verbose=True):
@@ -865,8 +894,6 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
 
 
 
-
-
 def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
 
     min_pa = np.array(min_pa)
@@ -893,9 +920,8 @@ def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
         max_pa[minpa_gt_maxpa] = np.nan
         min_pa[minpa_gt_maxpa] = np.nan
 
-        ax.fill_between(t, min_pa_upper, max_pa_upper, facecolor='.7', edgecolor='.7', lw=2)
         ax.fill_between(t, min_pa_lower, max_pa_lower, facecolor='.7', edgecolor='.7', lw=2)
-        ax.fill_between(t, min_pa, max_pa, edgecolor='.7', facecolor='.7', lw=2)
+
         ax.set_ylabel("Available Position Angle (Degree)")
         ax.set_title(instrument_name)
         ax.fmt_xdata = DateFormatter('%Y-%m-%d')
@@ -950,6 +976,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('ra', help='Right Ascension of target in either sexagesimal (hh:mm:ss.s) or degrees')
     parser.add_argument('dec', help='Declination of target in either sexagesimal (dd:mm:ss.s) or degrees')
+    parser.add_argument('--bkg_cutoff', help='Background limit cut off for visibility')
     parser.add_argument('--pa', help='Specify a desired Position Angle')
     parser.add_argument('--save_plot', help='Path of file to save plot output')
     parser.add_argument('--save_table', help='Path of file to save table output')
