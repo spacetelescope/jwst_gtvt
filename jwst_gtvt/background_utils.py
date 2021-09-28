@@ -3,7 +3,7 @@
 
 from astropy.time import Time
 from astropy.table import Table
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from jwst_backgrounds import jbt
 import numpy as np
 import pandas as pd
@@ -28,7 +28,7 @@ def build_background_table(bkg_data):
     for i, calendar_day in enumerate(bkg_data.bkg_data['calendar']):
         for year in ["2021", "2022", "2023", "2024"]:
             date = convert_day_to_date(str(calendar_day), year) # Convert date to MM-DD-YYYY
-            bkg_table_data['Date'].append(Time(date))
+            bkg_table_data['Date'].append(date)
             bkg_table_data['bkg'].append(bkg_data.bathtub['total_thiswave'][i])
 
     bkg_table = Table(data=bkg_table_data)
@@ -42,11 +42,11 @@ def compare_and_match_visibility_and_background_data(bkg_table, visibility_table
 
     bkg_column = []
 
-    has_nan = np.zeros(len(visibility_table), dtype=bool)
-    for col in visibility_table.itercols():
-        if col.info.dtype.kind == 'f':
-            has_nan |= np.isnan(col)
-    mytable_no_nan = visibility_table[~has_nan]
+    # If target is not visibile, all columns will contain nan for that date
+    # so to obtain the index, I am just selecting one column to find the indices
+    # of the non nan values.
+    index = ~np.isnan(visibility_table['NIRCam min'])
+    mytable_no_nan = visibility_table[index]
 
     for date in mytable_no_nan['Date']:
         if date in bkg_table['Date']:
@@ -57,7 +57,8 @@ def compare_and_match_visibility_and_background_data(bkg_table, visibility_table
             bkg_column.append(0.0)
 
     mytable_no_nan['bkg'] = bkg_column
-    
+    print(mytable_no_nan)
+    print(len(index))
     return mytable_no_nan
 
 
@@ -104,5 +105,7 @@ def convert_day_to_date(day_number, year):
     # converting to date
     res_date = strt_date + timedelta(days=int(day_number) - 1)
     res = res_date.strftime(("%Y-%m-%d"))
-    
-    return res
+
+    formatted_date = datetime.strptime(res, '%Y-%m-%d')
+
+    return formatted_date

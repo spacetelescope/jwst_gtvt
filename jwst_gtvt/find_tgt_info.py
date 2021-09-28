@@ -423,8 +423,10 @@ def main(args, fixed=True):
             tab = compare_and_match_visibility_and_background_data(bkg_table, tab)
 
             # replace tab variable here for plotting
+            print(tab)
             tab = tab[tab['bkg'] >= float(args.bkg_cutoff)]
             plot_all_instrument_visibility(tab, args)
+
 
         # Plot observing windows
         if args.instrument is None:
@@ -546,18 +548,15 @@ def plot_all_instrument_visibility(visibility_table, args):
     fig, axs = plt.subplots(2, 3, figsize=(14,8))
 
     for ax, instrument in zip(axs.reshape(-1), instruments):
-        minimum_visibility_angles, maximim_visibility_angles = filter_and_scale_pitch_angles(visibility_table[instrument + ' min'], visibility_table[instrument + ' max'])
-        ax.fill_between(visibility_table['Date'], minimum_visibility_angles, maximim_visibility_angles, facecolor='.7', edgecolor='.7', lw=2)
-        plt.suptitle('RA {}, DEC {}'.format(args.ra, args.dec), fontsize=20)
-        ax.set_title(instrument)
-        ax.set_ylabel("Available Position Angle (Degree)")
-        ax.fmt_xdata = DateFormatter('%Y-%m-%d')
+        plot_single_instrument(ax, instrument, visibility_table['Date'], visibility_table[instrument + ' min'], visibility_table[instrument + ' max'])
 
-    # rotate x label
-    labels = ax.get_xticklabels()
-    for label in labels:
-        label.set_rotation(30)
+        # rotate x label
+        labels = ax.get_xticklabels()
+        for label in labels:
+            label.set_rotation(30)
 
+    plt.suptitle('RA {}, DEC {}'.format(args.ra, args.dec), fontsize=20)
+    plt.tight_layout()
     fig.show()
 
 
