@@ -418,126 +418,94 @@ def main(args, fixed=True):
                 'MIRI min', 'MIRI max', 'FGS min', 'FGS max'))
 
         if args.bkg_cutoff:
-            print('Matching background and visibility... This can take a couple of seconds...')
             bkg_table = construct_target_background_for_gtvt(ra[0], dec[0])
-            tab = compare_and_match_visibility_and_background_data(bkg_table, tab)
+            combined_table = compare_and_match_visibility_and_background_data(bkg_table, tab)
 
-            # replace tab variable here for plotting
-            print(tab)
-            tab = tab[tab['bkg'] >= float(args.bkg_cutoff)]
-            plot_all_instrument_visibility(tab, args)
+            plot_background_limited_visibility(combined_table, args)
 
+        else:
+            # Plot observing windows
+            if args.instrument is None:
+                plot_all_instrument_visibility(tab, args)
 
-        # Plot observing windows
-        if args.instrument is None:
-            years = YearLocator()
-            months = MonthLocator()
-            yearsFmt = DateFormatter('%Y')
-            monthsFmt = DateFormatter('%m')
-            fig, axes = plt.subplots(2, 3, figsize=(14,8))
+            elif args.instrument.lower() not in ['v3', 'nircam', 'miri', 'nirspec', 'niriss', 'fgs']:
+                print()
+                print(args.instrument+" not recognized. --instrument should be one of: v3, nircam, miri, nirspec, niriss, fgs")
+                return
 
-            axes[0,0].set_title("V3")
-            plot_single_instrument(axes[0,0], "V3", times, minV3PA_data, maxV3PA_data)
-            axes[0,0].fmt_xdata = DateFormatter('%Y-%m-%d')
-            axes[0,0].set_ylabel("Available Position Angle (Degree)")
-            axes[0,0].set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-            labels = axes[0,0].get_xticklabels()
-            for label in labels:
-                label.set_rotation(30)
+            elif args.instrument.lower() == 'v3':
+                fig, ax = plt.subplots(figsize=(14,8))
+                plot_single_instrument(ax, 'Observatory V3', times, minV3PA_data, maxV3PA_data)
+                ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
 
+            elif args.instrument.lower() == 'nircam':
+                fig, ax = plt.subplots(figsize=(14,8))
+                plot_single_instrument(ax, 'NIRCam', times, minNIRCam_PA_data, maxNIRCam_PA_data)
+                ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
+
+            elif args.instrument.lower() == 'miri':
+                fig, ax = plt.subplots(figsize=(14,8))
+                plot_single_instrument(ax, 'MIRI', times, minMIRI_PA_data, maxMIRI_PA_data)
+                ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
+
+            elif args.instrument.lower() == 'nirspec':
+                fig, ax = plt.subplots(figsize=(14,8))
+                plot_single_instrument(ax, 'NIRSpec', times, minNIRSpec_PA_data, maxNIRSpec_PA_data)
+                ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
+
+            elif args.instrument.lower() == 'niriss':
+                fig, ax = plt.subplots(figsize=(14,8))
+                plot_single_instrument(ax, 'NIRISS', times, minNIRISS_PA_data, maxNIRISS_PA_data)
+                ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
+
+            elif args.instrument.lower() == 'fgs':
+                fig, ax = plt.subplots(figsize=(14,8))
+                plot_single_instrument(ax, 'FGS', times, minFGS_PA_data, maxFGS_PA_data)
+                ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
+
+            if args.name is not None:
+                targname = args.name
+            else:
+                targname = ''
             if fixed:
-                axes[0,1].set_title('(R.A. = {}, Dec. = {})\n'.format(args.ra, args.dec)+"NIRCam")
-            plot_single_instrument(axes[0,1], 'NIRCam', times, minNIRCam_PA_data, maxNIRCam_PA_data)
-            axes[0,1].fmt_xdata = DateFormatter('%Y-%m-%d')
-            axes[0,1].set_ylabel("Available Position Angle (Degree)")
-            axes[0,1].set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-            labels = axes[0,1].get_xticklabels()
-            for label in labels:
-                label.set_rotation(30)
+                suptitle = '{} (RA = {}, DEC = {})'.format(targname, args.ra, args.dec)
+            else:
+                suptitle = '{}'.format(targname, args.ra, args.dec)
+                fig.suptitle(suptitle, fontsize=18)
+                fig.tight_layout()
+                fig.subplots_adjust(top=0.88)
 
-            axes[0,2].set_title("MIRI")
-            plot_single_instrument(axes[0,2], 'MIRI', times, minMIRI_PA_data, maxMIRI_PA_data)
-            axes[0,2].set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-            labels = axes[0,2].get_xticklabels()
-            for label in labels:
-                label.set_rotation(30)
+            if args.save_plot is None:
+                plt.show()
+            elif args.save_plot == 'test':
+                plt.close()
+            else:
+                plt.savefig(args.save_plot)
 
-            axes[1,0].set_title("NIRSpec")
-            axes[1,0].fmt_xdata = DateFormatter('%Y-%m-%d')
-            plot_single_instrument(axes[1,0], 'NIRSpec', times, minNIRSpec_PA_data, maxNIRSpec_PA_data)
-            axes[1,0].set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-            labels = axes[1,0].get_xticklabels()
-            for label in labels:
-                label.set_rotation(30)
 
-            axes[1,1].set_title("NIRISS")
-            plot_single_instrument(axes[1,1], 'NIRISS', times, minNIRISS_PA_data, maxNIRISS_PA_data)
-            axes[1,1].set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-            labels = axes[1,1].get_xticklabels()
-            for label in labels:
-                label.set_rotation(30)
+def plot_background_limited_visibility(visibility_table, args):
+    instruments = ['NIRCam', 'NIRSpec', 'NIRISS', 'MIRI', 'FGS', 'V3PA']
 
-            axes[1,2].set_title("FGS")
-            plot_single_instrument(axes[1,2], 'FGS', times, minFGS_PA_data, maxFGS_PA_data)
-            axes[1,2].set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-            labels = axes[1,2].get_xticklabels()
-            for label in labels:
-                label.set_rotation(30)
-            # fig.autofmt_xdate()
+    fig, axs = plt.subplots(2, 3, figsize=(14,8))
 
-        elif args.instrument.lower() not in ['v3', 'nircam', 'miri', 'nirspec', 'niriss', 'fgs']:
-            print()
-            print(args.instrument+" not recognized. --instrument should be one of: v3, nircam, miri, nirspec, niriss, fgs")
-            return
+    greater_than_table = visibility_table[visibility_table['bkg'] >= float(args.bkg_cutoff)]
+    less_than_table = visibility_table[visibility_table['bkg'] <= float(args.bkg_cutoff)]
 
-        elif args.instrument.lower() == 'v3':
-            fig, ax = plt.subplots(figsize=(14,8))
-            plot_single_instrument(ax, 'Observatory V3', times, minV3PA_data, maxV3PA_data)
-            ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
+    for ax, instrument in zip(axs.reshape(-1), instruments):
+        plot_single_instrument(ax, instrument, greater_than_table['Date'], greater_than_table[instrument + ' min'], greater_than_table[instrument + ' max'], label="bkg >= {}".format(args.bkg_cutoff))
+        plot_single_instrument(ax, instrument, less_than_table['Date'], less_than_table[instrument + ' min'], less_than_table[instrument + ' max'], edgecolor='red', facecolor='red', label="bkg <= {}".format(args.bkg_cutoff))
+        # rotate x label
+        labels = ax.get_xticklabels()
+        for label in labels:
+            label.set_rotation(30)
 
-        elif args.instrument.lower() == 'nircam':
-            fig, ax = plt.subplots(figsize=(14,8))
-            plot_single_instrument(ax, 'NIRCam', times, minNIRCam_PA_data, maxNIRCam_PA_data)
-            ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
+    lines_labels = [ax.get_legend_handles_labels() for ax in fig.axes]
+    handles, labels = ax.get_legend_handles_labels()
 
-        elif args.instrument.lower() == 'miri':
-            fig, ax = plt.subplots(figsize=(14,8))
-            plot_single_instrument(ax, 'MIRI', times, minMIRI_PA_data, maxMIRI_PA_data)
-            ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-
-        elif args.instrument.lower() == 'nirspec':
-            fig, ax = plt.subplots(figsize=(14,8))
-            plot_single_instrument(ax, 'NIRSpec', times, minNIRSpec_PA_data, maxNIRSpec_PA_data)
-            ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-
-        elif args.instrument.lower() == 'niriss':
-            fig, ax = plt.subplots(figsize=(14,8))
-            plot_single_instrument(ax, 'NIRISS', times, minNIRISS_PA_data, maxNIRISS_PA_data)
-            ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-
-        elif args.instrument.lower() == 'fgs':
-            fig, ax = plt.subplots(figsize=(14,8))
-            plot_single_instrument(ax, 'FGS', times, minFGS_PA_data, maxFGS_PA_data)
-            ax.set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-
-        if args.name is not None:
-            targname = args.name
-        else:
-            targname = ''
-        if fixed:
-            suptitle = '{} (RA = {}, DEC = {})'.format(targname, args.ra, args.dec)
-        else:
-            suptitle = '{}'.format(targname, args.ra, args.dec)
-        fig.suptitle(suptitle, fontsize=18)
-        fig.tight_layout()
-        fig.subplots_adjust(top=0.88)
-
-        if args.save_plot is None:
-            plt.show()
-        elif args.save_plot == 'test':
-            plt.close()
-        else:
-            plt.savefig(args.save_plot)
+    fig.legend(handles, labels, loc='upper right')
+    plt.suptitle('RA {}, DEC {}'.format(args.ra, args.dec), fontsize=20)
+    plt.tight_layout()
+    plt.show()
 
 
 def plot_all_instrument_visibility(visibility_table, args):
@@ -557,7 +525,7 @@ def plot_all_instrument_visibility(visibility_table, args):
 
     plt.suptitle('RA {}, DEC {}'.format(args.ra, args.dec), fontsize=20)
     plt.tight_layout()
-    fig.show()
+    plt.show()
 
 
 def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_table=None, v3pa=None, fixed=True, verbose=True):
@@ -893,7 +861,7 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
 
 
 
-def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
+def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa, facecolor='0.7', edgecolor='0.7', label=None):
 
     min_pa = np.array(min_pa)
     max_pa = np.array(max_pa)
@@ -919,7 +887,7 @@ def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
         max_pa[minpa_gt_maxpa] = np.nan
         min_pa[minpa_gt_maxpa] = np.nan
 
-        ax.fill_between(t, min_pa_lower, max_pa_lower, facecolor='.7', edgecolor='.7', lw=2)
+        ax.fill_between(t, min_pa_lower, max_pa_lower, facecolor=facecolor, edgecolor=edgecolor, lw=2, alpha=0.7, label=label)
 
         ax.set_ylabel("Available Position Angle (Degree)")
         ax.set_title(instrument_name)
@@ -927,7 +895,7 @@ def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
 
 
     else:
-        ax.fill_between(t, min_pa, max_pa, edgecolor='none', facecolor='.7')
+        ax.fill_between(t, min_pa, max_pa, edgecolor='none', facecolor=facecolor, alpha=0.7, label=label)
         ax.set_ylabel("Available Position Angle (Degree)")
         ax.set_title(instrument_name)
         ax.fmt_xdata = DateFormatter('%Y-%m-%d')

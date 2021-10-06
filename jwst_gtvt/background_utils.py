@@ -45,10 +45,13 @@ def compare_and_match_visibility_and_background_data(bkg_table, visibility_table
     # If target is not visibile, all columns will contain nan for that date
     # so to obtain the index, I am just selecting one column to find the indices
     # of the non nan values.
-    index = ~np.isnan(visibility_table['NIRCam min'])
-    mytable_no_nan = visibility_table[index]
+    
+    # no_nan_index = ~np.isnan(visibility_table['NIRCam min'])
+    # mytable_no_nan = visibility_table[no_nan_index]
 
-    for date in mytable_no_nan['Date']:
+    # mytable_no_nan = visibility_table
+
+    for date in visibility_table['Date']:
         if date in bkg_table['Date']:
             index = np.where(bkg_table['Date'] == date)[0]
             bkg_value_at_date = bkg_table['bkg'][index][0]
@@ -56,10 +59,8 @@ def compare_and_match_visibility_and_background_data(bkg_table, visibility_table
         else:
             bkg_column.append(0.0)
 
-    mytable_no_nan['bkg'] = bkg_column
-    print(mytable_no_nan)
-    print(len(index))
-    return mytable_no_nan
+    visibility_table['bkg'] = bkg_column
+    return visibility_table
 
 
 def construct_target_background_for_gtvt(ra, dec, wavelength=2.15, thresh=1.1):
