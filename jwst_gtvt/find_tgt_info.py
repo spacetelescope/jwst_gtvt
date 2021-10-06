@@ -488,12 +488,12 @@ def plot_background_limited_visibility(visibility_table, args):
 
     fig, axs = plt.subplots(2, 3, figsize=(14,8))
 
-    greater_than_table = visibility_table[visibility_table['bkg'] >= float(args.bkg_cutoff)]
-    less_than_table = visibility_table[visibility_table['bkg'] <= float(args.bkg_cutoff)]
+    less_than_table = visibility_table[visibility_table['bkg'] >= float(args.bkg_cutoff)]
+    greater_than_table = visibility_table[visibility_table['bkg'] <= float(args.bkg_cutoff)]
 
     for ax, instrument in zip(axs.reshape(-1), instruments):
-        plot_single_instrument(ax, instrument, greater_than_table['Date'], greater_than_table[instrument + ' min'], greater_than_table[instrument + ' max'], label="bkg >= {}".format(args.bkg_cutoff))
-        plot_single_instrument(ax, instrument, less_than_table['Date'], less_than_table[instrument + ' min'], less_than_table[instrument + ' max'], edgecolor='red', facecolor='red', label="bkg <= {}".format(args.bkg_cutoff))
+        plot_single_instrument(ax, instrument, greater_than_table['Date'], greater_than_table[instrument + ' min'], greater_than_table[instrument + ' max'], label="bkg <= {}".format(args.bkg_cutoff))
+        plot_single_instrument(ax, instrument, less_than_table['Date'], less_than_table[instrument + ' min'], less_than_table[instrument + ' max'], edgecolor='red', facecolor='red', label="bkg >= {}".format(args.bkg_cutoff))
         # rotate x label
         labels = ax.get_xticklabels()
         for label in labels:
