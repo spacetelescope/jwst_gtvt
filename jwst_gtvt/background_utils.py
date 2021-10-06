@@ -6,7 +6,6 @@ from astropy.table import Table
 from datetime import date, datetime, timedelta
 from jwst_backgrounds import jbt
 import numpy as np
-import pandas as pd
 
 
 def build_background_table(bkg_data):

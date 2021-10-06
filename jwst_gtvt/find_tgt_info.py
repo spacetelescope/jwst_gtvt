@@ -7,6 +7,7 @@ import math
 
 
 import argparse
+import astropy
 from astropy.time import Time
 from astropy.table import Table
 from astropy.table import join as astropy_join
@@ -503,7 +504,11 @@ def plot_background_limited_visibility(visibility_table, args):
     handles, labels = ax.get_legend_handles_labels()
 
     fig.legend(handles, labels, loc='upper right')
-    plt.suptitle('RA {}, DEC {}'.format(args.ra, args.dec), fontsize=20)
+    if isinstance(args.ra, astropy.table.column.MaskedColumn) and isinstance(args.dec, astropy.table.column.MaskedColumn):
+        plt.suptitle('Target {}'.format(args.name), fontsize=20)
+    else:
+        plt.suptitle('RA {}, DEC {}'.format(args.ra, args.dec), fontsize=20)
+
     plt.tight_layout()
     plt.show()
 
