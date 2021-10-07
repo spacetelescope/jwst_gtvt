@@ -87,6 +87,7 @@ def allowed_max_vehicle_roll(sun_ra, sun_dec, ra, dec):
     max_vehicle_roll = math.asin(unit_limit(math.sin(sun_roll)/math.cos(vehicle_pitch)))
     return max_vehicle_roll
 
+
 def get_target_ephemeris(desg, start_date, end_date, smallbody=False):
     """Ephemeris from JPL/HORIZONS.
     smallbody : bool, optional
@@ -431,8 +432,7 @@ def main(args, fixed=True):
 
             elif args.instrument.lower() not in ['v3', 'nircam', 'miri', 'nirspec', 'niriss', 'fgs']:
                 print()
-                print(args.instrument+" not recognized. --instrument should be one of: v3, nircam, miri, nirspec, niriss, fgs")
-                return
+                raise ValueError(args.instrument + " not recognized. --instrument should be one of: v3, nircam, miri, nirspec, niriss, fgs")
 
             elif args.instrument.lower() == 'v3':
                 fig, ax = plt.subplots(figsize=(14,8))
@@ -468,10 +468,11 @@ def main(args, fixed=True):
                 targname = args.name
             else:
                 targname = ''
-            if fixed:
+
+            if fixed and args.instrument:
                 suptitle = '{} (RA = {}, DEC = {})'.format(targname, args.ra, args.dec)
-            else:
-                suptitle = '{}'.format(targname, args.ra, args.dec)
+            elif not fixed and args.instrument:
+                suptitle = '{}'.format(targname)
                 fig.suptitle(suptitle, fontsize=18)
                 fig.tight_layout()
                 fig.subplots_adjust(top=0.88)
@@ -504,6 +505,7 @@ def plot_background_limited_visibility(visibility_table, args):
     handles, labels = ax.get_legend_handles_labels()
 
     fig.legend(handles, labels, loc='upper right')
+    print(type(args.ra), type(args.dec))
     if isinstance(args.ra, astropy.table.column.MaskedColumn) and isinstance(args.dec, astropy.table.column.MaskedColumn):
         plt.suptitle('Target {}'.format(args.name), fontsize=20)
     else:
@@ -527,8 +529,11 @@ def plot_all_instrument_visibility(visibility_table, args):
         labels = ax.get_xticklabels()
         for label in labels:
             label.set_rotation(30)
+    if isinstance(args.ra, astropy.table.column.MaskedColumn) and isinstance(args.dec, astropy.table.column.MaskedColumn):
+        plt.suptitle('Target {}'.format(args.name), fontsize=20)
+    else:
+        plt.suptitle('RA {}, DEC {}'.format(args.ra, args.dec), fontsize=20)
 
-    plt.suptitle('RA {}, DEC {}'.format(args.ra, args.dec), fontsize=20)
     plt.tight_layout()
     plt.show()
 

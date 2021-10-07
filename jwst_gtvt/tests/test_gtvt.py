@@ -40,6 +40,8 @@ class mimic_parser:
         self.instrument = None
         self.name = None
         self.save_plot = 'test'
+        self.bkg_cutoff = 0.0
+
 
 def test_ra_dec_hour_min_sec():
     """Test end-to-end for jwst_gtvt fixed target given ra and dec in hours:minutes:seconds"""
