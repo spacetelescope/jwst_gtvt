@@ -18,10 +18,11 @@ from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
 import numpy as np
 from os.path import join, abspath, dirname
 import pysiaf
+from tqdm import tqdm
 import warnings
 
 from . import ephemeris_old2x as EPH
-from .background_utils import construct_target_background_for_gtvt, compare_and_match_visibility_and_background_data
+from .background_utils import construct_target_background_for_gtvt, compare_and_match_visibility_and_background_data, get_moving_target_background
 
 # ignore astropy warning that Date after 2020-12-30 is "dubious"
 warnings.filterwarnings('ignore', category=UserWarning, append=True)
@@ -107,7 +108,7 @@ def get_target_ephemeris(desg, start_date, end_date, smallbody=False):
 
     eph = obj.ephemerides(cache=False, quantities=(1))
 
-    return eph['targetname'][0], eph['RA'], eph['DEC']
+    return eph['targetname'][0], eph['RA'], eph['DEC'], eph['datetime_jd']
 
 
 def window_summary_line(fixed, wstart, wend, pa_start, pa_end, ra_start, ra_end, dec_start, dec_end, cvz=False):
@@ -420,9 +421,21 @@ def main(args, fixed=True):
                 'MIRI min', 'MIRI max', 'FGS min', 'FGS max'))
 
         if args.bkg_cutoff:
-            bkg_table = construct_target_background_for_gtvt(ra[0], dec[0])
-            combined_table = compare_and_match_visibility_and_background_data(bkg_table, tab)
+            if fixed:
+                bkg_table = construct_target_background_for_gtvt(ra[0], dec[0])
+            else:
+                bkg_table_data = {'Date': [], 'bkg':[]}
+                print('COLLECTING BACKGROUND AS A FUNCTION OF RA, DEC, & TIME....')
+                for RA, DEC, DATE in tqdm(zip(args.ra, args.dec, args.julian_date), total=len(args.ra)):
+                    date, bkg_value = get_moving_target_background(RA, DEC, DATE)
+                    bkg_table_data['Date'].append(date)
+                    bkg_table_data['bkg'].append(bkg_value)
+            
+                bkg_table = Table(data=bkg_table_data)
 
+            print(bkg_table)
+
+            combined_table = compare_and_match_visibility_and_background_data(bkg_table, tab)
             plot_background_limited_visibility(combined_table, args)
 
         else:
@@ -490,8 +503,8 @@ def plot_background_limited_visibility(visibility_table, args):
 
     fig, axs = plt.subplots(2, 3, figsize=(14,8))
 
-    less_than_table = visibility_table[visibility_table['bkg'] >= float(args.bkg_cutoff)]
-    greater_than_table = visibility_table[visibility_table['bkg'] <= float(args.bkg_cutoff)]
+    less_than_table = visibility_table[visibility_table['bkg'] <= float(args.bkg_cutoff)]
+    greater_than_table = visibility_table[visibility_table['bkg'] >= float(args.bkg_cutoff)]
 
     for ax, instrument in zip(axs.reshape(-1), instruments):
         plot_single_instrument(ax, instrument, greater_than_table['Date'], greater_than_table[instrument + ' min'], greater_than_table[instrument + ' max'], label="bkg <= {}".format(args.bkg_cutoff))
@@ -505,7 +518,7 @@ def plot_background_limited_visibility(visibility_table, args):
     handles, labels = ax.get_legend_handles_labels()
 
     fig.legend(handles, labels, loc='upper right')
-    print(type(args.ra), type(args.dec))
+
     if isinstance(args.ra, astropy.table.column.MaskedColumn) and isinstance(args.dec, astropy.table.column.MaskedColumn):
         plt.suptitle('Target {}'.format(args.name), fontsize=20)
     else:

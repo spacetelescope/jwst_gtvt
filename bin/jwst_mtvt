@@ -20,7 +20,7 @@ if __name__ == '__main__':
     parser.add_argument('--no_verbose', action="store_true", default=False, help='Suppress table output to screen')
     args = parser.parse_args()
 
-    name, args.ra, args.dec = get_target_ephemeris(
+    name, args.ra, args.dec, args.julian_date = get_target_ephemeris(
         ' '.join(args.desg), args.start_date, args.end_date, smallbody=args.smallbody)
     if args.name is None:
         args.name = name
