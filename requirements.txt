@@ -3,6 +3,6 @@ astroquery>=0.4.dev0
 matplotlib>=3.2.1
 numpy>=1.18.2
 pysiaf>=0.6.2
-jwst_background>=1.1.2
+jwst-backgrounds>=1.1.2
 dask>=2021.08.1
 psutil>=5.8.0
