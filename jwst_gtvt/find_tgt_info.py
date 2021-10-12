@@ -13,10 +13,13 @@ from astropy.table import Table
 from astropy.table import join as astropy_join
 from astroquery.jplhorizons import Horizons
 from datetime import datetime
+import dask
+from dask.diagnostics import ProgressBar
 import matplotlib.pyplot as plt
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
 import numpy as np
 from os.path import join, abspath, dirname
+import psutil
 import pysiaf
 from tqdm import tqdm
 import warnings
@@ -424,16 +427,20 @@ def main(args, fixed=True):
             if fixed:
                 bkg_table = construct_target_background_for_gtvt(ra[0], dec[0])
             else:
-                bkg_table_data = {'Date': [], 'bkg':[]}
+                delayed_results = []
                 print('COLLECTING BACKGROUND AS A FUNCTION OF RA, DEC, & TIME....')
-                for RA, DEC, DATE in tqdm(zip(args.ra, args.dec, args.julian_date), total=len(args.ra)):
-                    date, bkg_value = get_moving_target_background(RA, DEC, DATE)
-                    bkg_table_data['Date'].append(date)
-                    bkg_table_data['bkg'].append(bkg_value)
-            
-                bkg_table = Table(data=bkg_table_data)
+                print('TARGET: {} || PROCESSORS AVAILABLE ON MACHINE: {} || USING {} PROCESSORS'.format(args.name, psutil.cpu_count(), args.num_cpu))
 
-            print(bkg_table)
+                for RA, DEC, DATE in zip(args.ra, args.dec, args.julian_date):
+                    background_results = dask.delayed(get_moving_target_background)(RA, DEC, DATE)
+                    delayed_results.append(background_results)
+
+                with ProgressBar():
+                    result = dask.compute(delayed_results, num_workers=args.num_cpu)[0]
+
+                date, bkg = zip(*result)
+                bkg_table_data = {'Date': date, 'bkg': bkg}
+                bkg_table = Table(data=bkg_table_data)
 
             combined_table = compare_and_match_visibility_and_background_data(bkg_table, tab)
             plot_background_limited_visibility(combined_table, args)

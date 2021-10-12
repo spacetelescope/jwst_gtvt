@@ -11,6 +11,7 @@ if __name__ == '__main__':
     parser.add_argument('--smallbody', action='store_true', help='Set if the designation is that of a comet or asteroid.  This is required for periodic comets with multiple orbit solutions in JPL/HORIZONS.')
     parser.add_argument('--v3pa', help='Specify a desired V3 (telescope frame) Position Angle.')
     parser.add_argument('--bkg_cutoff', help='Background limit cut off for visibility')
+    parser.add_argument('--num_cpu', type=int, default=1, help='Number of processors for moving target support')
     parser.add_argument('--save_plot', help='Path of file to save plot output.')
     parser.add_argument('--save_table', help='Path of file to save table output.')
     parser.add_argument('--instrument', help='If specified plot shows only windows for this instrument.  Options: nircam, nirspec, niriss, miri, fgs, v3 (case insensitive).')
