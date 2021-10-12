@@ -21,7 +21,6 @@ import numpy as np
 from os.path import join, abspath, dirname
 import psutil
 import pysiaf
-from tqdm import tqdm
 import warnings
 
 from . import ephemeris_old2x as EPH
