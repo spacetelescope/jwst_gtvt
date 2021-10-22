@@ -616,9 +616,10 @@ Below is an example of the full text output
 
 # Background Cut Off Example
 
-The JWST GTVT will display visible angles based on background cut off limit specified by the `--bkg_cutoff` flag. Providing
-a background cut off will call [JWST Background](https://github.com/spacetelescope/jwst_backgrounds) and flag any positions
-that have a background value greater than or equal to the cut off provided.
+The JWST GTVT will display visible angles based on background cut off limit specified by the `--bkg_cutoff` flag (units are in 
+MegaJanskys per steradian [MJy/sr]). Providing a background cut off will call
+ [JWST Background](https://github.com/spacetelescope/jwst_backgrounds) and flag any positions that have a background value greater 
+ than or equal to the cut off provided.
 
 `$ jwst_gtvt 16:52:58.9 02:24:03 --bkg_cutoff 0.1`
 
