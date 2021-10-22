@@ -40,6 +40,8 @@ class mimic_parser:
         self.instrument = None
         self.name = None
         self.save_plot = 'test'
+        self.bkg_cutoff = 0.0
+
 
 def test_ra_dec_hour_min_sec():
     """Test end-to-end for jwst_gtvt fixed target given ra and dec in hours:minutes:seconds"""
@@ -60,7 +62,7 @@ def test_moving_target():
     
     args = mimic_parser(fixed=False, desg=['Ceres'])
 
-    name, args.ra, args.dec = get_target_ephemeris(
+    name, args.ra, args.dec, _ = get_target_ephemeris(
         ' '.join(args.desg), args.start_date, args.end_date, smallbody=args.smallbody)
     if args.name is None:
         args.name = name

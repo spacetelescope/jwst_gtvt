@@ -29,37 +29,31 @@ Alternatively, you can clone the respository from GitHub and install the tool fr
 There are two scripts available.  `jwst_gtvt` for fixed targets, and `jwst_mtvt` for moving targets.  To see the help info use
 
     $ jwst_gtvt -h
-        usage: jwst_gtvt [-h] [--v3pa V3PA] [--save_plot SAVE_PLOT]
-                 [--save_table SAVE_TABLE] [--instrument INSTRUMENT]
-                 [--name NAME] [--start_date START_DATE] [--end_date END_DATE]
-                 [--no_verbose]
+        usage: jwst_gtvt [-h] [--bkg_cutoff BKG_CUTOFF] [--v3pa V3PA] [--save_plot SAVE_PLOT] [--save_table SAVE_TABLE] [--instrument INSTRUMENT] [--name NAME] [--start_date START_DATE]
+                 [--end_date END_DATE] [--no_verbose]
                  ra dec
 
         positional arguments:
-        ra                    Right Ascension of target in either sexagesimal
-                                (hh:mm:ss.s) or degrees.
-        dec                   Declination of target in either sexagesimal
-                                (dd:mm:ss.s) or degrees.
+            ra                    Right Ascension of target in either sexagesimal (hh:mm:ss.s) or degrees.
+            dec                   Declination of target in either sexagesimal (dd:mm:ss.s) or degrees.
 
         optional arguments:
-        -h, --help            show this help message and exit
-        --v3pa V3PA           Specify a desired V3 (telescope frame) Position Angle.
-        --save_plot SAVE_PLOT
-                                Path of file to save plot output.
-        --save_table SAVE_TABLE
-                                Path of file to save table output.
-        --instrument INSTRUMENT
-                                If specified plot shows only windows for this
-                                instrument. Options: nircam, nirspec, niriss, miri,
-                                fgs, v3 (case insensitive).
-        --name NAME           Target Name to appear on plots. Names with space
-                                should use double quotes e.g. "NGC 6240".
-        --start_date START_DATE
-                                Start date for visibility search in yyyy-mm-dd format.
-                                Earliest available is 2020-01-01.
-        --end_date END_DATE   End date for visibility search in yyyy-mm-dd format.
-                                Latest available is 2023-12-31.
-        --no_verbose          Suppress table output to screen
+            -h, --help            show this help message and exit
+            --bkg_cutoff BKG_CUTOFF
+                                    Background limit cut off for visibility
+            --v3pa V3PA           Specify a desired V3 (telescope frame) Position Angle.
+            --save_plot SAVE_PLOT
+                                    Path of file to save plot output.
+            --save_table SAVE_TABLE
+                                    Path of file to save table output.
+            --instrument INSTRUMENT
+                                    If specified plot shows only windows for this instrument. Options: nircam, nirspec, niriss, miri, fgs, v3 (case insensitive).
+            --name NAME           Target Name to appear on plots. Names with space should use double quotes e.g. "NGC 6240".
+            --start_date START_DATE
+                                    Start date for visibility search in yyyy-mm-dd format. Earliest available is 2020-01-01.
+            --end_date END_DATE   End date for visibility search in yyyy-mm-dd format. Latest available is 2023-12-31.
+            --no_verbose          Suppress table output to screen
+
 
 # Example
 
@@ -619,6 +613,17 @@ Below is an example of the full text output
     2023-09-08    91.24 100.58    91.21 100.55   228.73 238.06    90.67 100.01    96.25 105.59    89.99  99.33
     2023-09-09    91.38  99.63    91.36  99.60   228.87 237.11    90.81  99.06    96.40 104.64    90.13  98.37
     2023-09-10    91.53  98.67    91.50  98.65   229.01 236.16    90.96  98.10    96.54 103.69    90.28  97.42
+
+# Background Cut Off Example
+
+The JWST GTVT will display visible angles based on background cut off limit specified by the `--bkg_cutoff` flag (units are in 
+MegaJanskys per steradian [MJy/sr]). Providing a background cut off will call
+ [JWST Background](https://github.com/spacetelescope/jwst_backgrounds) and flag any positions that have a background value greater 
+ than or equal to the cut off provided.
+
+`$ jwst_gtvt 16:52:58.9 02:24:03 --bkg_cutoff 0.1`
+
+![Background Plot](docs/jwst_target_visibility_bkgcutoff.png "Example plot using background cut off flag.")
 
 # Troubleshooting
 

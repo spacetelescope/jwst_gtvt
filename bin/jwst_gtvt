@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import argparse
+from datetime import datetime
 import sys
 
 from jwst_gtvt.find_tgt_info import main
@@ -19,12 +20,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('ra', help='Right Ascension of target in either sexagesimal (hh:mm:ss.s) or degrees.')
     parser.add_argument('dec', help='Declination of target in either sexagesimal (dd:mm:ss.s) or degrees.')
+    parser.add_argument('--bkg_cutoff', help='Background limit cut off (in  MJy/sr) for visibility')
     parser.add_argument('--v3pa', help='Specify a desired V3 (telescope frame) Position Angle.')
     parser.add_argument('--save_plot', help='Path of file to save plot output.')
     parser.add_argument('--save_table', help='Path of file to save table output.')
     parser.add_argument('--instrument', help='If specified plot shows only windows for this instrument.  Options: nircam, nirspec, niriss, miri, fgs, v3 (case insensitive).')
     parser.add_argument('--name', help='Target Name to appear on plots.  Names with space should use double quotes e.g. "NGC 6240".')
-    parser.add_argument('--start_date', help='Start date for visibility search in yyyy-mm-dd format. Earliest available is 2020-01-01.')
+    parser.add_argument('--start_date', default=datetime.today().strftime('%Y-%m-%d'), help='Start date for visibility search in yyyy-mm-dd format. Earliest available is 2020-01-01.')
     parser.add_argument('--end_date', help='End date for visibility search in yyyy-mm-dd format. Latest available is 2023-12-31.')
     parser.add_argument('--no_verbose', action="store_true", default=False, help='Suppress table output to screen')
     args = parser.parse_args(arg_list)
