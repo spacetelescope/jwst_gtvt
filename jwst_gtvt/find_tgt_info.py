@@ -139,13 +139,13 @@ def main(args, fixed=True):
 
     A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG, verbose=args.no_verbose)
 
-    search_start = Time(args.start_date, format='iso').mjd if args.start_date is not None else 58849.0  #Jan 1, 2020
-    search_end = Time(args.end_date, format='iso').mjd if args.end_date is not None else 60309.0 # Dec 31, 2023
+    search_start = Time(args.start_date, format='iso').mjd if args.start_date is not None else 58850.0  #Dec 19, 2021g
+    search_end = Time(args.end_date, format='iso').mjd if args.end_date is not None else 60297.0 # Dec 31, 2023
 
-    if not (58849.0 <= search_start <= 60309.0) and args.start_date is not None:
-        raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(args.start_date, '2020-01-01', '2023-12-31'))
-    if not (58849.0 <= search_end <= 60309.0) and args.end_date is not None:
-        raise ValueError('End date {} outside of available ephemeris {} to {}'.format(args.end_date, '2020-01-01', '2023-12-31'))
+    if not (58850.0 <= search_start <= 60297.0) and args.start_date is not None:
+        raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(args.start_date, '2020-12-19', '2023-12-19'))
+    if not (58850.0 <= search_end <= 60297.0) and args.end_date is not None:
+        raise ValueError('End date {} outside of available ephemeris {} to {}'.format(args.end_date, '2021-12-19', '2023-12-19'))
     if search_start > search_end:
         raise ValueError('Start date {} should be before end date {}'.format(args.start_date, args.end_date))
 
@@ -563,12 +563,12 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
 
     A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2020-2024.txt"),ECL_FLAG, verbose=verbose)
 
-    search_start = Time(start_date, format='iso').mjd if start_date is not None else 58849.0  #Jan 1, 2020
-    search_end = Time(end_date, format='iso').mjd if end_date is not None else 60309.0 # Dec 31, 2023
+    search_start = Time(start_date, format='iso').mjd if start_date is not None else 59567.0  #Jan 1, 2020
+    search_end = Time(end_date, format='iso').mjd if end_date is not None else 62854.0 # Dec 31, 2023
 
-    if not (58849.0 <= search_start <= 60309.0) and start_date is not None:
+    if not (59567.0 <= search_start <= 62854.0) and start_date is not None:
         raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(start_date, '2020-01-01', '2023-12-31'))
-    if not (58849.0 <= search_end <= 60309.0) and end_date is not None:
+    if not (59567.0 <= search_end <= 62854.0) and end_date is not None:
         raise ValueError('End date {} outside of available ephemeris {} to {}'.format(end_date, '2020-01-01', '2023-12-31'))
     if search_start > search_end:
         raise ValueError('Start date {} should be before end date {}'.format(start_date, end_date))
