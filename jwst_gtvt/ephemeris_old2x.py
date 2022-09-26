@@ -7,7 +7,6 @@ import sys
 #import time_extensionsx as time2
 from math import *
 from .rotationsx import *
-from . import astro_funcx as astro_func
 
 D2R = pi/180.  #degrees to radians
 R2D = 180. / pi #radians to degrees 
@@ -21,7 +20,7 @@ obliquity_of_the_ecliptic = -23.439291  # At J2000 equinox
 obliquity_of_the_ecliptic *=  D2R
 Qecl2eci = QX(obliquity_of_the_ecliptic)
 
-
+epsilon = 23.43929 * D2R #obliquity of the ecliptic J2000
 
 class Ephemeris:
     def __init__(self, afile, cnvrt=False, verbose=True):
@@ -115,6 +114,26 @@ class Ephemeris:
         del fin
         #print len(self.datelist),len(self.xlist),len(self.ylist),len(self.zlist)
         
+    def pa(self, tgt_c1, tgt_c2, obj_c1, obj_c2):
+        """calculates position angle of object at tgt position."""
+        y = cos(obj_c2)*sin(obj_c1-tgt_c1)
+        x = (sin(obj_c2)*cos(tgt_c2)-cos(obj_c2)*sin(tgt_c2)*cos(obj_c1-tgt_c1))
+        p = atan2(y,x)
+        if p < 0.: p += PI2
+        if p >= PI2: p -= PI2
+        return p
+
+    def delta_pa_no_roll(self, pos1_c1, pos1_c2, pos2_c1, pos2_c2):
+        """Calculates the change in position angle between two positions with no roll about V1"""
+        u = (sin(pos1_c2) + sin(pos2_c2)) * sin(pos2_c1 - pos1_c1)
+        v = cos(pos2_c1 - pos1_c1) + cos(pos1_c2)*cos(pos2_c2)+ sin(pos1_c2)*sin(pos2_c2)*cos(pos2_c1 - pos1_c1)
+        return atan2(u,v)
+
+    def dist(self, obj1_c1, obj1_c2, obj2_c1, obj2_c2):
+        """angular distance betrween two objects, positions specified in spherical coordinates."""
+        x = cos(obj2_c2)*cos(obj1_c2)*cos(obj2_c1-obj1_c1) + sin(obj2_c2)*sin(obj1_c2)
+        return acos(unit_limit(x))
+
     def report_ephemeris (self, limit=100000, pathname=None):
         """Prints a formatted report of the ephemeris.
         
@@ -175,7 +194,7 @@ class Ephemeris:
 
     def normal_pa(self,adate,tgt_c1,tgt_c2):
         (sun_c1, sun_c2) = self.sun_pos(adate)
-        sun_pa = astro_func.pa(tgt_c1,tgt_c2,sun_c1,sun_c2)
+        sun_pa = self.pa(tgt_c1,tgt_c2,sun_c1,sun_c2)
         V3_pa = sun_pa + pi  # We want -V3 pointed towards sun.
         if V3_pa < 0. : V3_pa += PI2
         if V3_pa >= PI2 : V3_pa -= PI2
@@ -189,12 +208,12 @@ class Ephemeris:
             return False
             
         (sun_1,sun_2) = self.sun_pos(date)
-        d = astro_func.dist(coord_1,coord_2,sun_1,sun_2)
+        d = self.dist(coord_1,coord_2,sun_1,sun_2)
         vehicle_pitch = pi/2 - d   #see JI memo from May 2006
         #sun pitch is always equal or greater than sun angle (V1 to sun)
         if (d<MIN_SUN_ANGLE or d>MAX_SUN_ANGLE):
             return False
-        pa = astro_func.pa(coord_1, coord_2, sun_1, sun_2) + pi
+        pa = self.pa(coord_1, coord_2, sun_1, sun_2) + pi
         roll = acos(cos(V3pa - pa))
         sun_roll = asin(sin(roll) * cos(vehicle_pitch))
         if (abs(sun_roll)<=5.2*D2R):
@@ -205,7 +224,7 @@ class Ephemeris:
 
     def in_FOR(self,adate,coord_1,coord_2):
         (sun_1,sun_2) = self.sun_pos(adate)
-        d = astro_func.dist(coord_1,coord_2,sun_1,sun_2)
+        d = self.dist(coord_1,coord_2,sun_1,sun_2)
         #print d*R2D
         #90 - sun pitch is always equal or greater than sun angle (V1 to sun)
         if (d<MIN_SUN_ANGLE or d>MAX_SUN_ANGLE):
@@ -217,7 +236,7 @@ class Ephemeris:
         mid_date = (in_date+out_date)/2.
         while delta_days > 0.000001:
             (sun_1,sun_2) = self.sun_pos(mid_date)
-            d = astro_func.dist(coord_1,coord_2,sun_1,sun_2)
+            d = self.dist(coord_1,coord_2,sun_1,sun_2)
             if (d>MAX_SUN_ANGLE or d<MIN_SUN_ANGLE):
                 out_date = mid_date
             else:
