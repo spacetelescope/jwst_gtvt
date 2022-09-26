@@ -216,7 +216,7 @@ class Ephemeris:
         # 90 - sun pitch is always equal or greater than sun angle (V1 to sun)
         if (d < MIN_SUN_ANGLE or d > MAX_SUN_ANGLE):
             return False
-``
+
         return True
 
     def bisect_by_FOR(self,in_date,out_date,coord_1,coord_2):#in and out of FOR, assumes only one "root" in interval
