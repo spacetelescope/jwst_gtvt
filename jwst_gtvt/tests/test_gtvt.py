@@ -1,4 +1,5 @@
 """ JWST GENERAL AND MOVING TARGET VISIBILITY TOOL TESTS"""
+import filecmp
 
 from jwst_gtvt.find_tgt_info import main as jwst_gtvt_main
 from jwst_gtvt.find_tgt_info import get_target_ephemeris
@@ -34,7 +35,7 @@ class mimic_parser:
 
         self.save_table = None
         self.no_verbose = True
-        self.start_date = '2020-01-01'
+        self.start_date = '2021-12-26'
         self.end_date = '2023-12-31'
         self.v3pa = None
         self.instrument = None
@@ -66,3 +67,21 @@ def test_moving_target():
         args.name = name
 
     jwst_gtvt_main(args, fixed=False)
+
+
+# def test_gtvt_table_output():
+#     """Test results from current branch to file that is created with same parameters below.
+#     """
+#     import os
+    
+#     pwd = os.getcwd()
+
+#     benchmark = os.path.join(pwd, 'jwst_gtvt/tests/data', 'benchmark_table_data')
+#     test_data = os.path.join(pwd, 'jwst_gtvt/tests/data', 'table_to_test') 
+
+#     args = mimic_parser(ra='16:52:58.9', dec='02:24:03')
+#     args.save_table = test_data
+
+#     jwst_gtvt_main(args)
+
+#     assert filecmp.cmp(benchmark, test_data)
