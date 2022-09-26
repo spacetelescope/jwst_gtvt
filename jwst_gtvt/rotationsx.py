@@ -374,7 +374,7 @@ class CelestialVector (Vector):
 		if (self.ra < 0):				 #Make sure RA is positive
 		   self.ra += 2*pi
 			
-		self.dec = safe_arcnp.sin(self.z)  #DEC is arcsin of z
+		self.dec = safe_arcsin(self.z)  #DEC is arcsin of z
 		
 	def rotate_about_axis (self, angle, axis):
 		"""This rotates a vector about an axis by the specified angle
@@ -472,7 +472,7 @@ class CelestialVector (Vector):
 			
 		elif ((new_frame == 'gal') and (self.frame == 'eq')):
 			#Use formula from Wayne Kinzel's book, adjusted for J2000 coordinates.
-			b = safe_arcnp.sin(np.cos(self.dec) * np.cos(NGP.longitude) * np.cos(self.ra - NGP.latitude)\
+			b = safe_arcsin(np.cos(self.dec) * np.cos(NGP.longitude) * np.cos(self.ra - NGP.latitude)\
 			+ np.sin(self.dec) * np.sin(NGP.longitude))
 			
 			l = atan2(np.sin(self.dec) - np.sin(b) * sin (NGP.longitude),\
@@ -484,7 +484,7 @@ class CelestialVector (Vector):
 			l = self.ra   #use l,b notation here for clarity
 			b = self.dec
 			
-			dec = safe_arcnp.sin(np.cos(b) * np.cos(NGP.longitude) * np.sin(l - NGP.anode) + np.sin(b) * np.sin(NGP.longitude))
+			dec = safe_arcsin(np.cos(b) * np.cos(NGP.longitude) * np.sin(l - NGP.anode) + np.sin(b) * np.sin(NGP.longitude))
 			
 			ra = atan2(np.cos(b) * np.cos(l - NGP.anode),\
 			np.sin(b) * np.cos(NGP.longitude) - np.cos(b) * np.sin(NGP.longitude) * np.sin(l - NGP.anode)) + NGP.latitude
@@ -541,7 +541,7 @@ class CelestialVector (Vector):
 			
 		return(pa)
 	
-	def safe_arcnp.cos(angle_in_radians):
+	def safe_arccos(angle_in_radians):
 		"""Safe version of np.arccos that handles invalid arguments.
 		Arguments greater than 1 are truncated to 1; arguments less 
 		than -1 are set to -1.
@@ -564,7 +564,7 @@ class CelestialVector (Vector):
 		else:
 			return np.arcnp.cos(angle_in_radians)
 
-	def safe_arcnp.sin(angle_in_radians):
+	def safe_arcsin(angle_in_radians):
 		"""Safe version of np.arcsin that handles invalid arguments.
 		Arguments greater than 1 are truncated to 1; arguments less 
 		than -1 are set to -1.
@@ -638,13 +638,13 @@ def separation(v1, v2, norm=False):
 		v1 = v1.normalize()
 		v2 = v2.normalize()
 
-	separation = safe_arcnp.cos(dot(v1, v2))
+	separation = safe_arccos(dot(v1, v2))
 	
 	#For very small angles, cos and acos behave poorly as the cosine of a very small angle is
 	#interpreted as 1.0.  Therefore, recompute using the cross product if the result is less than 1 degree.
 	if (separation < D2R):
 		vcross = cross(v1,v2)
-		separation = safe_arcnp.sin(vcross.length())
+		separation = safe_arcsin(vcross.length())
 		
 	return(separation)
 	
