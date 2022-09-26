@@ -806,7 +806,7 @@ def cvt_inert2att_Q_to_angles(Q):
    V1_eci_pt = Q.inv_cnvrt(V1_body)
    coord1  = math.atan2(V1_eci_pt.y,V1_eci_pt.x)
    if coord1 < 0. : coord1 += PI2
-   coord2 = math.anp.sin(unit_limit(V1_eci_pt.z))
+   coord2 = np.arcsin(unit_limit(V1_eci_pt.z))
 
    V3_body = Vector(0.,0.,1.)
    V3_eci_pt = Q.inv_cnvrt(V3_body)
@@ -830,7 +830,7 @@ are 321 mapped to ra,-dec,-pa"""
    ra = math.atan2(2.*(q1*q2 - q3*q4), q1*q1 - q2*q2 - q3*q3 +q4*q4)
    if ra < 0.: ra += PI2
    arg = min(1.,max(-1.,2.*(q1*q3 + q2*q4)))
-   dec = math.anp.sin(arg)
+   dec = np.arcsin(arg)
    pa = math.atan2(-2.*(q2*q3 - q1*q4), -q1*q1 - q2*q2 + q3*q3 +q4*q4)
    if pa < 0.: pa += PI2
    return (ra,dec,pa)
@@ -874,7 +874,7 @@ def cvt_v2v3_using_body2inertial_Q_to_c1c2pa_tuple(Q,v2,v3):
    Vp_eci_pt = Q.cnvrt(Vp_body)
    coord1  = atan2(Vp_eci_pt.y,Vp_eci_pt.x)
    if coord1 < 0. : coord1 += PI2
-   coord2 = anp.sin(unit_limit(Vp_eci_pt.z))
+   coord2 = np.arcsin(unit_limit(Vp_eci_pt.z))
 
    V3_body = Vector(0.,0.,1.)
    V3_eci_pt = Q.cnvrt(V3_body)
@@ -896,7 +896,7 @@ def cvt_c1c2_using_body2inertial_Q_to_v2v3pa_tuple(Q,coord1,coord2):
    Vp_eci.set_xyz_from_angs(coord1,coord2)
    Vp_body_pt = Q.inv_cnvrt(Vp_eci)
    v2 = atan2(Vp_body_pt.y,Vp_body_pt.x)
-   v3 = anp.sin(unit_limit(Vp_body_pt.z))
+   v3 = np.arcsin(unit_limit(Vp_body_pt.z))
    V3_body = Vector(0.,0.,1.)
    V3_eci_pt = self.cnvrt(V3_body)
    NP_eci = Vector(0.,0.,1.)
