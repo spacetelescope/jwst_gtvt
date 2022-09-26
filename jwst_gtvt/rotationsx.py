@@ -7,12 +7,7 @@ from math import *
 
 import numpy as np
 
-# GLOBALS
-R2D = 180.0/pi
-D2R = 1/R2D
-EPSILON = 1.0e-10   #use for safe comparisons of floating-point numbers
-OBLIQUITY = 23.43929 * D2R  #Obliquity of Earth's orbit, in radians
-
+from .constants import D2R, R2D, OBLIQUITY
 
 class GalacticPole (object):
 	"""Represents coordinates of galactic pole."""
