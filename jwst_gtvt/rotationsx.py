@@ -755,13 +755,13 @@ unit_limit = lambda x: min(max(-1.,x),1.)
 
 def QX(angle):
    """Creates rotation quaternion about X axis, assuming coordinate frame is rotated"""
-   return Quaternion(Vector(math.np.sin(-angle/2.),0.,0.),math.np.cos(angle/2.))
+   return Quaternion(Vector(np.sin(-angle/2.),0.,0.),np.cos(angle/2.))
 def QY(angle):
    """Creates rotation quaternion about Y axis, assuming coordinate frame is rotated"""
-   return Quaternion(Vector(0.,math.np.sin(-angle/2.),0.),math.np.cos(angle/2.))
+   return Quaternion(Vector(0.,np.sin(-angle/2.),0.),np.cos(angle/2.))
 def QZ(angle):
    """Creates rotation quaternion about Z axis, assuming coordinate frame is rotated"""
-   return Quaternion(Vector(0.,0.,math.np.sin(-angle/2.)),math.np.cos(angle/2.))
+   return Quaternion(Vector(0.,0.,np.sin(-angle/2.)),np.cos(angle/2.))
 
 
 
