@@ -1,13 +1,19 @@
 #! /usr/bin/env python
 """Module for general rotations library."""
 
-#import random
-from __future__ import division
 
 import math
 from math import *
-from . import math_extensionsx as math2
-      
+
+import numpy as np
+
+# GLOBALS
+R2D = 180.0/pi
+D2R = 1/R2D
+EPSILON = 1.0e-10   #use for safe comparisons of floating-point numbers
+OBLIQUITY = 23.43929 * D2R  #Obliquity of Earth's orbit, in radians
+
+
 class GalacticPole (object):
 	"""Represents coordinates of galactic pole."""
 	
@@ -281,9 +287,9 @@ class Vector (object):
 	# RLH: Not necessary if CelestialVector is used.
 	def set_xyz(self,ra,dec):
 		"""Creates a unit vector from spherical coordinates """ 
-		self.x = cos(dec) *cos(ra)
-		self.y = cos(dec) *sin(ra)
-		self.z = sin(dec)
+		self.x = np.cos(dec) *np.cos(ra)
+		self.y = np.cos(dec) *np.sin(ra)
+		self.z = np.sin(dec)
 
 NULL_3D_VECTOR = Vector(0,0,0)    #this can be reused as needed
 
@@ -318,20 +324,20 @@ class CelestialVector (Vector):
 		relative to the equatorial plane."""
 	  
 		if (degrees):
-			ra = math2.D2R * ra
-			dec = math2.D2R * dec
+			ra = D2R * ra
+			dec = D2R * dec
 		
 		self.ra = ra
 		self.dec = dec
 		self.frame = frame
 
 		#Initialize standard vector with translated Cartesian coordinates
-		Vector.__init__(self, x=cos(ra)*cos(dec), y=sin(ra)*cos(dec), z=sin(dec))
+		Vector.__init__(self, x=np.cos(ra)*np.cos(dec), y=np.sin(ra)*np.cos(dec), z=np.sin(dec))
 		
 	def __str__(self, verbose=True):
 		"""Returns a string representation of the vector.  Displays angles in degrees."""
 		celest_info = 'CelestialVector: RA: %.3fD, DEC: %.3fD, frame: %s'\
-		% (math2.R2D*self.ra, math2.R2D*self.dec, self.frame)
+		% (R2D*self.ra, R2D*self.dec, self.frame)
 		
 		if (verbose):
 			celest_info = celest_info + '\n' + super(CelestialVector, self).__str__()
@@ -343,14 +349,14 @@ class CelestialVector (Vector):
 		degrees = True if units are degrees.  Default is radians."""
 		
 		if (degrees):
-			ra = math2.D2R * ra
-			dec = math2.D2R * dec
+			ra = D2R * ra
+			dec = D2R * dec
 		
 		self.ra = ra 
 		self.dec = dec
 	
 		#Update Cartesian coordinates as well.
-		super(CelestialVector, self).set_eq(cos(ra)*cos(dec), sin(ra)*cos(dec), sin(dec))
+		super(CelestialVector, self).set_eq(np.cos(ra)*np.cos(dec), np.sin(ra)*np.cos(dec), np.sin(dec))
 		
 	def update_cartesian(self, x=None, y=None, z=None):
 		"""Modifies a celestial vector by specifying new Cartesian coordinates.
@@ -368,7 +374,7 @@ class CelestialVector (Vector):
 		if (self.ra < 0):				 #Make sure RA is positive
 		   self.ra += 2*pi
 			
-		self.dec = math2.asin2(self.z)  #DEC is arcsin of z
+		self.dec = safe_arcsin(self.z)  #DEC is arcsin of z
 		
 	def rotate_about_axis (self, angle, axis):
 		"""This rotates a vector about an axis by the specified angle
@@ -381,16 +387,16 @@ class CelestialVector (Vector):
 		The z-rotation rotates the x-axis toward the y-axis."""
 		
 		if (axis == 'x'):
-			rot_matrix = Matrix([[1,0,0],[0,cos(angle),-sin(angle)],\
-			[0, sin(angle), cos(angle)]])
+			rot_matrix = Matrix([[1,0,0],[0,np.cos(angle),-np.sin(angle)],\
+			[0, np.sin(angle), np.cos(angle)]])
 			
 		elif (axis == 'y'):
-			rot_matrix = Matrix([[cos(angle), 0, sin(angle)], [0,1,0],\
-			[-sin(angle), 0, cos(angle)]])
+			rot_matrix = Matrix([[np.cos(angle), 0, np.sin(angle)], [0,1,0],\
+			[-np.sin(angle), 0, np.cos(angle)]])
 			
 		elif (axis == 'z'):
-			rot_matrix = Matrix([[cos(angle), -sin(angle), 0],\
-			[sin(angle), cos(angle), 0], [0,0,1]])
+			rot_matrix = Matrix([[np.cos(angle), -np.sin(angle), 0],\
+			[np.sin(angle), np.cos(angle), 0], [0,0,1]])
 			
 		else:
 			print ('Error')
@@ -414,8 +420,8 @@ class CelestialVector (Vector):
 		could be used in its place.  However, rotate_about_axis is faster and
 		clearer when the rotation axis is one of the Cartesian axes."""
 		
-		cos_ang = cos(angle)    #Used repeatedly below
-		sin_ang = sin(angle)
+		cos_ang = np.cos(angle)    #Used repeatedly below
+		sin_ang = np.sin(angle)
 		
 		#Fill out the Rodrigues rotation matrix
 		R11 = cos_ang + eigenaxis.x**2 * (1 - cos_ang)
@@ -458,19 +464,19 @@ class CelestialVector (Vector):
 		
 		#Equatorial to ecliptic: rotate z-axis toward y-axis.
 		if ((new_frame == 'ec') and (self.frame == 'eq')):
-			result = self.rotate_about_axis(-math2.OBLIQUITY, 'x')
+			result = self.rotate_about_axis(-OBLIQUITY, 'x')
 		
 		#Ecliptic to equatorial: rotate y-axis toward z-axis.
 		elif ((new_frame == 'eq') and (self.frame == 'ec')):
-			result = self.rotate_about_axis(math2.OBLIQUITY, 'x')
+			result = self.rotate_about_axis(OBLIQUITY, 'x')
 			
 		elif ((new_frame == 'gal') and (self.frame == 'eq')):
 			#Use formula from Wayne Kinzel's book, adjusted for J2000 coordinates.
-			b = math2.asin2(cos(self.dec) * cos(NGP.longitude) * cos(self.ra - NGP.latitude)\
-			+ sin(self.dec) * sin(NGP.longitude))
+			b = safe_arcsin(np.cos(self.dec) * np.cos(NGP.longitude) * np.cos(self.ra - NGP.latitude)\
+			+ np.sin(self.dec) * np.sin(NGP.longitude))
 			
-			l = atan2(sin(self.dec) - sin(b) * sin (NGP.longitude),\
-			cos (self.dec) * sin(self.ra - NGP.latitude) * cos(NGP.longitude)) + NGP.anode
+			l = atan2(np.sin(self.dec) - np.sin(b) * sin (NGP.longitude),\
+			cos (self.dec) * np.sin(self.ra - NGP.latitude) * np.cos(NGP.longitude)) + NGP.anode
 			
 			result = CelestialVector(l, b, degrees=False)
 			
@@ -478,10 +484,10 @@ class CelestialVector (Vector):
 			l = self.ra   #use l,b notation here for clarity
 			b = self.dec
 			
-			dec = math2.asin2(cos(b) * cos(NGP.longitude) * sin(l - NGP.anode) + sin(b) * sin(NGP.longitude))
+			dec = safe_arcsin(np.cos(b) * np.cos(NGP.longitude) * np.sin(l - NGP.anode) + np.sin(b) * np.sin(NGP.longitude))
 			
-			ra = atan2(cos(b) * cos(l - NGP.anode),\
-			sin(b) * cos(NGP.longitude) - cos(b) * sin(NGP.longitude) * sin(l - NGP.anode)) + NGP.latitude
+			ra = atan2(np.cos(b) * np.cos(l - NGP.anode),\
+			np.sin(b) * np.cos(NGP.longitude) - np.cos(b) * np.sin(NGP.longitude) * np.sin(l - NGP.anode)) + NGP.latitude
 			
 			result = CelestialVector(ra, dec, degrees=False)
 						
@@ -509,9 +515,9 @@ class CelestialVector (Vector):
 		See "V3-axis Position Angle", John Isaacs, May 2003 for
 		further discussion."""
 		
-		x_coord = -cos(self.ra) * sin(self.dec) * cos(pa) - sin(self.ra) * sin(pa)
-		y_coord = -sin(self.ra) * sin(self.dec) * cos(pa) + cos(self.ra) * sin(pa)
-		z_coord = cos(self.dec) * cos(pa)
+		x_coord = -np.cos(self.ra) * np.sin(self.dec) * np.cos(pa) - np.sin(self.ra) * np.sin(pa)
+		y_coord = -np.sin(self.ra) * np.sin(self.dec) * np.cos(pa) + np.cos(self.ra) * np.sin(pa)
+		z_coord = np.cos(self.dec) * np.cos(pa)
 		result = CelestialVector()
 		result.update_cartesian(x_coord, y_coord, z_coord)
 		return(result)
@@ -526,16 +532,62 @@ class CelestialVector (Vector):
 		See "V3-axis Position Angle", John Isaacs, May 2003 for
 		further discussion."""
 		
-		y_coord = cos(v.dec) * sin(v.ra - self.ra)
-		x_coord = sin(v.dec) * cos(self.dec) - cos(v.dec) * sin(self.dec) * cos (v.ra - self.ra)
+		y_coord = np.cos(v.dec) * np.sin(v.ra - self.ra)
+		x_coord = np.sin(v.dec) * np.cos(self.dec) - np.cos(v.dec) * np.sin(self.dec) * cos (v.ra - self.ra)
 		pa = atan2(y_coord, x_coord)
 		
 		if (pa < 0):
 			pa += (2 * pi)  #PA has range 0-360 degrees
 			
 		return(pa)
+	
+	def safe_arccos(angle_in_radians):
+		"""Safe version of np.arccos that handles invalid arguments.
+		Arguments greater than 1 are truncated to 1; arguments less 
+		than -1 are set to -1.
 		
+		Parameters
+		----------
+		angle_in_radians : float
+			Position angle in radians
+
+		Return
+		------
+		result : float
+			Value of np.arcnp.cos(angle_in_radians) between -1.0 and 1.0 radians
+		"""
+
+		if angle_in_radians > 1.0:
+			return np.arcnp.cos(1.0)
+		elif angle_in_radians < -1.0:
+			return np.arcnp.cos(-1.0)
+		else:
+			return np.arcnp.cos(angle_in_radians)
+
+	def safe_arcsin(angle_in_radians):
+		"""Safe version of np.arcsin that handles invalid arguments.
+		Arguments greater than 1 are truncated to 1; arguments less 
+		than -1 are set to -1.
 		
+		Parameters
+		----------
+		angle_in_radians : float
+			Position angle in radians
+
+		Return
+		------
+		result : float
+			Value of np.arcnp.sin(angle_in_radians) between -1.0 and 1.0 radians
+		"""
+
+		if angle_in_radians > 1.0:
+			return np.arcnp.sin(1.0)
+		elif angle_in_radians < -1.0:
+			return np.arcnp.sin(-1.0)
+		else:
+			return np.arcnp.sin(angle_in_radians)
+
+
 class Attitude (CelestialVector):
 	"Defines an Observatory attitude by adding a position angle."""
 	
@@ -548,7 +600,7 @@ class Attitude (CelestialVector):
 		super(Attitude, self).__init__(ra=ra, dec=dec, frame=frame, degrees=degrees)
 	
 		if (degrees):   #convert into radians
-			pa = math2.D2R * pa
+			pa = D2R * pa
 		
 		self.pa = pa
 	
@@ -557,7 +609,7 @@ class Attitude (CelestialVector):
 		
 		verbose (optional) = flag indicating whether detailed Vector information should be included."""
 		
-		att_info = 'Attitude: PA: %.3fD' %(math2.R2D * self.pa)
+		att_info = 'Attitude: PA: %.3fD' %(R2D * self.pa)
 		att_info = att_info + '\n' + super(Attitude, self).__str__(verbose)
 		return(att_info)
 
@@ -586,13 +638,13 @@ def separation(v1, v2, norm=False):
 		v1 = v1.normalize()
 		v2 = v2.normalize()
 
-	separation = math2.acos2(dot(v1, v2))
+	separation = safe_arccos(dot(v1, v2))
 	
 	#For very small angles, cos and acos behave poorly as the cosine of a very small angle is
 	#interpreted as 1.0.  Therefore, recompute using the cross product if the result is less than 1 degree.
-	if (separation < math2.D2R):
+	if (separation < D2R):
 		vcross = cross(v1,v2)
-		separation = math2.asin2(vcross.length())
+		separation = safe_arcsin(vcross.length())
 		
 	return(separation)
 	
@@ -617,8 +669,8 @@ def ra_separation(v1, v2):
 	|sep| = DELTA-RA cos DEC."""
 	
 	delta_ra = ra_delta(v1, v2)
-	dec = math2.avg2(v1.dec, v2.dec)  #use average of the two declinations.
-	return(delta_ra * cos(dec))
+	dec = np.average(v1.dec, v2.dec)  #use average of the two declinations.
+	return(delta_ra * np.cos(dec))
 	
 def dec_separation(v1, v2):
 	"""Returns difference in declination between two CelestialVectors."""
@@ -703,13 +755,13 @@ unit_limit = lambda x: min(max(-1.,x),1.)
 
 def QX(angle):
    """Creates rotation quaternion about X axis, assuming coordinate frame is rotated"""
-   return Quaternion(Vector(math.sin(-angle/2.),0.,0.),math.cos(angle/2.))
+   return Quaternion(Vector(np.sin(-angle/2.),0.,0.),np.cos(angle/2.))
 def QY(angle):
    """Creates rotation quaternion about Y axis, assuming coordinate frame is rotated"""
-   return Quaternion(Vector(0.,math.sin(-angle/2.),0.),math.cos(angle/2.))
+   return Quaternion(Vector(0.,np.sin(-angle/2.),0.),np.cos(angle/2.))
 def QZ(angle):
    """Creates rotation quaternion about Z axis, assuming coordinate frame is rotated"""
-   return Quaternion(Vector(0.,0.,math.sin(-angle/2.)),math.cos(angle/2.))
+   return Quaternion(Vector(0.,0.,np.sin(-angle/2.)),np.cos(angle/2.))
 
 
 
@@ -754,7 +806,7 @@ def cvt_inert2att_Q_to_angles(Q):
    V1_eci_pt = Q.inv_cnvrt(V1_body)
    coord1  = math.atan2(V1_eci_pt.y,V1_eci_pt.x)
    if coord1 < 0. : coord1 += PI2
-   coord2 = math.asin(unit_limit(V1_eci_pt.z))
+   coord2 = np.arcsin(unit_limit(V1_eci_pt.z))
 
    V3_body = Vector(0.,0.,1.)
    V3_eci_pt = Q.inv_cnvrt(V3_body)
@@ -778,7 +830,7 @@ are 321 mapped to ra,-dec,-pa"""
    ra = math.atan2(2.*(q1*q2 - q3*q4), q1*q1 - q2*q2 - q3*q3 +q4*q4)
    if ra < 0.: ra += PI2
    arg = min(1.,max(-1.,2.*(q1*q3 + q2*q4)))
-   dec = math.asin(arg)
+   dec = np.arcsin(arg)
    pa = math.atan2(-2.*(q2*q3 - q1*q4), -q1*q1 - q2*q2 + q3*q3 +q4*q4)
    if pa < 0.: pa += PI2
    return (ra,dec,pa)
@@ -822,7 +874,7 @@ def cvt_v2v3_using_body2inertial_Q_to_c1c2pa_tuple(Q,v2,v3):
    Vp_eci_pt = Q.cnvrt(Vp_body)
    coord1  = atan2(Vp_eci_pt.y,Vp_eci_pt.x)
    if coord1 < 0. : coord1 += PI2
-   coord2 = asin(unit_limit(Vp_eci_pt.z))
+   coord2 = np.arcsin(unit_limit(Vp_eci_pt.z))
 
    V3_body = Vector(0.,0.,1.)
    V3_eci_pt = Q.cnvrt(V3_body)
@@ -844,7 +896,7 @@ def cvt_c1c2_using_body2inertial_Q_to_v2v3pa_tuple(Q,coord1,coord2):
    Vp_eci.set_xyz_from_angs(coord1,coord2)
    Vp_body_pt = Q.inv_cnvrt(Vp_eci)
    v2 = atan2(Vp_body_pt.y,Vp_body_pt.x)
-   v3 = asin(unit_limit(Vp_body_pt.z))
+   v3 = np.arcsin(unit_limit(Vp_body_pt.z))
    V3_body = Vector(0.,0.,1.)
    V3_eci_pt = self.cnvrt(V3_body)
    NP_eci = Vector(0.,0.,1.)
@@ -913,32 +965,32 @@ class Quaternion:
       return Vector(QV.q1,QV.q2,QV.q3)
    def set_values(self, V, angle):
       """Sets quaterion values using a direction vector and a rotation of the coordinate frame about it."""
-      S = sin(-angle/2.)
+      S = np.sin(-angle/2.)
       self.q1 = V.x * S
       self.q2 = V.y * S
       self.q3 = V.z * S
-      self.q4 = cos(angle/2.)
+      self.q4 = np.cos(angle/2.)
       
    def set_as_QX(self,angle):
       """Sets quaterion in place like QX function"""
-      self.q1 = sin(-angle/2.)
+      self.q1 = np.sin(-angle/2.)
       self.q2 = 0.
       self.q3 = 0.
-      self.q4 = cos(angle/2.)
+      self.q4 = np.cos(angle/2.)
       
    def set_as_QY(self,angle):
       """Sets quaterion in place like QY function"""
       self.q1 = 0.
-      self.q2 = sin(-angle/2.)
+      self.q2 = np.sin(-angle/2.)
       self.q3 = 0.
-      self.q4 = cos(angle/2.)
+      self.q4 = np.cos(angle/2.)
       
    def set_as_QZ(self,angle):
       """Sets quaterion in place like QZ function"""
       self.q1 = 0.
       self.q2 = 0.
-      self.q3 = sin(-angle/2.)
-      self.q4 = cos(angle/2.)
+      self.q3 = np.sin(-angle/2.)
+      self.q4 = np.cos(angle/2.)
       
    def set_as_mult(self,QQ1,QQ2):
       """Sets self as QQ1*QQ2 in place for quaternion multiplication """
