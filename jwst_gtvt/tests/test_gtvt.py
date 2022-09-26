@@ -35,7 +35,7 @@ class mimic_parser:
 
         self.save_table = None
         self.no_verbose = True
-        self.start_date = '2021-12-25 12:48:00.0000'
+        self.start_date = '2021-12-26'
         self.end_date = '2023-12-31'
         self.v3pa = None
         self.instrument = None
