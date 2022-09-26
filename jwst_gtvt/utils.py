@@ -6,13 +6,6 @@ import astropy
 import os
 import shutil
 
-class Error(Exception):
-   """Base class for other exceptions"""
-   pass
-
-class ChoiceError(Error):
-   """Raised when input is not y or n"""
-   pass
 
 def delete_cache():
     """Delete astroquery Horizons cache"""
