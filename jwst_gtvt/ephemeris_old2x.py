@@ -1,10 +1,5 @@
 #! /usr/bin/env python
-#Module ephemeris.py
-from __future__ import print_function
-
 import sys
-#import time
-#import time_extensionsx as time2
 from math import *
 from .rotationsx import *
 
