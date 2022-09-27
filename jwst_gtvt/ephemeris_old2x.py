@@ -3,24 +3,11 @@
 from __future__ import print_function
 
 import sys
-#import time
-#import time_extensionsx as time2
 from math import *
+
 from .rotationsx import *
+from .constants import D2R, PI2, R2D, UNIT_LIMIT, MIN_SUN_ANGLE, MAX_SUN_ANGLE
 
-D2R = pi/180.  #degrees to radians
-R2D = 180. / pi #radians to degrees 
-PI2 = 2. * pi   # 2 pi
-unit_limit = lambda x: min(max(-1.,x),1.) # forces value to be in [-1,1]
-MIN_SUN_ANGLE = 84.8 * D2R  #minimum Sun angle, in radians
-MAX_SUN_ANGLE = 135.0 * D2R #maximum Sun angle, in radians
-SUN_ANGLE_PAD = 0.5 * D2R   #pad away from Sun angle limits when constructing safe attitude
-
-obliquity_of_the_ecliptic = -23.439291  # At J2000 equinox
-obliquity_of_the_ecliptic *=  D2R
-Qecl2eci = QX(obliquity_of_the_ecliptic)
-
-epsilon = 23.43929 * D2R #obliquity of the ecliptic J2000
 
 class Ephemeris:
     def __init__(self, afile, cnvrt=False, verbose=True):
@@ -132,7 +119,7 @@ class Ephemeris:
     def dist(self, obj1_c1, obj1_c2, obj2_c1, obj2_c2):
         """angular distance betrween two objects, positions specified in spherical coordinates."""
         x = cos(obj2_c2)*cos(obj1_c2)*cos(obj2_c1-obj1_c1) + sin(obj2_c2)*sin(obj1_c2)
-        return acos(unit_limit(x))
+        return acos(UNIT_LIMIT(x))
 
     def report_ephemeris (self, limit=100000, pathname=None):
         """Prints a formatted report of the ephemeris.
@@ -187,7 +174,7 @@ class Ephemeris:
     def sun_pos(self,adate):
         Vsun = -1. * self.pos(adate)
         Vsun = Vsun / Vsun.length()
-        coord2 = asin(unit_limit(Vsun.z))
+        coord2 = asin(UNIT_LIMIT(Vsun.z))
         coord1 = atan2(Vsun.y,Vsun.x)
         if coord1 < 0.: coord1 += PI2
         return (coord1,coord2)
@@ -225,10 +212,11 @@ class Ephemeris:
     def in_FOR(self,adate,coord_1,coord_2):
         (sun_1,sun_2) = self.sun_pos(adate)
         d = self.dist(coord_1,coord_2,sun_1,sun_2)
-        #print d*R2D
-        #90 - sun pitch is always equal or greater than sun angle (V1 to sun)
-        if (d<MIN_SUN_ANGLE or d>MAX_SUN_ANGLE):
+
+        # 90 - sun pitch is always equal or greater than sun angle (V1 to sun)
+        if (d < MIN_SUN_ANGLE or d > MAX_SUN_ANGLE):
             return False
+
         return True
 
     def bisect_by_FOR(self,in_date,out_date,coord_1,coord_2):#in and out of FOR, assumes only one "root" in interval
