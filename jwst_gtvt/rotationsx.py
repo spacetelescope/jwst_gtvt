@@ -7,7 +7,7 @@ from math import *
 
 import numpy as np
 
-from .constants import D2R, R2D, OBLIQUITY
+from .constants import D2R, R2D, OBLIQUITY_OF_THE_ECLIPTIC
 
 class GalacticPole (object):
 	"""Represents coordinates of galactic pole."""
@@ -459,11 +459,11 @@ class CelestialVector (Vector):
 		
 		#Equatorial to ecliptic: rotate z-axis toward y-axis.
 		if ((new_frame == 'ec') and (self.frame == 'eq')):
-			result = self.rotate_about_axis(-OBLIQUITY, 'x')
+			result = self.rotate_about_axis(-OBLIQUITY_OF_THE_ECLIPTIC, 'x')
 		
 		#Ecliptic to equatorial: rotate y-axis toward z-axis.
 		elif ((new_frame == 'eq') and (self.frame == 'ec')):
-			result = self.rotate_about_axis(OBLIQUITY, 'x')
+			result = self.rotate_about_axis(OBLIQUITY_OF_THE_ECLIPTIC, 'x')
 			
 		elif ((new_frame == 'gal') and (self.frame == 'eq')):
 			#Use formula from Wayne Kinzel's book, adjusted for J2000 coordinates.
