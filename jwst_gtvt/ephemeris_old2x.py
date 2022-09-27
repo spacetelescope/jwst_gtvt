@@ -1,7 +1,4 @@
 #! /usr/bin/env python
-#Module ephemeris.py
-from __future__ import print_function
-
 import sys
 from math import *
 
