@@ -1,9 +1,13 @@
 from astropy.time import Time
+import csv
 import pandas as pd
 import pysiaf
 import numpy as np
+import os
+import sys
+import requests
 
-from .constants import UNIT_LIMIT
+from .constants import UNIT_LIMIT, URL
 
 D2R = np.pi/180.  #degrees to radians
 R2D = 180. / np.pi #radians to degrees 
@@ -18,7 +22,7 @@ obliquity_of_the_ecliptic *=  D2R
 
 
 class Ephemeris:
-    def __init__(self, ephmeride_filename, start_date=Time.now(), end_date=None, verbose=True):
+    def __init__(self, start_date=Time('2021-12-26'), end_date=Time('2024-10-03')):
         """
         ephermeride_filename : str
             path to ephemeris file
@@ -27,68 +31,110 @@ class Ephemeris:
         end_date : astropy.Time.time
             End time of observing, default is end of mission lifetime
         verbose : bool
-            Share table data
+            Print jwst_gtvt results to screen
         """
-        self.column_names = ['JDTDB','Calendar Date (TDB)','X','Y','Z','VX', 'VY', 'VZ']
-        self.dataframe = pd.read_csv(ephmeride_filename, sep=",", names=self.column_names)
+        self.start_date = start_date
+        self.end_date = end_date
+        self.ephemeris_filename =  os.path.join(os.path.dirname(__file__), 'ephemeris_2021-12-26_2024-10-03.csv')  # set filename to local copy by default
+        self.ephemeris = self.get_ephemeris_data(start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
+        self.dataframe = self.convert_ephemeris_to_df(self.ephemeris)
         self.dataframe = self.dataframe.drop(columns=['VX', 'VY', 'VZ'])  # We don't use the velocities in the GTVT/MTVT
 
         # Create MJD Column
         self.dataframe['MJD'] = self.dataframe['JDTDB'].values - 2400000.5
 
-        self.start_date = int(start_date.mjd)
-
-        if end_date:
-            self.end_date = int(end_date.mjd)
-        else:
-            self.end_date = int(self.dataframe['MJD'].max())
+        self.start_date_mjd = int(start_date.mjd)
+        self.end_date_mjd = int(end_date.mjd)
 
         # only build dataframe based on start and end date and reset the index
-        self.dataframe = self.dataframe[(self.dataframe['MJD'] >= self.start_date) &
-                                        (self.dataframe['MJD'] <= self.end_date)].reset_index(drop=True)
+        self.dataframe = self.dataframe[(self.dataframe['MJD'] >= self.start_date_mjd) &
+                                        (self.dataframe['MJD'] <= self.end_date_mjd)].reset_index(drop=True)
 
         # Update positions based on pos() function
         for coordinate in ['X', 'Y', 'Z']:
             self.dataframe[coordinate] = (self.dataframe[coordinate].shift() - self.dataframe[coordinate]) * 1 + self.dataframe[coordinate]
 
-    def build_entire_dataframe(self, ra, dec):
+    def get_ephemeris_data(self, start_date, end_date):
+        """dates must be in format YYYY-MM-DD, returns text of ephemeris
+        """ 
+        try:
+            url = URL.format(start_date, end_date)  # Get Horizons url for JWST ephemeris and add user specified dates
+            self.eph_request = requests.get(url)
+            ephemeris = np.array(self.eph_request.text.splitlines())
+        except requests.exceptions.ConnectionError as err:
+            print('No internet connection, using local file: {}'.format(self.ephemeris_filename))
+            with open(self.ephemeris_filename, newline='') as csvfile:
+                ephemeris = csv.reader(csvfile, delimiter=',')
+            
+        return ephemeris
+
+    def convert_ephemeris_to_df(self, ephemeris):
+
+        start_index = np.where(ephemeris == '$$SOE')[0][0] + 1
+        end_index = np.where(ephemeris == '$$EOE')[0][0]
+
+        row_data = [row_data.split(',') for row_data in ephemeris[start_index:end_index]]
+        result = [filter(None, row) for row in row_data]
+
+        df = pd.DataFrame(result, columns=['JDTDB','Calendar Date (TDB)','X','Y','Z','VX', 'VY', 'VZ'])
+        convert_dict = {'JDTDB': float,
+                        'X': float,
+                        'Y': float,
+                        'Z': float}
+        df = df.astype(convert_dict)
+
+        return df
+
+    def display_ephemeris_header(self):
+        end_index = np.where(self.ephemeris == '$$SOE')[0][0] - 2
+        print(self.ephemeris[0:end_index])
+
+    def display_ephemeris_footer(self):
+        start_index = np.where(self.ephemeris== '$$EOE')[0][0] + 1
+        print(self.ephemeris[start_index:])
+
+    def write_ephemeris(self, write_path):
+        outfname = write_path
+        with open(outfname, "w") as of:
+            for line in self.ephemeris:
+                of.write(line)
+
+    def retrieve_target_positions(self, ra, dec):
         """start with text file, end with data frame to generate the gtvt figures.
         """
 
-        eph = Ephemeris('jwst_gtvt/data_only_ephemerides.txt')
+        self.dataframe = self.sun_position_vectors(self.dataframe)
 
-        eph.dataframe = eph.sun_position_vectors(eph.dataframe)
-
-        eph.dataframe = eph.sun_position_coordinates(eph.dataframe)
-
-        eph.dataframe['ra'] = ra
-        eph.dataframe['dec'] = dec
-
-        eph.dataframe['ra_radians'] = eph.dataframe['ra'] * D2R
-        eph.dataframe['dec_radians'] = eph.dataframe['dec'] * D2R
-
-        eph.dataframe = eph.calculate_sun_pa(eph.dataframe,
-                                             eph.dataframe['ra_radians'],
-                                             eph.dataframe['dec_radians'],
-                                             eph.dataframe['coord1'],
-                                             eph.dataframe['coord2'])
-
-        eph.dataframe = eph.normal_pa(eph.dataframe,
-                                      eph.dataframe['ra_radians'],
-                                      eph.dataframe['dec_radians'])
-
-        eph.dataframe = eph.dist(eph.dataframe)
-        eph.dataframe = eph.in_FOR(eph.dataframe)
-        eph.dataframe = eph.get_allowed_max_boresight(eph.dataframe)
+        self.dataframe = self.sun_position_coordinates(self.dataframe)
+     
+        self.dataframe['ra'] = ra
+        self.dataframe['dec'] = dec
+     
+        self.dataframe['ra_radians'] = self.dataframe['ra'] * D2R
+        self.dataframe['dec_radians'] = self.dataframe['dec'] * D2R
+     
+        self.dataframe = self.calculate_sun_pa(self.dataframe,
+                                               self.dataframe['ra_radians'],
+                                               self.dataframe['dec_radians'],
+                                               self.dataframe['coord1'],
+                                               self.dataframe['coord2'])
+     
+        self.dataframe = self.normal_pa(self.dataframe,
+                                        self.dataframe['ra_radians'],
+                                        self.dataframe['dec_radians'])
+     
+        self.dataframe = self.dist(self.dataframe)
+        self.dataframe = self.in_FOR(self.dataframe)
+        self.dataframe = self.get_allowed_max_boresight(self.dataframe)
 
         instrument_aperture_pairs = [('NIRCAM', 'NRCALL_FULL'), ('NIRSPEC', 'NRS_FULL_MSA'),
                                      ('NIRISS', 'NIS_CEN'), ('MIRI', 'MIRIM_FULL'), 
                                      ('FGS', 'FGS1_FULL'), ('V3PA', None)]
 
         for instrument, aperture in instrument_aperture_pairs:
-            eph.dataframe = self.calculate_min_max_pa_angles(eph.dataframe, instrument, aperture)
+            self.dataframe = self.calculate_min_max_pa_angles(self.dataframe, instrument, aperture)
 
-        return eph.dataframe
+        return self.dataframe
 
     def sun_position_vectors(self, dataframe):
         """Add the sun vector to ephemeris data frame
