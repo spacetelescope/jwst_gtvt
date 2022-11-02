@@ -1,4 +1,7 @@
 import datetime
+from collections import defaultdict
+import pandas as pd
+import pkg_resources
 from tabulate import tabulate
 
 
@@ -6,12 +9,16 @@ def display_results(ephemeris):
     """print out results to screen"""
 
     now = datetime.datetime.now()
+    version = pkg_resources.get_distribution("jwst_gtvt").version
+    welcome_string = "JWST General Target Visibility Tool"
+    date_string = "Runtime/Date: {}".format(now)
+    version_string = "Version Number: {}".format(version)
 
-    welcome_string = """JWST General Target Visibility Tool
-                        {}
-                     """.format(now)
+    print(tabulate([[welcome_string],
+                    [date_string],
+                    [version_string]], tablefmt='grid'))
 
-    print(tabulate([[welcome_string]], tablefmt='grid'))
+    print('')
 
     pa_columns = {'NIRCAM_max_pa_angle': 'NRC Max PA', 
                   'NIRCAM_min_pa_angle': 'NRC Min PA',
@@ -28,33 +35,38 @@ def display_results(ephemeris):
 
     df = ephemeris.dataframe
 
-    ra = max(df['ra'])
-    dec = max(df['dec'])
+    if ephemeris.fixed is True:
+        ra = max(df['ra'])
+        dec = max(df['dec'])
+        target_info_string = 'RA: %-*s  Dec: %-*s  Ecliptic Latitude: %s' % (10, ra, 10, dec, 24.284867)
+    else:
+        target_info_string = 'Target Name: %-*s Ecliptic Latitude: %s' % (10, ephemeris.target_name, 24.284867)
 
     df = df.loc[df['in_FOR']==True]
 
-    ra_dec_string = 'RA: %-*s  Dec: %-*s  Ecliptic Latitude: %s' % (10, ra, 10, dec, 24.284867)
     interval_string = 'Checked Interval [{}, {}]'.format(ephemeris.start_date, ephemeris.end_date)
-    print(ra_dec_string)
-    print('-' * len(ra_dec_string))
+
+    print(target_info_string)
+    print('-' * len(target_info_string))
+    print('')
     print(interval_string)
-    print('-' * len(interval_string))
+    print('')
 
     window_indices = get_visibility_windows(df.index.tolist())
+    window_dict = defaultdict(list)
 
     for start, end in window_indices:
-        start_date = ephemeris.dataframe.iloc[start]['Calendar Date (TDB)']
-        end_date = ephemeris.dataframe.iloc[end]['Calendar Date (TDB)']
-        window_duration = end - start
-        start_v3 = ephemeris.dataframe.iloc[start]['V3PA']
-        end_v3 = ephemeris.dataframe.iloc[end]['V3PA']
+        window_dict['Window Start'].append(ephemeris.dataframe.iloc[start]['Calendar Date (TDB)'])
+        window_dict['Window End'].append(ephemeris.dataframe.iloc[end]['Calendar Date (TDB)'])
+        window_dict['Window Duration'].append(end - start)
+        window_dict['V3 Angle Start'].append(ephemeris.dataframe.iloc[start]['V3PA'])
+        window_dict['V3 Angle End'].append(ephemeris.dataframe.iloc[end]['V3PA'])
 
-        print('%-*s  %-*s  %-*s  %-*s  %-*s' % (10, start_date, 10, end_date, 
-                                                10, window_duration,10, start_v3,
-                                                10, end_v3))
+    window_df = pd.DataFrame(window_dict)
+    print(tabulate(window_df, headers='keys', tablefmt='psql', showindex=False))
 
     df = df[list(pa_columns.keys())]
-    print(tabulate(df, headers=list(pa_columns.values()), tablefmt='psql'))
+    print(tabulate(df, headers=list(pa_columns.values()), tablefmt='psql', showindex=False))
 
 
 def get_visibility_windows(df_indices):
