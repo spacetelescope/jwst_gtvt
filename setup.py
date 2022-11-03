@@ -20,7 +20,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.2.0',
+    version='0.3.0',
 
     description='JWST General Target Visibility Tool',
 
@@ -46,7 +46,6 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
     ],
@@ -71,7 +70,7 @@ setup(
          'pysiaf',
      ],
      
-     python_requires='>=3.7',
+     python_requires='>=3.8',
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

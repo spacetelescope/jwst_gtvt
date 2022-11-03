@@ -1,3 +1,10 @@
+0.3.0
+=====
+
+- Updated in flight ephemeris for JWST with dates starting at launch (12-26-2021)
+- Removing python 3.7 support, 3.8 and up is required.
+- Updated README examples and figures.
+
 0.2.0
 =====
 
