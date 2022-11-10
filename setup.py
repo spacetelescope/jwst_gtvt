@@ -23,6 +23,10 @@ setup(
     version='0.3.0',
 
     description='JWST General Target Visibility Tool',
+    
+    long_description=long_description,
+    
+    long_description_content_type='text/markdown',
 
     # The project's main homepage.
     url='https://github.com/spacetelescope/jwst_gtvt',
