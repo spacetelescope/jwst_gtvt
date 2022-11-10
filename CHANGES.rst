@@ -1,3 +1,10 @@
+0.3.0
+=====
+
+- Updated the default JWST ephemeris and removed the old ephemeris.
+- Updated the default start date to 2021-12-26 (JWST launch) and the default end date to 2024-10-02.
+- Updated README examples and figures.
+
 0.2.0
 =====
 
