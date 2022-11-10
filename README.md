@@ -78,9 +78,9 @@ For moving targets, use `jwst_mtvt`
 
 Periodic comets and most asteroids benefit from using the `--smallbody` flag
 
-`$ jwst_mtvt 2`  # Uranus (no windows)
+`$ jwst_mtvt 2`  # Venus (no windows)
 
-`$ jwst_mtvt 2 --smallbody`  # Iris
+`$ jwst_mtvt 2 --smallbody`  # 2 Pallas
 
 `$ jwst_mtvt C/2016 M1`  # works with or without --smallbody
 
