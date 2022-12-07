@@ -563,8 +563,8 @@ def get_table(ra, dec, instrument=None, start_date=None, end_date=None, save_tab
 
     A_eph = EPH.Ephemeris(join(dirname(abspath(__file__)), "horizons_EM_jwst_wrt_sun_2021-2024.txt"),ECL_FLAG, verbose=verbose)
 
-    search_start = Time(args.start_date, format='iso').mjd if args.start_date is not None else 59574.0  #Dec 26, 2021
-    search_end = Time(args.end_date, format='iso').mjd if args.end_date is not None else 60585.0  #Oct 02, 2024
+    search_start = Time(start_date, format='iso').mjd if start_date is not None else 59574.0  #Dec 26, 2021
+    search_end = Time(end_date, format='iso').mjd if end_date is not None else 60585.0  #Oct 02, 2024
 
     if not (59574.0 <= search_start <= 60586.0) and start_date is not None:
         raise ValueError('Start date {} outside of available ephemeris {} to {}'.format(start_date, '2021-12-26', '2024-10-02'))
