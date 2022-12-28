@@ -1,5 +1,6 @@
 astropy>=4.0
 astroquery>=0.4.dev0
+docopt>=0.6.2
 matplotlib>=3.2.1
 numpy>=1.18.2
 pysiaf>=0.6.2

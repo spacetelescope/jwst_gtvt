@@ -1,3 +1,25 @@
+#! /usr/bin/env python
+
+"""Generate visibility plots for GTVT/MTVT
+
+This script contains the main components that generate the dataframe
+containing information displayed in the figured created by the jwst_gtvt.
+
+
+Authors
+-------
+    - Mees Fix
+    - Bryan Holler
+    - Matt Hill
+
+Use
+---
+    This script is intended to be executed as such:
+    ::
+        >>> from jwst_gtvt.ephemeride_rewrite import Ephemeris
+        >>> eph = Ephemeris()
+"""
+
 from astropy.time import Time
 from astroquery.jplhorizons import Horizons
 import csv
@@ -8,7 +30,7 @@ import os
 import sys
 import requests
 
-from .constants import UNIT_LIMIT, URL
+from jwst_gtvt.constants import UNIT_LIMIT, URL
 
 D2R = np.pi/180.  #degrees to radians
 R2D = 180. / np.pi #radians to degrees 
@@ -56,13 +78,19 @@ class Ephemeris:
             self.dataframe[coordinate] = (self.dataframe[coordinate].shift() - self.dataframe[coordinate]) * 1 + self.dataframe[coordinate]
 
     def get_allowed_max_boresight(self, dataframe):
-        dataframe['max_boresight'] = dataframe.apply(lambda x: self.allowed_max_vehicle_roll(x['coord1'], x['coord2'], x['ra_radians'], x['dec_radians']), axis=1)
+        """Need Docstring
+        """
+        dataframe['max_boresight'] = dataframe.apply(lambda x: self.allowed_max_vehicle_roll(x['coord1'],
+                                                                                             x['coord2'], 
+                                                                                             x['ra_radians'], 
+                                                                                             x['dec_radians']), axis=1)
         dataframe['max_boresight'] *= R2D
 
         return dataframe
 
     def allowed_max_sun_roll(self, sun_p):
-
+        """Need Docstring
+        """
         abs_max_sun_roll = 5.2 * D2R
 
         if sun_p > 2.5 * D2R:
@@ -75,6 +103,24 @@ class Ephemeris:
         return max_sun_roll
 
     def allowed_max_vehicle_roll(self, sun_ra, sun_dec, ra, dec):
+        """Need Docstring
+
+        Parameters
+        ----------
+        sun_ra : float
+            Sun's right ascension
+        sun_dec : float
+            Sun's declination
+        ra : float
+            Target's right ascension
+        dec : float
+            Target's declination
+
+        Returns
+        -------
+        max_vehicle_roll : float
+            Maximum allowed roll of spacecraft.
+        """
         vehicle_pitch = np.pi/2. - self.angular_sep(sun_ra, sun_dec, ra, dec)
         sun_roll = 5.2 * D2R
         last_sun_roll = 0.
@@ -89,12 +135,48 @@ class Ephemeris:
         return max_vehicle_roll
 
     def angular_sep(self, obj1_c1, obj1_c2, obj2_c1, obj2_c2):
-        """angular distance between two objects, positions specified in spherical coordinates."""
+        """angular distance between two objects, positions specified in spherical coordinates.
+
+        Parameters
+        ----------
+        obj1_c1 : float
+            Object one coordinate 1
+        obj2_c2 : float 
+            Object one coordinate 2
+        obj2_c1 : float
+            Object two coordinate 1
+        obj2_c2 : float
+            Object two coordinate 2
+
+        Returns
+        -------
+        np.arccos(UNIT_LIMIT(x)) : float
+            Angular seperation of two targets
+        """
+
         x = np.cos(obj2_c2) * np.cos(obj1_c2) * np.cos(obj2_c1 - obj1_c1) + np.sin(obj2_c2) * np.sin(obj1_c2)
         
         return np.arccos(UNIT_LIMIT(x))
-    
+
     def calculate_min_max_pa_angles(self, dataframe, instrument, aperture=None, angle_name='V3IdlYAngle'):
+        """Get the minimum and maximum position angle
+
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            Pandas dataframe containing metadata from tool
+        instrument : str
+            JWST instrument name
+        aperture : str
+            JWST instrument aperture name
+        angle_name : str
+            pysiaf angle name [Default : V3IdlYAngle]
+
+        Return
+        ------
+        dataframe : pd.DataFrame
+            Pandas dataframe with updated/new data
+        """
 
         V3PA = dataframe['V3PA']
         max_boresight_roll = dataframe['max_boresight']
@@ -119,7 +201,26 @@ class Ephemeris:
         return dataframe
 
     def calculate_sun_pa(self, dataframe, tgt_coord1, tgt_coord2, sun_coord1, sun_coord2):
-        """calculates position angle of object at tgt position."""
+        """calculates position angle of object at tgt position.
+
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            Pandas dataframe
+        tgt_coord1 : float
+            Target coordinate 1
+        tgt_coord2 : float
+            Target coordinate 2
+        sun_coord1 : float
+            Sun's coordinate 1
+        sun_coord2 : float
+            Sun's coordinate 2
+
+        Return
+        ------
+        dataframe : pandas.dataframe
+            Pandas dateframe with updated data
+        """
 
         sun_pa_y = np.cos(sun_coord2)*np.sin(sun_coord1 - tgt_coord1)
         sun_pa_x = (np.sin(sun_coord2)*np.cos(tgt_coord2)-np.cos(sun_coord2)*np.sin(tgt_coord2)*np.cos(sun_coord1 - tgt_coord1))
@@ -132,7 +233,18 @@ class Ephemeris:
         return dataframe
 
     def convert_ephemeris_to_df(self, ephemeris):
+        """Convert ephemeris data into a dataframe
 
+        Parameters
+        ----------
+        ephemeris : str
+            Ephemeris as python string
+
+        Returns
+        -------
+        df : pandas.DataFrame
+            JWST ephmeris as pandas dataframe 
+        """
         start_index = np.where(ephemeris == '$$SOE')[0][0] + 1
         end_index = np.where(ephemeris == '$$EOE')[0][0]
 
@@ -149,15 +261,25 @@ class Ephemeris:
         return df
 
     def display_ephemeris_footer(self):
+        """Show metadata of ephemeris footer.
+        """
         start_index = np.where(self.ephemeris== '$$EOE')[0][0] + 1
         print(self.ephemeris[start_index:])
 
     def display_ephemeris_header(self):
+        """Show metadata of ephemeris header.
+        """
         end_index = np.where(self.ephemeris == '$$SOE')[0][0] - 2
         print(self.ephemeris[0:end_index])
 
     def dist(self, dataframe):
-        """angular distance betrween two objects, positions specified in spherical coordinates."""
+        """angular distance betrween two objects, positions specified in spherical coordinates.
+
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            Pandas dataframe with updated metadata
+        """
 
         # obj1 = target
         # obj2 = sun
@@ -199,7 +321,19 @@ class Ephemeris:
         return angle
 
     def get_ephemeris_data(self, start_date, end_date):
-        """dates must be in format YYYY-MM-DD, returns text of ephemeris
+        """Read JWST data and make python object.
+
+        Parameters
+        ----------
+        start_date : astropy.Time.strftime
+            Start date of ephemeris (YYYY-MM-DD)
+        end_date : astropy.Time.strftime
+            End date of ephemeris (YYYY-MM-DD)
+
+        Returns
+        -------
+        ephemeris : np.array
+            Ephemeris in an array split by lines.
         """ 
         try:
             url = URL.format(start_date, end_date)  # Get Horizons url for JWST ephemeris and add user specified dates
@@ -212,6 +346,32 @@ class Ephemeris:
             
         return ephemeris
 
+    def get_fixed_target_positions(self, ra, dec):
+        """start with text file, end with data frame to generate the gtvt figures.
+
+        Parameters
+        ----------
+        ra : float
+            Right ascension of target
+        dec : float
+            Declination of target
+        fixed : bool
+            True if target is fixed, False if moving.
+
+        Returns
+        -------
+        dataframe : pandas.DataFrame
+            Pandas dataframe with updated metadata 
+        """
+        self.fixed = True
+ 
+        self.dataframe['ra'] = ra
+        self.dataframe['dec'] = dec
+
+        self.dataframe = self.build_dataframe()
+
+        return self.dataframe
+
     def get_moving_target_positions(self, desg, smallbody=False):
         """Ephemeris from JPL/HORIZONS.
         smallbody : bool, optional
@@ -219,6 +379,8 @@ class Ephemeris:
         spacecraft, or moons.
         Returns : target name from HORIZONS, RA, and Dec.
         """
+
+        self.fixed = False
 
         if smallbody:
             bodytype='smallbody'
@@ -233,14 +395,43 @@ class Ephemeris:
         eph = obj.ephemerides(cache=False, quantities=(1))
         self.target_name = eph['targetname'][0]
 
-        return eph['RA'].data.data, eph['DEC'].data.data
+        self.dataframe['ra'] = eph['RA'].data.data 
+        self.dataframe['dec'] = eph['DEC'].data.data
+
+        self.dataframe = self.build_dataframe()
+
+        return self.dataframe
 
     def in_FOR(self, dataframe):
+        """Based on parameters calculated in tool, see if the target is in the Field of Regard
+
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            Pandas dataframe
+        
+        Returns
+        -------
+        dataframe : pandas.DataFrame
+            Pandas dataframe with updated metadata
+        """
         dataframe['in_FOR'] = np.where((dataframe["dist"] < MAX_SUN_ANGLE) & (dataframe["dist"] > MIN_SUN_ANGLE), True, False)
         return dataframe
 
     def normal_pa(self, dataframe, tgt_ra, tgt_dec):
         """Calculate the normal position angle (V3)
+
+        Parameters
+        ----------
+        tgt_ra : float
+            Right ascension of target
+        tgt_dec : float
+            Declination of target
+
+        Returns
+        -------
+        dataframe : pandas.DataFrame
+            Pandas dataframe with updated metadata 
         """
 
         if 'sun_pa' not in dataframe.columns:
@@ -257,17 +448,11 @@ class Ephemeris:
 
         return dataframe
 
-    def retrieve_target_positions(self, ra, dec, fixed):
-        """start with text file, end with data frame to generate the gtvt figures.
-        """
-        self.fixed = fixed
+    def build_dataframe(self):
         self.dataframe = self.sun_position_vectors(self.dataframe)
 
         self.dataframe = self.sun_position_coordinates(self.dataframe)
-     
-        self.dataframe['ra'] = ra
-        self.dataframe['dec'] = dec
-     
+
         self.dataframe['ra_radians'] = self.dataframe['ra'] * D2R
         self.dataframe['dec_radians'] = self.dataframe['dec'] * D2R
      
@@ -296,6 +481,16 @@ class Ephemeris:
 
     def sun_position_vectors(self, dataframe):
         """Add the sun vector to ephemeris data frame
+        
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            Pandas dataframe containing ephemeride information
+
+        Returns
+        -------
+        dataframe : pandas.DataFrame
+            Pandas dataframe containing updated metadata. 
         """
 
         # Create dataframe of only positional vectors.
@@ -312,7 +507,17 @@ class Ephemeris:
         return dataframe
 
     def sun_position_coordinates(self, dataframe):
-        """Get sun's position
+        """Get sun's positional coordinates
+
+        Parameters
+        ----------
+        dataframe : pandas.DataFrame
+            Pandas dataframe containing ephemeride information
+
+        Returns
+        -------
+        dataframe : pandas.DataFrame
+            Pandas dataframe containing updated metadata. 
         """
 
         dataframe['coord2'] = np.arcsin(dataframe['Vsun_Z'].values)
@@ -323,6 +528,13 @@ class Ephemeris:
         return dataframe
 
     def write_ephemeris(self, write_path):
+        """Write ephemeris to file
+
+        Parameters
+        ----------
+        write_path : str
+            Full file path to write file out to.
+        """
         outfname = write_path
         with open(outfname, "w") as of:
             for line in self.ephemeris:

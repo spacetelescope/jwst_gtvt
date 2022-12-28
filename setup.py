@@ -69,6 +69,7 @@ setup(
          'matplotlib',
          'astroquery',
          'pysiaf',
+         'type-docopt'
      ],
      
      python_requires='>=3.7',
