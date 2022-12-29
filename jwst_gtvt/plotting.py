@@ -1,125 +1,61 @@
 import matplotlib.pyplot as plt
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
-import numpy as np
 from astropy.time import Time
-import pandas as pd
 
-from jwst_gtvt.ephemeride_rewrite import Ephemeris
+from jwst_gtvt.display_results import get_visibility_windows 
 
-def plot_single_instrument(ax, instrument_name, t, min_pa, max_pa):
+def plot_visibility(ephemeris, instrument=None):
+    # Just incase dataframe hasn't been sorted yet
+    dataframe = ephemeris.dataframe
+    df = dataframe.loc[dataframe['in_FOR']==True]
 
-    min_pa = np.array(min_pa)
-    max_pa = np.array(max_pa)
-    t = np.array(t)
+    times = Time(df['MJD'], format='mjd').datetime
 
-    if np.any(min_pa > max_pa):
-        minpa_lt_maxpa = min_pa < max_pa
-        minpa_gt_maxpa = min_pa > max_pa
+    # These indices allow us to get the visible regions regions
+    window_indices = get_visibility_windows(df.index.tolist())
 
-        max_pa_upper = np.copy(max_pa)
-        min_pa_upper = np.copy(min_pa)
-        max_pa_upper[minpa_gt_maxpa] = 360
-        max_pa_upper[minpa_lt_maxpa] = np.nan
-        min_pa_upper[minpa_lt_maxpa] = np.nan
+    if instrument:
+        # Set plotting configs
+        plt.figure(figsize=(18, 8))
+        plt.grid(color='k', linestyle='--', linewidth=2, alpha=0.3)
+        plt.xticks(fontsize=14, rotation=45)
+        plt.yticks(fontsize=14)
 
-        max_pa_lower = np.copy(max_pa)
-        min_pa_lower = np.copy(min_pa)
-        min_pa_lower[minpa_gt_maxpa] = 0
-        max_pa_lower[minpa_lt_maxpa] = np.nan
-        min_pa_lower[minpa_lt_maxpa] = np.nan
+        for start, end in window_indices:
+            data_to_plot = df.loc[start:end]
+            min_PA_data = data_to_plot[instrument.upper() + '_min_pa_angle']
+            max_PA_data = data_to_plot[instrument.upper() + '_max_pa_angle']
+            plt.fill_between(data_to_plot['MJD'], min_PA_data, max_PA_data, color='grey')
 
+        plt.ylabel('Available Position Angles (Degrees)', fontsize=20)
 
-        max_pa[minpa_gt_maxpa] = np.nan
-        min_pa[minpa_gt_maxpa] = np.nan
-
-        ax.fill_between(t, min_pa_upper, max_pa_upper, facecolor='.7', edgecolor='.7', lw=2)
-        ax.fill_between(t, min_pa_lower, max_pa_lower, facecolor='.7', edgecolor='.7', lw=2)
-        ax.fill_between(t, min_pa, max_pa, edgecolor='.7', facecolor='.7', lw=2)
-        ax.set_ylabel("Available Position Angle (Degree)")
-        ax.set_title(instrument_name)
-        ax.fmt_xdata = DateFormatter('%Y-%m-%d')
-
+        if ephemeris.fixed:
+            ra, dec = max(df['ra']), max(df['dec'])
+            plt.title('RA: {} Dec: {} with {}'.format(ra, dec, instrument.upper()), fontsize=25)
+        else:
+            plt.title('Target {} with {}'.format(ephemeris.target_name, instrument.upper()), fontsize=25)
+        plt.show()
 
     else:
-        ax.fill_between(t, min_pa, max_pa, edgecolor='none', facecolor='.7')
-        ax.set_ylabel("Available Position Angle (Degree)")
-        ax.set_title(instrument_name)
-        ax.fmt_xdata = DateFormatter('%Y-%m-%d')
+        instrument_names = ['NIRCAM', 'NIRSPEC', 'NIRISS', 'MIRI', 'FGS', 'V3PA']
+        fig, axs = plt.subplots(ncols=3, nrows=2, figsize = (18,8))
+        fig.tight_layout()
 
-eph = Ephemeris()
-eph.get_fixed_target_positions(253.2458, 2.4008)
+        if ephemeris.fixed:
+            ra, dec = max(df['ra']), max(df['dec'])
+            fig.suptitle('RA: {} Dec: {}'.format(ra, dec), fontsize=25)
+        else:
+            plt.suptitle('Target {}'.format(ephemeris.target_name), fontsize=25)
 
-df = eph.dataframe
-df = df.loc[df['in_FOR']==True]
+        for instrument_name, ax in zip(instrument_names, axs.flatten()):
+            for start, end in window_indices:
+                data_to_plot = df.loc[start:end]
+                min_PA_data = data_to_plot[instrument_name + '_min_pa_angle']
+                max_PA_data = data_to_plot[instrument_name + '_max_pa_angle']
+                ax.fill_between(data_to_plot['MJD'], min_PA_data, max_PA_data, color='grey')
+                ax.set_title(instrument_name)
+                ax.tick_params('x', labelrotation=45)
+                ax.grid(color='k', linestyle='--', linewidth=2, alpha=0.3)
+                ax.set_ylabel('Available Position Angles (Degrees)')
+        plt.show()
 
-search_start = min(df['MJD'])
-search_end = max(df['MJD'])
-
-times = Time(df['MJD'], format='mjd').datetime
-
-minV3PA_data = df['V3PA_min_pa_angle']
-maxV3PA_data = df['V3PA_max_pa_angle']
-minNIRCam_PA_data = df['NIRCAM_min_pa_angle']
-maxNIRCam_PA_data = df['NIRCAM_max_pa_angle']
-minMIRI_PA_data = df['MIRI_min_pa_angle']
-maxMIRI_PA_data = df['MIRI_max_pa_angle']
-minNIRSpec_PA_data = df['NIRSPEC_min_pa_angle']
-maxNIRSpec_PA_data = df['NIRSPEC_max_pa_angle']
-minNIRISS_PA_data = df['NIRISS_min_pa_angle']
-maxNIRISS_PA_data = df['NIRISS_max_pa_angle']
-minFGS_PA_data = df['FGS_min_pa_angle']
-maxFGS_PA_data = df['FGS_max_pa_angle']
-
-years = YearLocator()
-months = MonthLocator()
-yearsFmt = DateFormatter('%Y')
-monthsFmt = DateFormatter('%m')
-fig, axes = plt.subplots(2, 3, figsize=(14,8))
-
-axes[0,0].set_title("V3")
-plot_single_instrument(axes[0,0], "V3", times, minV3PA_data, maxV3PA_data)
-axes[0,0].fmt_xdata = DateFormatter('%Y-%m-%d')
-axes[0,0].set_ylabel("Available Position Angle (Degree)")
-axes[0,0].set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-labels = axes[0,0].get_xticklabels()
-for label in labels:
-    label.set_rotation(30)
-
-plot_single_instrument(axes[0,1], 'NIRCam', times, minNIRCam_PA_data, maxNIRCam_PA_data)
-axes[0,1].fmt_xdata = DateFormatter('%Y-%m-%d')
-axes[0,1].set_ylabel("Available Position Angle (Degree)")
-axes[0,1].set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-labels = axes[0,1].get_xticklabels()
-for label in labels:
-    label.set_rotation(30)
-
-axes[0,2].set_title("MIRI")
-plot_single_instrument(axes[0,2], 'MIRI', times, minMIRI_PA_data, maxMIRI_PA_data)
-axes[0,2].set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-labels = axes[0,2].get_xticklabels()
-for label in labels:
-    label.set_rotation(30)
-
-axes[1,0].set_title("NIRSpec")
-axes[1,0].fmt_xdata = DateFormatter('%Y-%m-%d')
-plot_single_instrument(axes[1,0], 'NIRSpec', times, minNIRSpec_PA_data, maxNIRSpec_PA_data)
-axes[1,0].set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-labels = axes[1,0].get_xticklabels()
-for label in labels:
-    label.set_rotation(30)
-
-axes[1,1].set_title("NIRISS")
-plot_single_instrument(axes[1,1], 'NIRISS', times, minNIRISS_PA_data, maxNIRISS_PA_data)
-axes[1,1].set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-labels = axes[1,1].get_xticklabels()
-for label in labels:
-    label.set_rotation(30)
-
-axes[1,2].set_title("FGS")
-plot_single_instrument(axes[1,2], 'FGS', times, minFGS_PA_data, maxFGS_PA_data)
-axes[1,2].set_xlim(Time(search_start, format='mjd').datetime, Time(search_end, format='mjd').datetime)
-labels = axes[1,2].get_xticklabels()
-for label in labels:
-    label.set_rotation(30)
-plt.show()
-plt.close()

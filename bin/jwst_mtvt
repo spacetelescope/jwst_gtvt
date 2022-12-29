@@ -4,12 +4,13 @@ Main driver for moving target support. This script will display and
 generate the figure for 
 
 Usage:
-  jwst_mtvt <desg> [--smallbody]
+  jwst_mtvt <desg> [--instrument=<inst>] [--smallbody]
 
 Arguments:
   <desg>    Name of moving target. 
 
 Options:
+  [--instrument]      JWST instrument to plot individually
   --smallbody       Boolean flag for [default: False]
   -h --help         Show this screen.
   --version         Show version.
@@ -18,13 +19,14 @@ Options:
 from jwst_gtvt.display_results import display_results
 from docopt import docopt
 from jwst_gtvt.ephemeride_rewrite import Ephemeris
+from jwst_gtvt.plotting import plot_visibility
 
 
 def main(args):
     eph = Ephemeris()
     eph.get_moving_target_positions(args['<desg>'], smallbody=['--smallbody'])
     display_results(eph)
-    print('Here is your fancy plot')
+    plot_visibility(eph, args['--instrument'])
 
 if __name__ == "__main__":
     args = docopt(usage, version='0.6.2')

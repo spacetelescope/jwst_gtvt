@@ -3,13 +3,14 @@ usage = """
 Database utility scripts.
 
 Usage:
-  jwst_gtvt <ra> <dec>
+  jwst_gtvt <ra> <dec> [--instrument=<inst>]
 
 Arguments:
   <ra>    Right ascension of target to observe with JWST.
   <dec>   Declination of target to observe with JWST.
 
 Options:
+  [--instrument]      JWST instrument to plot individually
   -h --help         Show this screen.
   --version         Show version.
 """
@@ -17,6 +18,7 @@ Options:
 from jwst_gtvt.display_results import display_results
 from docopt import docopt
 from jwst_gtvt.ephemeride_rewrite import Ephemeris
+from jwst_gtvt.plotting import plot_visibility
 
 
 def main(args):
@@ -24,7 +26,7 @@ def main(args):
     ra, dec = float(args['<ra>']), float(args['<dec>'])
     eph.get_fixed_target_positions(ra, dec)
     display_results(eph)
-    print('Here is your fancy plot')
+    plot_visibility(eph, args['--instrument'])
 
 if __name__ == "__main__":
     args = docopt(usage, version='0.6.2')
