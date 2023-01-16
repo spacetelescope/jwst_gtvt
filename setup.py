@@ -91,7 +91,7 @@ setup(
     # have to be included in MANIFEST.in as well.
     package_data={
         'jwst_gtvt': [
-            'horizons_EM_jwst_wrt_sun_2020-2024.txt'
+            'ephemeris_2021-12-26_2024-10-03.csv'
         ],
     },
 

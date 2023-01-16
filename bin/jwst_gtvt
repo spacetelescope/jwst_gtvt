@@ -17,7 +17,7 @@ Options:
 
 from jwst_gtvt.display_results import display_results
 from docopt import docopt
-from jwst_gtvt.ephemeride_rewrite import Ephemeris
+from jwst_gtvt.jwst_tvt import Ephemeris
 from jwst_gtvt.plotting import plot_visibility
 
 
