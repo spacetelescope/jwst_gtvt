@@ -375,7 +375,13 @@ class Ephemeris:
             Pandas dataframe with updated metadata 
         """
         self.fixed = True
- 
+
+        if ':' in ra:
+            ra = self.convert_ddmmss_to_float(ra) * 15.
+            dec = self.convert_ddmmss_to_float(dec)
+        else:
+            ra, dec = float(ra), float(dec)
+
         self.dataframe['ra'] = ra
         self.dataframe['dec'] = dec
 
