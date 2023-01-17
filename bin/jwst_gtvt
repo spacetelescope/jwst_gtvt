@@ -15,6 +15,7 @@ Options:
   --version         Show version.
 """
 
+from jwst_gtvt.constants import D2R
 from jwst_gtvt.display_results import display_results
 from docopt import docopt
 from jwst_gtvt.jwst_tvt import Ephemeris
@@ -23,7 +24,12 @@ from jwst_gtvt.plotting import plot_visibility
 
 def main(args):
     eph = Ephemeris()
-    ra, dec = float(args['<ra>']), float(args['<dec>'])
+    if ':' in args['<ra>']:
+      ra = eph.convert_ddmmss_to_float(args['<ra>']) * 15.
+      dec = eph.convert_ddmmss_to_float(args['<dec>'])
+    else:
+      ra, dec = float(args['<ra>']), float(args['<dec>'])
+
     eph.get_fixed_target_positions(ra, dec)
     display_results(eph)
     plot_visibility(eph, args['--instrument'])

@@ -77,6 +77,17 @@ class Ephemeris:
         for coordinate in ['X', 'Y', 'Z']:
             self.dataframe[coordinate] = (self.dataframe[coordinate].shift() - self.dataframe[coordinate]) * 1 + self.dataframe[coordinate]
 
+    def convert_ddmmss_to_float(self, astring):
+        """Convert date ra dec to sexigesimal
+        """
+        aline = astring.split(':')
+        d= float(aline[0])
+        m= float(aline[1])
+        s= float(aline[2])
+        hour_or_deg = (s/60.+m)/60.+d
+
+        return hour_or_deg
+
     def get_allowed_max_boresight(self, dataframe):
         """Need Docstring
         """
