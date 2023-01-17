@@ -14,7 +14,7 @@ def test_moving_target():
 def test_ra_dec_hour_min_sec():
     """Test end-to-end for jwst_gtvt fixed target given ra and dec in hours:minutes:seconds"""
 
-    ra, dec = '16:52:58.9', dec='02:24:03'
+    ra, dec = '16:52:58.9', '02:24:03'
     eph.get_fixed_target_positions(ra, dec)
 
 
