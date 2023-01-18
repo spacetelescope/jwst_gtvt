@@ -3,14 +3,15 @@ usage = """
 Database utility scripts.
 
 Usage:
-  jwst_gtvt <ra> <dec> [--instrument=<inst>]
+  jwst_gtvt <ra> <dec> [--instrument=<inst>] [--silent]
 
 Arguments:
   <ra>    Right ascension of target to observe with JWST.
   <dec>   Declination of target to observe with JWST.
 
 Options:
-  [--instrument]      JWST instrument to plot individually
+  [--instrument]    JWST instrument to plot individually
+  [--silent]        Boolean to print results to screen [default: False]
   -h --help         Show this screen.
   --version         Show version.
 """
@@ -25,7 +26,8 @@ from jwst_gtvt.plotting import plot_visibility
 def main(args):
     eph = Ephemeris()
     eph.get_fixed_target_positions(ra, dec)
-    display_results(eph)
+    if not args['--silent']:
+        display_results(eph)
     plot_visibility(eph, args['--instrument'])
 
 if __name__ == "__main__":
