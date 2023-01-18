@@ -27,7 +27,7 @@ def test_ra_dec_sexigesimal():
 
 @pytest.mark.parametrize("instrument", ['MIRI', 'NIRCAM', 'NIRSPEC', 'NIRISS', 'FGS', 'V3PA'])
 @pytest.mark.parametrize("mode", ['fixed', 'moving'])
-def test_gtvt_single_instrument(instruments, mode):
+def test_gtvt_single_instrument(instrument, mode):
     eph = Ephemeris()
     if mode == 'fixed':
         ra, dec = '253.2458', '2.4008'
