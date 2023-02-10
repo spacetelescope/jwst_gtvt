@@ -25,7 +25,7 @@ from jwst_gtvt.plotting import plot_visibility
 
 def main(args):
     eph = Ephemeris()
-    eph.get_fixed_target_positions(ra, dec)
+    eph.get_fixed_target_positions(args['<ra>'], args['<dec>'])
     if not args['--silent']:
         display_results(eph)
     plot_visibility(eph, args['--instrument'])

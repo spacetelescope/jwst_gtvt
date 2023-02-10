@@ -4,7 +4,7 @@ from astropy.time import Time
 
 from jwst_gtvt.display_results import get_visibility_windows 
 
-def plot_visibility(ephemeris, instrument=None):
+def plot_visibility(ephemeris, instrument=None, test=False):
     # Just incase dataframe hasn't been sorted yet
     dataframe = ephemeris.dataframe
     df = dataframe.loc[dataframe['in_FOR']==True]
@@ -35,6 +35,7 @@ def plot_visibility(ephemeris, instrument=None):
             plt.title('RA: {} Dec: {} with {}'.format(ra, dec, instrument.upper()), fontsize=18)
         else:
             plt.title('Target {} with {}'.format(ephemeris.target_name, instrument.upper()), fontsize=18)
+
         plt.show()
 
     else:
