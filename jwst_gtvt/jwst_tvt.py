@@ -351,6 +351,7 @@ class Ephemeris:
             self.eph_request = requests.get(url)
             ephemeris = np.array(self.eph_request.text.splitlines())
         except requests.exceptions.ConnectionError as err:
+            print(err)
             print('No internet connection, using local file: {}'.format(self.ephemeris_filename))
             with open(self.ephemeris_filename, newline='') as csvfile:
                 ephemeris = csv.reader(csvfile, delimiter=',')
