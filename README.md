@@ -108,7 +108,7 @@ Below is an example of the full text output
     +------------------------------------------+
     | JWST General Target Visibility Tool      |
     +------------------------------------------+
-    | Runtime/Date: 2023-05-16 14:35:49.360642 |
+    | Runtime/Date: YYYY-MM-DD   HR:MIN:SS     |
     +------------------------------------------+
     | Version Number: X.Y.Z                    |
     +------------------------------------------+
@@ -492,7 +492,7 @@ The JWST GTVT API allows you to breakdown and interact with the different compon
     >>> eph.display_ephemeris_header()
 
     '*******************************************************************************'
-    'Ephemeris / WWW_USER Wed May 17 12:07:34 2023 Pasadena, USA      / Horizons'
+    'Ephemeris / WWW_USER DOW Month Day Time Year      Pasadena, USA      / Horizons'
     '*******************************************************************************'
     'Target body name: James Webb Space Telescope (spacecraft) (-170) {source: JWST_merged}'
     'Center body name: Sun (10)                        {source: DE441}'
@@ -567,7 +567,7 @@ The JWST GTVT API allows you to breakdown and interact with the different compon
     "VEC_DELTA_T = 'NO'"]
 
     >>> eph.dataframe
-    
+
             JDTDB              Calendar Date (TDB)             X             Y             Z      MJD
     0     2459574.5   A.D. 2021-Dec-26 00:00:00.0000           NaN           NaN           NaN  59574.0
     1     2459575.5   A.D. 2021-Dec-27 00:00:00.0000 -1.051333e+07  1.347734e+08  5.836535e+07  59575.0
