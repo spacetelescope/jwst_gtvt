@@ -481,6 +481,111 @@ Below is an example of the full text output
     |      99.0046 |      91.0951 |     237.609  |     229.7    |      99.687  |      91.7775 |      103.951 |      96.0419 |      97.8663 |      89.9569 |     99.    1171    |     91.2077 |
     +--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------    +-------------   +-------------+
 
+
+# API
+
+The JWST GTVT API allows you to breakdown and interact with the different componenets avaialble of our code base.
+
+    $ python
+    >>> from jwst_gtvt.jwst_tvt import Ephemeris
+    >>> eph = Ephemeris()
+    >>> eph.display_ephemeris_header()
+
+    '*******************************************************************************'
+    'Ephemeris / WWW_USER Wed May 17 12:07:34 2023 Pasadena, USA      / Horizons'
+    '*******************************************************************************'
+    'Target body name: James Webb Space Telescope (spacecraft) (-170) {source: JWST_merged}'
+    'Center body name: Sun (10)                        {source: DE441}'
+    'Center-site name: BODY CENTER'
+    '*******************************************************************************'
+    'Start time      : A.D. 2021-Dec-26 00:00:00.0000 TDB'
+    'Stop  time      : A.D. 2024-Oct-03 00:00:00.0000 TDB'
+    'Step-size       : 1440 minutes'
+    '*******************************************************************************'
+    'Center geodetic : 0.0, 0.0, 0.0                   {E-lon(deg),Lat(deg),Alt(km)}'
+    'Center cylindric: 0.0, 0.0, 0.0                   {E-lon(deg),Dxy(km),Dz(km)}'
+    'Center radii    : 696000.0, 696000.0, 696000.0 km {Equator_a, b, pole_c}'
+    'Output units    : KM-S' 'Calendar mode   : Mixed Julian/Gregorian'
+    'Output type     : LT CORRECTED cartesian states'
+    'Output format   : 2 (position and velocity)' 'Reference frame : ICRF'
+    '*******************************************************************************']
+
+    >>> eph.display_ephemeris_footer()
+
+    ['**************************************************************************************************************************************************************************************************'
+    ' ' 'TIME' ''
+    '  Barycentric Dynamical Time ("TDB" or T_eph) output was requested. This'
+    'continuous coordinate time is equivalent to the relativistic proper time'
+    'of a clock at rest in a reference frame co-moving with the solar system'
+    "barycenter but outside the system's gravity well. It is the independent"
+    'variable in the solar system relativistic equations of motion.' ''
+    '  TDB runs at a uniform rate of one SI second per second and is independent'
+    "of irregularities in Earth's rotation." ' ' 'CALENDAR SYSTEM' ''
+    '  Mixed calendar mode was active such that calendar dates after AD 1582-Oct-15'
+    '(if any) are in the modern Gregorian system. Dates prior to 1582-Oct-5 (if any)'
+    'are in the Julian calendar system, which is automatically extended for dates'
+    'prior to its adoption on 45-Jan-1 BC.  The Julian calendar is useful for'
+    'matching historical dates. The Gregorian calendar more accurately corresponds'
+    'to the Earth\'s orbital motion and seasons. A "Gregorian-only" calendar mode is'
+    'available if such physical events are the primary interest.' ''
+    'REFERENCE FRAME AND COORDINATES' ''
+    '  International Celestial Reference Frame (ICRF)' ''
+    '    The ICRF is an adopted reference frame whose axes are defined relative to '
+    '    fixed extragalactic radio sources distributed across the sky.' ''
+    '    The ICRF was aligned with the prior FK5/J2000 dynamical system at the ~0.02 '
+    '    arcsecond level but is not identical and has no associated standard epoch.'
+    '' '  Symbol meaning:' ''
+    '    JDTDB    Julian Day Number, Barycentric Dynamical Time'
+    '      X      X-component of position vector (km)'
+    '      Y      Y-component of position vector (km)'
+    '      Z      Z-component of position vector (km)'
+    '      VX     X-component of velocity vector (km/sec)                           '
+    '      VY     Y-component of velocity vector (km/sec)                           '
+    '      VZ     Z-component of velocity vector (km/sec)                           '
+    '' 'ABERRATIONS AND CORRECTIONS' ''
+    ' States have been corrected for Newtonian down-leg (receive) light-time'
+    ' displacement.' '' 'Computations by ...' ''
+    '    Solar System Dynamics Group, Horizons On-Line Ephemeris System'
+    '    4800 Oak Grove Drive, Jet Propulsion Laboratory'
+    '    Pasadena, CA  91109   USA' ''
+    '    General site: https://ssd.jpl.nasa.gov/'
+    '    Mailing list: https://ssd.jpl.nasa.gov/email_list.html'
+    '    System news : https://ssd.jpl.nasa.gov/horizons/news.html'
+    '    User Guide  : https://ssd.jpl.nasa.gov/horizons/manual.html'
+    '    Connect     : browser        https://ssd.jpl.nasa.gov/horizons/app.html#/x'
+    '                  API            https://ssd-api.jpl.nasa.gov/doc/horizons.html'
+    '                  command-line   telnet ssd.jpl.nasa.gov 6775'
+    '                  e-mail/batch   https://ssd.jpl.nasa.gov/ftp/ssd/hrzn_batch.txt'
+    '                  scripts        https://ssd.jpl.nasa.gov/ftp/ssd/SCRIPTS'
+    '    Author      : Jon.D.Giorgini@jpl.nasa.gov'
+    '*******************************************************************************'
+    '' '!$$SOF' 'COMMAND = -170' "OBJ_DATA = 'NO'" 'EPHEM_TYPE = VECTORS'
+    "START_TIME = '2021-12-26'" "STOP_TIME = '2024-10-03'"
+    "CENTER = '500@10'" "STEP_SIZE = '1 DAYS'" "CSV_FORMAT = 'YES'"
+    "VEC_TABLE = '2'" "REF_SYSTEM = 'ICRF'" "REF_PLANE = 'FRAME'"
+    "VEC_CORR = 'LT'" "OUT_UNITS = 'KM-S'" "VEC_LABELS = 'YES'"
+    "VEC_DELTA_T = 'NO'"]
+
+    >>> eph.dataframe
+    
+            JDTDB              Calendar Date (TDB)             X             Y             Z      MJD
+    0     2459574.5   A.D. 2021-Dec-26 00:00:00.0000           NaN           NaN           NaN  59574.0
+    1     2459575.5   A.D. 2021-Dec-27 00:00:00.0000 -1.051333e+07  1.347734e+08  5.836535e+07  59575.0
+    2     2459576.5   A.D. 2021-Dec-28 00:00:00.0000 -1.313013e+07  1.347285e+08  5.828041e+07  59576.0
+    3     2459577.5   A.D. 2021-Dec-29 00:00:00.0000 -1.574720e+07  1.345992e+08  5.817769e+07  59577.0
+    4     2459578.5   A.D. 2021-Dec-30 00:00:00.0000 -1.835999e+07  1.344084e+08  5.805701e+07  59578.0
+    ...         ...                              ...           ...           ...           ...      ...
+    1008  2460582.5   A.D. 2024-Sep-29 00:00:00.0000  1.504994e+08  1.211053e+07  5.587302e+06  60582.0
+    1009  2460583.5   A.D. 2024-Sep-30 00:00:00.0000  1.502033e+08  1.449748e+07  6.621077e+06  60583.0
+    1010  2460584.5   A.D. 2024-Oct-01 00:00:00.0000  1.498622e+08  1.688006e+07  7.652313e+06  60584.0
+    1011  2460585.5   A.D. 2024-Oct-02 00:00:00.0000  1.494761e+08  1.925750e+07  8.680688e+06  60585.0
+    1012  2460586.5   A.D. 2024-Oct-03 00:00:00.0000  1.490451e+08  2.162904e+07  9.705883e+06  60586.0
+
+    >>> ceres_df = eph.get_moving_target_positions('Ceres')
+    >>> from jwst_gtvt.plotting import plot_visibility
+    >>> plot_visibility(eph)
+
+
 # Troubleshooting
 
 Unless specified, astroquery will cache queries to Horizons. This can cause some issues when trying to query targets
