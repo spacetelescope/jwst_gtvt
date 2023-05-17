@@ -3,13 +3,15 @@ usage = """
 Database utility scripts.
 
 Usage:
-  jwst_gtvt <ra> <dec> [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
+  jwst_gtvt <ra> <dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
 
 Arguments:
   <ra>    Right ascension of target to observe with JWST.
   <dec>   Declination of target to observe with JWST.
 
 Options:
+  [--start_date]         Start date for plot
+  [--end_date]           End date for plot
   [--instrument]         JWST instrument to plot individually
   [--target_name]        User provided name for target
   [--write_ephemeris]    File name to write ephemeris to
@@ -19,6 +21,8 @@ Options:
   --version              Show version.
 """
 
+from astropy.time import Time
+
 from jwst_gtvt.constants import D2R
 from jwst_gtvt.display_results import display_results
 from docopt import docopt
@@ -27,7 +31,16 @@ from jwst_gtvt.plotting import plot_visibility
 
 
 def main(args):
-    eph = Ephemeris()
+    if args['--start_date'] and args['--end_date']:
+        start = Time(args['--start_date'])
+        end = Time(args['--end_date'])
+        if start > end:
+            raise ValueError("Date mismatch, end date is before start date.")
+        else:
+            eph = Ephemeris(start_date=start, end_date=end)
+    else:
+        eph = Ephemeris()
+
     eph.get_fixed_target_positions(args['<ra>'], args['<dec>'])
 
     if not args['--silent']:

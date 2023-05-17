@@ -4,12 +4,14 @@ Main driver for moving target support. This script will display and
 generate the figure for 
 
 Usage:
-  jwst_mtvt <desg> [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--smallbody] [--silent]
+  jwst_mtvt <desg> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--smallbody] [--silent]
 
 Arguments:
   <desg>    Name of moving target. 
 
 Options:
+  [--start_date]         Start date for plot
+  [--end_date]           End date for plot
   [--instrument]         JWST instrument to plot individually
   [--write_ephemeris]    File name to write ephemeris to
   [--write_plot]         File name to write plot out to
@@ -19,6 +21,8 @@ Options:
   --version              Show version.
 """
 
+from astropy.time import Time
+
 from jwst_gtvt.display_results import display_results
 from docopt import docopt
 from jwst_gtvt.jwst_tvt import Ephemeris
@@ -26,8 +30,17 @@ from jwst_gtvt.plotting import plot_visibility
 
 
 def main(args):
-    eph = Ephemeris()
-    eph.get_moving_target_positions(args['<desg>'], smallbody=args['--smallbody'])
+    if args['--start_date'] and args['--end_date']:
+        start = Time(args['--start_date'])
+        end = Time(args['--end_date'])
+        if start > end:
+            raise ValueError("Date mismatch, end date is before start date.")
+        else:
+            eph = Ephemeris(start_date=start, end_date=end)
+    else:
+        eph = Ephemeris()
+
+    eph.get_moving_target_positions(args['<desg>'], args['--smallbody'])
 
     if not args['--silent']:
         display_results(eph)
@@ -38,5 +51,5 @@ def main(args):
     plot_visibility(eph, args['--instrument'], write_plot=args['--write_plot'])
 
 if __name__ == "__main__":
-    args = docopt(usage, version='0.6.2')
+    args = docopt(usage, version='0.6.2') 
     main(args)

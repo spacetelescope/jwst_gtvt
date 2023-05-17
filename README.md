@@ -32,17 +32,22 @@ There are two scripts available.  `jwst_gtvt` for fixed targets, and `jwst_mtvt`
 
     $ jwst_gtvt -h
     Usage:
-        jwst_gtvt <ra> <dec> [--instrument=<inst>] [--silent]
+        jwst_gtvt <ra> <dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
 
     Arguments:
         <ra>    Right ascension of target to observe with JWST.
         <dec>   Declination of target to observe with JWST.
 
-    Options:
-        [--instrument]    JWST instrument to plot individually
-        [--silent]        Boolean to print results to screen [default: False]
-        -h --help         Show this screen.
-        --version         Show version.
+        Options:
+        [--start_date]         Start date for plot
+        [--end_date]           End date for plot
+        [--instrument]         JWST instrument to plot individually
+        [--target_name]        User provided name for target
+        [--write_ephemeris]    File name to write ephemeris to
+        [--write_plot]         File name to write plot out to
+        [--silent]             Boolean to print results to screen [default: False]
+        -h --help              Show this screen.
+        --version              Show version.
 
 
 # Example
@@ -82,16 +87,16 @@ The allowed values for `--instrument` are 'nircam', 'nirspec', 'niriss', 'miri',
 
 ![Example Plot](docs/nircam_target_visibility.png "Example plot output when specifying instrument.")
 
-You can save the text ouput to a file instead of having it output to terminal with `--save_table`.  
+You can save the text and figure ouput to a file instead of having it output to terminal with `--write_ephemeris` and `write_plot`.  
 
-`$ jwst_gtvt 16:52:58.9 02:24:03 --save_table visibility.txt`
+`$ jwst_gtvt 16:52:58.9 02:24:03 --write_ephemeris visibility.csv --write_plot visibility.png`
 
 If you only want to plot a specific range of dates, rather than the entire available ephemeris you specify a `--start_date` or `--end_date` in ISO format (yyyy-mm-dd).
 For example
 
-`$ jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240" --start_date 2020-01-01 --end_date 2021-01-01`
+`$ jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240" --start_date 2023-01-01 --end_date 2024-01-01`
 
-![Example Plot](docs/jwst_target_visibility_2020.png "Example plot output when specifying start and end dates.")
+![Example Plot](docs/jwst_target_visibility_2023.png "Example plot output when specifying start and end dates.")
 
 Specifying the `--v3pa` will display the observing windows which contain the desired V3 position angle in the text output.
 
@@ -100,7 +105,7 @@ Below is an example of the full text output
     $ jwst_gtvt 16:52:58.9 02:24:03
 
 
-    +------------------------------------------+
+   +------------------------------------------+
    | JWST General Target Visibility Tool      |
    +------------------------------------------+
    | Runtime/Date: 2023-05-16 14:35:49.360642 |
