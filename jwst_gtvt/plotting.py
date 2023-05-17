@@ -4,7 +4,7 @@ from astropy.time import Time
 
 from jwst_gtvt.display_results import get_visibility_windows 
 
-def plot_visibility(ephemeris, instrument=None, test=False):
+def plot_visibility(ephemeris, instrument=None, name=None, write_plot=None, test=False):
     # Just incase dataframe hasn't been sorted yet
     dataframe = ephemeris.dataframe
     df = dataframe.loc[dataframe['in_FOR']==True]
@@ -32,11 +32,17 @@ def plot_visibility(ephemeris, instrument=None, test=False):
 
         if ephemeris.fixed:
             ra, dec = max(df['ra']), max(df['dec'])
-            plt.title('RA: {} Dec: {} with {}'.format(ra, dec, instrument.upper()), fontsize=18)
+            if name:
+                plt.title('{} with {}'.format(name, instrument.upper()), fontsize=18)
+            else:
+                plt.title('RA: {} Dec: {} with {}'.format(ra, dec, instrument.upper()), fontsize=18)
         else:
             plt.title('Target {} with {}'.format(ephemeris.target_name, instrument.upper()), fontsize=18)
 
-        plt.show()
+        if write_plot:
+            plt.savefig(write_plot)
+        else:
+            plt.show()
 
     else:
         # plot all instruments here.
@@ -45,7 +51,10 @@ def plot_visibility(ephemeris, instrument=None, test=False):
 
         if ephemeris.fixed:
             ra, dec = max(df['ra']), max(df['dec'])
-            fig.suptitle('RA: {} Dec: {}'.format(ra, dec), fontsize=18)
+            if name:
+                fig.suptitle('Target Name: {}'.format(name), fontsize=18)
+            else:
+                fig.suptitle('RA: {} Dec: {}'.format(ra, dec), fontsize=18)
         else:
             plt.suptitle('Target {}'.format(ephemeris.target_name), fontsize=18)
 
@@ -62,4 +71,8 @@ def plot_visibility(ephemeris, instrument=None, test=False):
                 ax.set_ylabel('Available Position Angles (Degrees)')
 
         fig.tight_layout()
-        plt.show()
+
+        if write_plot:
+            plt.savefig(write_plot)
+        else:
+            plt.show()

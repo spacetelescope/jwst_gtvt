@@ -545,7 +545,7 @@ class Ephemeris:
 
         return dataframe
 
-    def write_ephemeris(self, write_path):
+    def write_ephemeris(self, data_frame, write_path):
         """Write ephemeris to file
 
         Parameters
@@ -553,7 +553,7 @@ class Ephemeris:
         write_path : str
             Full file path to write file out to.
         """
-        outfname = write_path
-        with open(outfname, "w") as of:
-            for line in self.ephemeris:
-                of.write(line)
+        if not write_path.endswith('.csv'):
+            raise Exception("Writing out files JWST GTVT uses a csv writer, please provide filename with '.csv' extension.")
+        else:
+            data_frame.to_csv(write_path)

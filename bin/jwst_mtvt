@@ -4,17 +4,19 @@ Main driver for moving target support. This script will display and
 generate the figure for 
 
 Usage:
-  jwst_mtvt <desg> [--instrument=<inst>] [--smallbody] [--silent]
+  jwst_mtvt <desg> [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--smallbody] [--silent]
 
 Arguments:
   <desg>    Name of moving target. 
 
 Options:
-  [--instrument]    JWST instrument to plot individually
-  --smallbody       Boolean flag for [default: False]
-  --silent          Boolean to print results to screen [default: False]
-  -h --help         Show this screen.
-  --version         Show version.
+  [--instrument]         JWST instrument to plot individually
+  [--write_ephemeris]    File name to write ephemeris to
+  [--write_plot]         File name to write plot out to
+  --smallbody            Boolean flag for [default: False]
+  --silent               Boolean to print results to screen [default: False]
+  -h --help              Show this screen.
+  --version              Show version.
 """
 
 from jwst_gtvt.display_results import display_results
@@ -26,10 +28,16 @@ from jwst_gtvt.plotting import plot_visibility
 def main(args):
     eph = Ephemeris()
     eph.get_moving_target_positions(args['<desg>'], smallbody=args['--smallbody'])
+
     if not args['--silent']:
         display_results(eph)
-    plot_visibility(eph, args['--instrument'])
+
+    if args['--write_ephemeris']:
+        eph.write_ephemeris(eph.dataframe, args['--write_ephemeris'])
+
+    plot_visibility(eph, args['--instrument'], write_plot=args['--write_plot'])
 
 if __name__ == "__main__":
     args = docopt(usage, version='0.6.2')
+    print(args)
     main(args)
