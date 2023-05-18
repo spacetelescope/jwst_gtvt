@@ -4,7 +4,7 @@ Main driver for moving target support. This script will display and
 generate the figure for 
 
 Usage:
-  jwst_mtvt <desg> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--smallbody] [--silent]
+  jwst_mtvt <desg> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
 
 Arguments:
   <desg>    Name of moving target. 
@@ -15,7 +15,6 @@ Options:
   [--instrument]         JWST instrument to plot individually
   [--write_ephemeris]    File name to write ephemeris to
   [--write_plot]         File name to write plot out to
-  --smallbody            Boolean flag for [default: False]
   --silent               Boolean to print results to screen [default: False]
   -h --help              Show this screen.
   --version              Show version.
@@ -40,7 +39,7 @@ def main(args):
     else:
         eph = Ephemeris()
 
-    eph.get_moving_target_positions(args['<desg>'], args['--smallbody'])
+    eph.get_moving_target_positions(args['<desg>'])
 
     if not args['--silent']:
         display_results(eph)

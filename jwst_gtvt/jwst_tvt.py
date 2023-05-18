@@ -58,7 +58,7 @@ class Ephemeris:
         """
         self.start_date = start_date
         self.end_date = end_date
-        self.ephemeris_filename =  os.path.join(os.path.dirname(__file__), 'ephemeris_2021-12-26_2024-10-03.csv')  # set filename to local copy by default
+        self.ephemeris_filename =  os.path.join(os.path.dirname(__file__), 'data/ephemeris_2021-12-26_2024-10-03.csv')  # set filename to local copy by default
         self.ephemeris = self.get_ephemeris_data(start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
         self.dataframe = self.convert_ephemeris_to_df(self.ephemeris)
         self.dataframe = self.dataframe.drop(columns=['VX', 'VY', 'VZ'])  # We don't use the velocities in the GTVT/MTVT
@@ -390,22 +390,16 @@ class Ephemeris:
 
         return self.dataframe
 
-    def get_moving_target_positions(self, desg, smallbody=False):
+    def get_moving_target_positions(self, desg):
         """Ephemeris from JPL/HORIZONS.
-        smallbody : bool, optional
-        Set to `True` for comets and asteroids, `False` for planets,
-        spacecraft, or moons.
+        desg : str
+            Name of target
         Returns : target name from HORIZONS, RA, and Dec.
         """
 
         self.fixed = False
 
-        if smallbody:
-            bodytype='smallbody'
-        else:
-            bodytype='majorbody'
-
-        obj = Horizons(id=desg, location='500@-170', id_type=bodytype,
+        obj = Horizons(id=desg, location='500@-170',
                        epochs={'start':self.start_date.to_value('iso', subfmt='date'), 
                                'stop':self.end_date.to_value('iso', subfmt='date'),
                                'step':'1d'})

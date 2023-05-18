@@ -7,9 +7,9 @@ from jwst_gtvt.display_results import get_visibility_windows
 def plot_visibility(ephemeris, instrument=None, name=None, write_plot=None, test=False):
     # Just incase dataframe hasn't been sorted yet
     dataframe = ephemeris.dataframe
+    dataframe['times'] = Time(dataframe['MJD'], format='mjd').datetime
+    
     df = dataframe.loc[dataframe['in_FOR']==True]
-
-    df['times'] = Time(df['MJD'], format='mjd').datetime
 
     # These indices allow us to get the visible regions regions
     window_indices = get_visibility_windows(df.index.tolist())
