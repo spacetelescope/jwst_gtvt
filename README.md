@@ -16,7 +16,11 @@ This tool requires a few packages all of which are included in the Anaconda Pyth
 
 * pysiaf
 
+* pandas
+
 * docopt
+
+* tabulate
 
 # Installation
 

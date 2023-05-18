@@ -20,7 +20,7 @@ setup(
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.2.0',
+    version='1.0.0',
 
     description='JWST General Target Visibility Tool',
 
@@ -46,9 +46,8 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 3.7',
-        'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
     ],
 
     # What does your project relate to?
@@ -64,15 +63,17 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
      install_requires=[
-         'numpy',
-         'astropy',
-         'matplotlib',
-         'astroquery',
-         'pysiaf',
-         'docopt'
+         'numpy==1.24.3',
+         'astropy==5.2.2',
+         'matplotlib==3.7.1',
+         'astroquery==0.4.6',
+         'pysiaf==0.19.0',
+         'pandas==2.0.1',
+         'docopt==0.6.2',
+         'tabulate==0.9.0',
      ],
      
-     python_requires='>=3.7',
+     python_requires='>=3.9',
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
@@ -91,7 +92,7 @@ setup(
     # have to be included in MANIFEST.in as well.
     package_data={
         'jwst_gtvt': [
-            'ephemeris_2021-12-26_2024-10-03.csv'
+            'data/ephemeris_2021-12-26_2024-10-03.csv'
         ],
     },
 
