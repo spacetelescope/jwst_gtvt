@@ -58,8 +58,8 @@ class Ephemeris:
         """
         self.start_date = start_date
         self.end_date = end_date
-        self.ephemeris_filename =  os.path.join(os.path.dirname(__file__), 'data/ephemeris_2021-12-26_2024-10-03.csv')  # set filename to local copy by default
-        self.ephemeris = self.get_ephemeris_data(start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
+        self.ephemeris_filename =  os.path.join(os.path.dirname(__file__), 'data/ephemeris_2021-12-26_2024-10-03.txt')  # set filename to local copy by default
+        self.ephemeris = self.get_ephemeris_data(start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
         self.dataframe = self.convert_ephemeris_to_df(self.ephemeris)
         self.dataframe = self.dataframe.drop(columns=['VX', 'VY', 'VZ'])  # We don't use the velocities in the GTVT/MTVT
 
@@ -331,7 +331,7 @@ class Ephemeris:
 
         return angle
 
-    def get_ephemeris_data(self, start_date, end_date):
+    def get_ephemeris_data(self, start_date=None, end_date=None):
         """Read JWST data and make python object.
 
         Parameters
@@ -346,16 +346,18 @@ class Ephemeris:
         ephemeris : np.array
             Ephemeris in an array split by lines.
         """ 
+
         try:
-            url = URL.format(start_date, end_date)  # Get Horizons url for JWST ephemeris and add user specified dates
-            self.eph_request = requests.get(url)
+            self.url = URL.format(start_date, end_date)  # Get Horizons url for JWST ephemeris and add user specified dates
+            self.eph_request = requests.get(self.url)
             ephemeris = np.array(self.eph_request.text.splitlines())
         except requests.exceptions.ConnectionError as err:
             print(err)
             print('No internet connection, using local file: {}'.format(self.ephemeris_filename))
-            with open(self.ephemeris_filename, newline='') as csvfile:
-                ephemeris = csv.reader(csvfile, delimiter=',')
-            
+            with open(self.ephemeris_filename) as f:
+                lines = np.array(f.read().splitlines())
+            ephemeris = np.array(lines)
+
         return ephemeris
 
     def get_fixed_target_positions(self, ra, dec):

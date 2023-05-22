@@ -92,7 +92,7 @@ setup(
     # have to be included in MANIFEST.in as well.
     package_data={
         'jwst_gtvt': [
-            'ephemeris_2021-12-26_2024-10-03.csv'
+            'data/ephemeris_2021-12-26_2024-10-03.txt'
         ],
     },
 

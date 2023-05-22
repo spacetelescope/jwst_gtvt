@@ -6,19 +6,19 @@ JWST requires shielding from the Sun for operation, which limits the available p
 
 This tool requires a few packages all of which are included in the Anaconda Python distribution.
 
-* numpy
-
-* maplotlib
-
 * astropy
 
 * astroquery (For moving target support)
 
+* docopt
+
+* maplotlib
+
+* numpy
+
 * pysiaf
 
 * pandas
-
-* docopt
 
 * tabulate
 
@@ -28,11 +28,11 @@ You can install the tool using `pip` with
 `pip install jwst-gtvt`
 
 Alternatively, you can clone the respository from GitHub and install the tool from inside the resulting directory with
-`python setup.py install`
+`pip install -e .`
 
 # Usage
 
-There are two scripts available.  `jwst_gtvt` for fixed targets, and `jwst_mtvt` for moving targets.  To see the help info use
+There are two scripts available. `jwst_gtvt` for fixed targets, and `jwst_mtvt` for moving targets. To see the help info use
 
     $ jwst_gtvt -h
     Usage:
