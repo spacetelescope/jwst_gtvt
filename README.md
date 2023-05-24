@@ -30,6 +30,11 @@ You can install the tool using `pip` with
 Alternatively, you can clone the respository from GitHub and install the tool from inside the resulting directory with
 `pip install -e .`
 
+We also provide conda environments
+    $ conda env create -f environment_python_3.10.yml
+    $ conda activate jwst-gtvt-3.10
+    $ pip install -e .
+
 # Usage
 
 There are two scripts available. `jwst_gtvt` for fixed targets, and `jwst_mtvt` for moving targets. To see the help info use
