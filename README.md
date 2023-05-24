@@ -117,7 +117,7 @@ Sharing output and reading data back in is easy
 If you only want to plot a specific range of dates, rather than the entire available ephemeris you specify a `--start_date` or `--end_date` in ISO format (yyyy-mm-dd).
 For example
 
-`$ jwst_gtvt 16:52:58.9 02:24:03 --name "NGC 6240" --start_date 2023-01-01 --end_date 2024-01-01`
+`$ jwst_gtvt 16:52:58.9 02:24:03 --target_name "NGC 6240" --start_date 2023-01-01 --end_date 2024-01-01`
 
 ![Example Plot](docs/jwst_target_visibility_2023.png "Example plot output when specifying start and end dates.")
 
