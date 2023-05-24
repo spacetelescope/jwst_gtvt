@@ -95,6 +95,25 @@ You can save the text and figure ouput to a file instead of having it output to 
 
 `$ jwst_gtvt 16:52:58.9 02:24:03 --write_ephemeris visibility.csv --write_plot visibility.png`
 
+Sharing output and reading data back in is easy
+
+    $ python
+    >>> import pandas as pd
+    >>> data = pd.read_csv('visibility')
+    >>> print(data[['MJD', ''NIRCAM_max_pa_angle']])
+              MJD  NIRCAM_max_pa_angle
+    0     59574.0                  NaN
+    1     59575.0           232.359648
+    2     59576.0           230.923010
+    3     59577.0           229.540568
+    4     59578.0           228.208743
+    ...       ...                  ...
+    1008  60582.0            79.433611
+    1009  60583.0            78.278362
+    1010  60584.0            77.103145
+    1011  60585.0            75.906550
+    1012  60586.0            74.687072
+
 If you only want to plot a specific range of dates, rather than the entire available ephemeris you specify a `--start_date` or `--end_date` in ISO format (yyyy-mm-dd).
 For example
 

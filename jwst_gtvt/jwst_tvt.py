@@ -552,4 +552,4 @@ class Ephemeris:
         if not write_path.endswith('.csv'):
             raise Exception("Writing out files JWST GTVT uses a csv writer, please provide filename with '.csv' extension.")
         else:
-            data_frame.to_csv(write_path)
+            data_frame.to_csv(write_path, index=False)
