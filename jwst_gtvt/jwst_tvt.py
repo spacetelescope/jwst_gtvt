@@ -410,7 +410,7 @@ class Ephemeris:
         obj = Horizons(id=desg, location='500@-170',
                        epochs={'start':self.start_date.to_value('iso', subfmt='date'), 
                                'stop':self.end_date.to_value('iso', subfmt='date'),
-                               'step':'1d'})g
+                               'step':'1d'})
 
         eph = obj.ephemerides(cache=False, quantities=(1))
         self.target_name = eph['targetname'][0]
