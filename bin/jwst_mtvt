@@ -41,6 +41,12 @@ def main(args):
 
     eph.get_moving_target_positions(args['<desg>'])
 
+    if not eph.dataframe['in_FOR'].any():
+        in_FOR_msg = ("No position angles in field of regard! "
+                      "Check constraints for your target and if it is observable with JWST. \n"
+                      "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-observatory-coordinate-system-and-field-of-regard for more information")
+        raise IndexError(in_FOR_msg)
+
     if not args['--silent']:
         display_results(eph)
 

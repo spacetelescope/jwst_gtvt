@@ -256,8 +256,14 @@ class Ephemeris:
         df : pandas.DataFrame
             JWST ephmeris as pandas dataframe 
         """
-        start_index = np.where(ephemeris == '$$SOE')[0][0] + 1
-        end_index = np.where(ephemeris == '$$EOE')[0][0]
+        try:
+            start_index = np.where(ephemeris == '$$SOE')[0][0] + 1
+            end_index = np.where(ephemeris == '$$EOE')[0][0]
+        except IndexError:
+            idx_err_msg = ("No position angles in field of regard! "
+                           "Check constraints for your target and if it is observable with JWST. \n"
+                           "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-observatory-coordinate-system-and-field-of-regard for more information")
+            raise IndexError(idx_err_msg)
 
         row_data = [row_data.split(',') for row_data in ephemeris[start_index:end_index]]
         result = [filter(None, row) for row in row_data]
@@ -404,7 +410,7 @@ class Ephemeris:
         obj = Horizons(id=desg, location='500@-170',
                        epochs={'start':self.start_date.to_value('iso', subfmt='date'), 
                                'stop':self.end_date.to_value('iso', subfmt='date'),
-                               'step':'1d'})
+                               'step':'1d'})g
 
         eph = obj.ephemerides(cache=False, quantities=(1))
         self.target_name = eph['targetname'][0]

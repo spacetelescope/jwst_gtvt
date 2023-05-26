@@ -63,14 +63,15 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
      install_requires=[
-         'numpy==1.24.3',
-         'astropy==5.2.2',
-         'matplotlib==3.7.1',
-         'astroquery==0.4.6',
-         'pysiaf==0.19.0',
-         'pandas==2.0.1',
-         'docopt==0.6.2',
-         'tabulate==0.9.0',
+         'astropy>=5.2.2',
+         'astroquery>=0.4.6',
+         'docopt>=0.6.2',
+         'matplotlib>=3.7.1',
+         'numpy>=1.24.3',
+         'pysiaf>=0.19.0',
+         'pandas>=2.0.1',
+         'docopt>=0.6.2',
+         'tabulate>=0.9.0',
      ],
      
      python_requires='>=3.9',

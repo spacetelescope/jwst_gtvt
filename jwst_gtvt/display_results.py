@@ -74,20 +74,18 @@ def get_visibility_windows(df_indices):
     This function captures the indices of visible windows for JWST observers.
     """
 
-    if df_indices:
-        window_indices = []
-        window_start_index = df_indices[0]
-        for x,y in zip(df_indices[::], df_indices[1::]):
-            difference = y - x
-            if difference > 1:
-                window_end_index = x
-                window_indices.append((window_start_index, window_end_index))
-                window_start_index = y
-            if y == df_indices[-1]:
-                window_indices.append((window_start_index, y))
-            else:
-                continue
+    window_indices = []
+    window_start_index = df_indices[0]
+    for x,y in zip(df_indices[::], df_indices[1::]):
+        difference = y - x
+        if difference > 1:
+            window_end_index = x
+            window_indices.append((window_start_index, window_end_index))
+            window_start_index = y
+        if y == df_indices[-1]:
+            window_indices.append((window_start_index, y))
+        else:
+            continue
 
-        return window_indices
-    else:
-        raise IndexError("There are no available dates for the target you are requesting. Check constraints for your target and if it is available with JWST.")
+    return window_indices
+
