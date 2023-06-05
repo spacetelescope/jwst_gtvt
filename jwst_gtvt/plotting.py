@@ -35,7 +35,7 @@ def plot_visibility(ephemeris, instrument=None, name=None, write_plot=None, test
             if name:
                 plt.title('{} with {}'.format(name, instrument.upper()), fontsize=18)
             else:
-                plt.title('RA: {} Dec: {} with {}'.format(ra, dec, instrument.upper()), fontsize=18)
+                plt.title('RA: {} Dec: {} with {}'.format(round(ra, 4), round(dec, 4), instrument.upper()), fontsize=18)
         else:
             plt.title('Target {} with {}'.format(ephemeris.target_name, instrument.upper()), fontsize=18)
 
@@ -68,7 +68,10 @@ def plot_visibility(ephemeris, instrument=None, name=None, write_plot=None, test
                 ax.set_title(instrument_name)
                 ax.tick_params('x', labelrotation=45)
                 ax.grid(color='k', linestyle='--', linewidth=2, alpha=0.3)
-                ax.set_ylabel('Available Position Angles (Degrees)')
+                if instrument_name == 'V3PA':
+                    ax.set_ylabel('Available Position Angles ($^\circ$)')
+                else:
+                    ax.set_ylabel('Available Aperture Position Angles ($^\circ$)')
 
         fig.tight_layout()
 

@@ -260,9 +260,14 @@ class Ephemeris:
             start_index = np.where(ephemeris == '$$SOE')[0][0] + 1
             end_index = np.where(ephemeris == '$$EOE')[0][0]
         except IndexError:
-            idx_err_msg = ("No position angles in field of regard! "
-                           "Check constraints for your target and if it is observable with JWST. \n"
-                           "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-observatory-coordinate-system-and-field-of-regard for more information")
+            # Date range out of bounds
+            if 'No ephemeris for target "James Webb Space Telescope (spacecraft)"' in ephemeris[0]:
+                idx_err_msg = ephemeris[0]
+            # No positions returned
+            else:
+                idx_err_msg = ("No position angles in field of regard! "
+                               "Check constraints for your target and if it is observable with JWST. \n"
+                               "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-observatory-coordinate-system-and-field-of-regard for more information")
             raise IndexError(idx_err_msg)
 
         row_data = [row_data.split(',') for row_data in ephemeris[start_index:end_index]]
