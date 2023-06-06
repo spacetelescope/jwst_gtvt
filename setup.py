@@ -63,7 +63,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
      install_requires=[
-         'astropy>=5.2.2',
+         'astropy=>5.2.2',
          'astroquery>=0.4.6',
          'docopt>=0.6.2',
          'matplotlib>=3.7.1',
