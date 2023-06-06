@@ -45,7 +45,7 @@ obliquity_of_the_ecliptic *=  D2R
 
 
 class Ephemeris:
-    def __init__(self, start_date=Time('2021-12-26'), end_date=Time('2024-10-03')):
+    def __init__(self, start_date=Time('2021-12-26'), end_date=Time('2025-05-29')):
         """
         ephermeride_filename : str
             path to ephemeris file
@@ -56,26 +56,35 @@ class Ephemeris:
         verbose : bool
             Print jwst_gtvt results to screen
         """
-        self.start_date = start_date
-        self.end_date = end_date
-        self.ephemeris_filename =  os.path.join(os.path.dirname(__file__), 'data/ephemeris_2021-12-26_2024-10-03.txt')  # set filename to local copy by default
-        self.ephemeris = self.get_ephemeris_data(start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
-        self.dataframe = self.convert_ephemeris_to_df(self.ephemeris)
-        self.dataframe = self.dataframe.drop(columns=['VX', 'VY', 'VZ'])  # We don't use the velocities in the GTVT/MTVT
 
-        # Create MJD Column
-        self.dataframe['MJD'] = self.dataframe['JDTDB'].values - 2400000.5
+        if start_date < Time('2021-12-26') or end_date > Time('2025-05-29'):
+            date_out_of_bound_msg = ("Time frame selected {} ----> {} is out of bounds!".format(start_date, end_date),
+                                     "Please select dates between 2021-12-26 ----> 2021-12-26")
+            raise SystemExit(date_out_of_bound_msg)
+        elif Time(start_date) > Time(end_date):
+            raise SystemExit("start_date later than end_date, exiting")
 
-        self.start_date_mjd = int(start_date.mjd)
-        self.end_date_mjd = int(end_date.mjd)
+        else:
+            self.start_date = start_date
+            self.end_date = end_date
+            self.ephemeris_filename =  os.path.join(os.path.dirname(__file__), 'data/ephemeris_2021-12-26_2025-05-29.txt')  # set filename to local copy by default
+            self.ephemeris = self.get_ephemeris_data(start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
+            self.dataframe = self.convert_ephemeris_to_df(self.ephemeris)
+            self.dataframe = self.dataframe.drop(columns=['VX', 'VY', 'VZ'])  # We don't use the velocities in the GTVT/MTVT
 
-        # only build dataframe based on start and end date and reset the index
-        self.dataframe = self.dataframe[(self.dataframe['MJD'] >= self.start_date_mjd) &
-                                        (self.dataframe['MJD'] <= self.end_date_mjd)].reset_index(drop=True)
+            # Create MJD Column
+            self.dataframe['MJD'] = self.dataframe['JDTDB'].values - 2400000.5
 
-        # Update positions based on pos() function
-        for coordinate in ['X', 'Y', 'Z']:
-            self.dataframe[coordinate] = (self.dataframe[coordinate].shift() - self.dataframe[coordinate]) * 1 + self.dataframe[coordinate]
+            self.start_date_mjd = int(start_date.mjd)
+            self.end_date_mjd = int(end_date.mjd)
+
+            # only build dataframe based on start and end date and reset the index
+            self.dataframe = self.dataframe[(self.dataframe['MJD'] >= self.start_date_mjd) &
+                                            (self.dataframe['MJD'] <= self.end_date_mjd)].reset_index(drop=True)
+
+            # Update positions based on pos() function
+            for coordinate in ['X', 'Y', 'Z']:
+                self.dataframe[coordinate] = (self.dataframe[coordinate].shift() - self.dataframe[coordinate]) * 1 + self.dataframe[coordinate]
 
     def convert_ddmmss_to_float(self, astring):
         """Convert date ra dec to sexigesimal
@@ -260,14 +269,10 @@ class Ephemeris:
             start_index = np.where(ephemeris == '$$SOE')[0][0] + 1
             end_index = np.where(ephemeris == '$$EOE')[0][0]
         except IndexError:
-            # Date range out of bounds
-            if 'No ephemeris for target "James Webb Space Telescope (spacecraft)"' in ephemeris[0]:
-                idx_err_msg = ephemeris[0]
             # No positions returned
-            else:
-                idx_err_msg = ("No position angles in field of regard! "
-                               "Check constraints for your target and if it is observable with JWST. \n"
-                               "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-observatory-coordinate-system-and-field-of-regard for more information")
+            idx_err_msg = ("No position angles in field of regard! "
+                           "Check constraints for your target and if it is observable with JWST. \n"
+                           "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-observatory-coordinate-system-and-field-of-regard for more information")
             raise IndexError(idx_err_msg)
 
         row_data = [row_data.split(',') for row_data in ephemeris[start_index:end_index]]
