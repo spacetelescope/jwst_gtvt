@@ -96,7 +96,7 @@ The allowed values for `--instrument` are 'nircam', 'nirspec', 'niriss', 'miri',
 
 ![Example Plot](docs/nircam_target_visibility.png "Example plot output when specifying instrument.")
 
-You can save the text and figure ouput to a file instead of having it output to terminal with `--write_ephemeris` and `write_plot`.  
+You can save the text and figure ouput to a file instead of having it output to terminal with `--write_ephemeris` and `--write_plot`.
 
 `$ jwst_gtvt 16:52:58.9 02:24:03 --write_ephemeris visibility.csv --write_plot visibility.png`
 
