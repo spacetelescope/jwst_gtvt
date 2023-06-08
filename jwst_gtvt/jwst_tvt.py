@@ -66,7 +66,7 @@ class Ephemeris:
         except:
             max_date = '2025-05-29'
 
-        if start_date < Time(LAUNCH_DATE) or end_date > Time('2025-05-29'):
+        if start_date < Time(LAUNCH_DATE) or end_date > Time(max_date):
             date_out_of_bound_msg = ("Time frame selected {} ----> {} is out of bounds!".format(start_date, end_date),
                                      "Please select dates between {} ----> {}".format(LAUNCH_DATE, max_date))
             raise SystemExit(date_out_of_bound_msg)

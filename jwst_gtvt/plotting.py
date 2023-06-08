@@ -28,7 +28,10 @@ def plot_visibility(ephemeris, instrument=None, name=None, write_plot=None, test
             plt.fill_between(data_to_plot['times'], min_PA_data, max_PA_data, color='grey')
             plt.fmt_xdata = DateFormatter('%Y-%m-%d')
 
-        plt.ylabel('Available Position Angles (Degrees)', fontsize=18)
+        if instrument=='v3pa':
+            plt.ylabel('Available Position Angles ($^\circ$)', fontsize=18)
+        else:
+            plt.ylabel('Available Aperture Position Angles ($^\circ$)', fontsize=18)
 
         if ephemeris.fixed:
             ra, dec = max(df['ra']), max(df['dec'])
