@@ -24,8 +24,8 @@ def delete_cache():
             elif choice == 'n':
                 print('You chose to not delete the cache, exiting.')
             else:
-                raise ChoiceError
-        except ChoiceError:
+                raise ValueError
+        except ValueError:
             print('Input was not y or n, try again and provide valid input!')
     else:
         print('There is no Horizons cache available, exiting')

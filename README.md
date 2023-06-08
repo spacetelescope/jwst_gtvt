@@ -617,7 +617,7 @@ The JWST GTVT API allows you to breakdown and interact with the different compon
 # Troubleshooting
 
 Unless specified, astroquery will cache queries to Horizons. This can cause some issues when trying to query targets
-when changes are made upstream at JPL. To find and clear the cache, you can use the astropy.
+when changes are made upstream at JPL. To find and clear the cache, you can use astropy.
 
     >>> import astropy
     >>> path = astropy.config.get_cache_dir()

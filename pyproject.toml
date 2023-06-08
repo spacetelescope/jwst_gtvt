@@ -47,6 +47,7 @@ build-backend = 'setuptools.build_meta'
 [project.scripts]
 jwst_gtvt = "jwst_gtvt.scripts.jwst_gtvt:driver"
 jwst_mtvt = "jwst_gtvt.scripts.jwst_mtvt:driver"
+delete_cache = "jwst_gtvt.scripts.delete_cache:driver"
 
 [tool.setuptools]
 include-package-data = true
