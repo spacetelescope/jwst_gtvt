@@ -124,7 +124,7 @@ For example
 
 `$ jwst_gtvt 16:52:58.9 02:24:03 --target_name "NGC 6240" --start_date 2023-01-01 --end_date 2024-01-01`
 
-![Example Plot](jwst_visibility_2023.png "Example plot output when specifying start and end dates.")
+![Example Plot](docs/jwst_visibility_2023.png "Example plot output when specifying start and end dates.")
 
 Specifying the `--v3pa` will display the observing windows which contain the desired V3 position angle in the text output.
 
