@@ -24,6 +24,7 @@ from astropy.time import Time
 from astroquery.jplhorizons import Horizons
 import csv
 import datetime
+import glob
 import pandas as pd
 import pysiaf
 import numpy as np
@@ -60,9 +61,14 @@ class Ephemeris:
             Print jwst_gtvt results to screen
         """
 
+        try:
+            max_date = self.ephemeris_maximum_date()
+        except:
+            max_date = '2025-05-29'
+
         if start_date < Time(LAUNCH_DATE) or end_date > Time('2025-05-29'):
             date_out_of_bound_msg = ("Time frame selected {} ----> {} is out of bounds!".format(start_date, end_date),
-                                     "Please select dates between 2021-12-26 ----> 2021-12-26")
+                                     "Please select dates between {} ----> {}".format(LAUNCH_DATE, max_date))
             raise SystemExit(date_out_of_bound_msg)
         elif Time(start_date) > Time(end_date):
             raise SystemExit("start_date later than end_date, exiting")
@@ -70,7 +76,12 @@ class Ephemeris:
         else:
             self.start_date = start_date
             self.end_date = end_date
-            self.ephemeris_filename =  os.path.join(os.path.dirname(__file__), 'data/ephemeris_2021-12-26_2025-05-29.txt')  # set filename to local copy by default
+
+            project_dirname = os.path.dirname(__file__)
+            filename_str = 'ephemeris_????-??-??_????-??-??.txt'
+            file_search_result = glob.glob(os.path.join(project_dirname, 'data', filename_str))[0]
+
+            self.ephemeris_filename = file_search_result   # set filename to local copy by default
             self.ephemeris = self.get_ephemeris_data(start_date=start_date.strftime('%Y-%m-%d'), end_date=end_date.strftime('%Y-%m-%d'))
             self.dataframe = self.convert_ephemeris_to_df(self.ephemeris)
             self.dataframe = self.dataframe.drop(columns=['VX', 'VY', 'VZ'])  # We don't use the velocities in the GTVT/MTVT
@@ -607,6 +618,6 @@ class Ephemeris:
         ephemeris = np.array(self.eph_request.text.splitlines())
         ephemeris_filename = 'ephemeris_{}_{}.txt'.format(LAUNCH_DATE, max_date)
         
-        with open(os.path.join(os.path.dirname(__file__), 'data/{}'.format(ephemeris_filename), 'w')) as fp:
+        with open(os.path.join(os.path.dirname(__file__), 'data/{}'.format(ephemeris_filename)), 'w') as fp:
             for entry in ephemeris:
                 fp.write("%s\n" % entry)

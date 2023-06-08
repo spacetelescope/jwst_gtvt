@@ -46,7 +46,7 @@ build-backend = 'setuptools.build_meta'
 
 [project.scripts]
 jwst_gtvt = "jwst_gtvt.scripts.jwst_gtvt:driver"
-jwst_mtvt = "jwst_gtvt.scripts.jwst_mtvt:main"
+jwst_mtvt = "jwst_gtvt.scripts.jwst_mtvt:driver"
 
 [tool.setuptools]
 include-package-data = true
