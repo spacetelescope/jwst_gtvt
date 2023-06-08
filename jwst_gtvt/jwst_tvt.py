@@ -23,11 +23,13 @@ Use
 from astropy.time import Time
 from astroquery.jplhorizons import Horizons
 import csv
+import datetime
 import pandas as pd
 import pysiaf
 import numpy as np
 import os
 import sys
+import re
 import requests
 
 from jwst_gtvt.constants import UNIT_LIMIT, URL
@@ -35,6 +37,7 @@ from jwst_gtvt.constants import UNIT_LIMIT, URL
 D2R = np.pi/180.  #degrees to radians
 R2D = 180. / np.pi #radians to degrees 
 unit_limit = lambda x: min(max(-1.,x),1.) # forces value to be in [-1,1]
+LAUNCH_DATE = '2021-12-26'
 MIN_SUN_ANGLE = 84.8 * D2R  #minimum Sun angle, in radians
 MAX_SUN_ANGLE = 135.0 * D2R #maximum Sun angle, in radians
 SUN_ANGLE_PAD = 0.5 * D2R   #pad away from Sun angle limits when constructing safe attitude
@@ -45,7 +48,7 @@ obliquity_of_the_ecliptic *=  D2R
 
 
 class Ephemeris:
-    def __init__(self, start_date=Time('2021-12-26'), end_date=Time('2025-05-29')):
+    def __init__(self, start_date=Time(LAUNCH_DATE), end_date=Time('2025-05-29')):
         """
         ephermeride_filename : str
             path to ephemeris file
@@ -57,7 +60,7 @@ class Ephemeris:
             Print jwst_gtvt results to screen
         """
 
-        if start_date < Time('2021-12-26') or end_date > Time('2025-05-29'):
+        if start_date < Time(LAUNCH_DATE) or end_date > Time('2025-05-29'):
             date_out_of_bound_msg = ("Time frame selected {} ----> {} is out of bounds!".format(start_date, end_date),
                                      "Please select dates between 2021-12-26 ----> 2021-12-26")
             raise SystemExit(date_out_of_bound_msg)
@@ -321,6 +324,28 @@ class Ephemeris:
 
         return dataframe
 
+    def ephemeris_maximum_date(self):
+        """Retrieve the last available date for JWST ephemerides."""
+        
+        # attempt to retrieve an ephemeris for a date too far in the future
+        future_date = '9999-01-01'
+        request_url = URL.format(LAUNCH_DATE, future_date)
+
+        try:
+            # this should return an error message containing the last good date
+            ephemeris_request = requests.get(request_url)
+
+            # parse the date from the message
+            m = re.match(r'.*after A\.D\. (\d{4}-[a-zA-Z]+-\d{1,2})',
+                        ephemeris_request.text)
+            dt = m.groups()[0]
+            end_date = datetime.datetime.strptime(dt, '%Y-%b-%d').strftime('%Y-%m-%d')
+        except Exception:
+            # if the above fails for any reason, fall back to a known good date
+            end_date = '2023-05-19'
+
+        return end_date
+
     def get_angle(self, instrument, aperture, angle_name):
         """Get angle requested by user
 
@@ -569,3 +594,19 @@ class Ephemeris:
             raise Exception("Writing out files JWST GTVT uses a csv writer, please provide filename with '.csv' extension.")
         else:
             data_frame.to_csv(write_path, index=False)
+
+    def update_ephemeris_data(self):
+        """Function to write out new text based ephemeris to GTVT.
+        """
+
+        max_date = self.ephemeris_maximum_date()
+
+        request_url = URL.format(LAUNCH_DATE, max_date)
+        self.ephemeris_request = requests.get(request_url)
+
+        ephemeris = np.array(self.eph_request.text.splitlines())
+        ephemeris_filename = 'ephemeris_{}_{}.txt'.format(LAUNCH_DATE, max_date)
+        
+        with open(os.path.join(os.path.dirname(__file__), 'data/{}'.format(ephemeris_filename), 'w')) as fp:
+            for entry in ephemeris:
+                fp.write("%s\n" % entry)

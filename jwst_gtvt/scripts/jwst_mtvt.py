@@ -55,6 +55,6 @@ def main(args):
 
     plot_visibility(eph, args['--instrument'], write_plot=args['--write_plot'])
 
-if __name__ == "__main__":
+def driver():
     args = docopt(usage, version='0.6.2') 
     main(args)

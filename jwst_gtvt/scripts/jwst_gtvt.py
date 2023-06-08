@@ -58,6 +58,6 @@ def main(args):
 
 
 
-if __name__ == "__main__":
+def driver():
     args = docopt(usage, version='0.6.2')
     main(args)
