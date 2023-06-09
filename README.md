@@ -1,14 +1,14 @@
 # JWST General Target Visibility Tool (jwst_gtvt)
 
-JWST requires shielding from the Sun for operation, which limits the available position angles observable at a given time. This script calculates the allowed position angle for a given Right Ascension and Declination for each instrument on the telescope.To report any issues, please use the JWST help portal https://jwsthelp.stsci.edu or feel free to open a github issue https://github.com/spacetelescope/jwst_gtvt/issues.
+JWST requires shielding from the Sun for operation, which limits the available position angles observable at a given time. This script calculates the allowed position angles for a given Right Ascension and Declination for each instrument on the telescope. To report any issues, please use the JWST help portal https://jwsthelp.stsci.edu or feel free to open a github issue https://github.com/spacetelescope/jwst_gtvt/issues.
 
 # Dependencies
 
-This tool requires a few packages all of which are included in the Anaconda Python distribution.
+This tool requires a few packages, all of which are included in the Anaconda Python distribution:
 
 * astropy
 
-* astroquery (For moving target support)
+* astroquery (for moving target support)
 
 * docopt
 
@@ -30,14 +30,16 @@ You can install the tool using `pip` with
 Alternatively, you can clone the respository from GitHub and install the tool from inside the resulting directory with
 `pip install -e .`
 
-We also provide conda environments
-    $ conda env create -f environment_python_3.10.yml
-    $ conda activate jwst-gtvt-3.10
-    $ pip install -e .
+We also provide conda environments:
+   ` $ conda env create -f environment_python_3.10.yml'
+    
+    `$ conda activate jwst-gtvt-3.10'
+    
+    `$ pip install -e .'
 
 # Usage
 
-There are two scripts available. `jwst_gtvt` for fixed targets, and `jwst_mtvt` for moving targets. To see the help info use
+There are two scripts available: `jwst_gtvt` for fixed targets and `jwst_mtvt` for moving targets. To see the help info use:
 
     $ jwst_gtvt -h
     Usage:
@@ -70,11 +72,11 @@ The observability windows will be printed to the terminal and a plot showing the
 
 ![Example Plot](docs/jwst_target_visibility.png "Example default plot output.")
 
-For moving targets, use `jwst_mtvt`
+For moving targets, use `jwst_mtvt`:
 
 `$ jwst_mtvt Ceres`
 
-Periodic comets and most asteroids benefit from using the `--smallbody` flag
+Periodic comets and most asteroids benefit from using the `--smallbody` flag.
 
 `$ jwst_mtvt 2`  # Venus (no windows)
 
@@ -89,7 +91,7 @@ Periodic comets and most asteroids benefit from using the `--smallbody` flag
 
 You can specify the instrument via the `--instrument` flag.
 
-`$ jwst_gtvt 16:52:58.9 02:24:03 --instrument nircam`
+`$ jwst_gtvt 16:52:58.9 02:24:03 --instrument nircam`,
 
 and the resulting plot will only contain the windows for the specified instrument.
 The allowed values for `--instrument` are 'nircam', 'nirspec', 'niriss', 'miri', 'fgs', and 'v3' (case insensitive).
@@ -100,7 +102,7 @@ You can save the text and figure ouput to a file instead of having it output to 
 
 `$ jwst_gtvt 16:52:58.9 02:24:03 --write_ephemeris visibility.csv --write_plot visibility.png`
 
-Sharing output and reading data back in is easy
+Sharing output and reading data back in is easy:
 
     $ python
     >>> import pandas as pd
@@ -120,7 +122,7 @@ Sharing output and reading data back in is easy
     1012  60586.0            74.687072
 
 If you only want to plot a specific range of dates, rather than the entire available ephemeris you specify a `--start_date` or `--end_date` in ISO format (yyyy-mm-dd).
-For example
+For example:
 
 `$ jwst_gtvt 16:52:58.9 02:24:03 --target_name "NGC 6240" --start_date 2023-01-01 --end_date 2024-01-01`
 
@@ -128,7 +130,7 @@ For example
 
 Specifying the `--v3pa` will display the observing windows which contain the desired V3 position angle in the text output.
 
-Below is an example of the full text output
+Below is an example of the full text output:
 
     $ jwst_gtvt 16:52:58.9 02:24:03
 
@@ -512,7 +514,7 @@ Below is an example of the full text output
 
 # API
 
-The JWST GTVT API allows you to breakdown and interact with the different componenets avaialble of our code base.
+The JWST GTVT API allows you to break down and interact with the different components available in the code base:
 
     $ python
     >>> from jwst_gtvt.jwst_tvt import Ephemeris
@@ -617,13 +619,13 @@ The JWST GTVT API allows you to breakdown and interact with the different compon
 # Troubleshooting
 
 Unless specified, astroquery will cache queries to Horizons. This can cause some issues when trying to query targets
-when changes are made upstream at JPL. To find and clear the cache, you can use astropy.
+when changes are made upstream at JPL. To find and clear the cache, you can use astropy:
 
     >>> import astropy
     >>> path = astropy.config.get_cache_dir()
     >>> print(path)
 
-This will print where astropy is caching all of it's data. If astroquery has been used to search for targets in the past,
+This will print where astropy is caching all of its data. If astroquery has been used to search for targets in the past,
 `<value_of_path>/astroquery/Horizons/` will exist. Now you have the full path and can remove it manually.
 
 You can also use our `delete_cache` utility function. After the software is installed you can enter:
