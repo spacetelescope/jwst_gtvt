@@ -49,12 +49,15 @@ def main(args):
                       "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-observatory-coordinate-system-and-field-of-regard for more information")
         raise IndexError(in_FOR_msg)
 
-    if not args['--silent']:
-        display_results(eph)
-
     if args['--write_ephemeris']:
+        args['--silent'] = True
         eph.write_ephemeris(eph.dataframe, args['--write_ephemeris'])
+
+    if not args['--silent']:
+            display_results(eph)
+
     plot_visibility(eph, args['--instrument'], name=args['--target_name'], write_plot=args['--write_plot'])
+
 
 
 

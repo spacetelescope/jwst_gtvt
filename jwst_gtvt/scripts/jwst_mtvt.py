@@ -4,7 +4,7 @@ Main driver for moving target support. This script will display and
 generate the figure for 
 
 Usage:
-  jwst_mtvt <desg> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
+  jwst_mtvt <desg> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--smallbody] [--silent]
 
 Arguments:
   <desg>    Name of moving target. 
@@ -15,6 +15,7 @@ Options:
   [--instrument]         JWST instrument to plot individually
   [--write_ephemeris]    File name to write ephemeris to
   [--write_plot]         File name to write plot out to
+  [--smallbody]          Smallbody designation for major body
   --silent               Boolean to print results to screen [default: False]
   -h --help              Show this screen.
   --version              Show version.
@@ -47,11 +48,12 @@ def main(args):
                       "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-observatory-coordinate-system-and-field-of-regard for more information")
         raise IndexError(in_FOR_msg)
 
+    if args['--write_ephemeris']:
+        args['--silent'] = True
+        eph.write_ephemeris(eph.dataframe, args['--write_ephemeris'])
+
     if not args['--silent']:
         display_results(eph)
-
-    if args['--write_ephemeris']:
-        eph.write_ephemeris(eph.dataframe, args['--write_ephemeris'])
 
     plot_visibility(eph, args['--instrument'], write_plot=args['--write_plot'])
 
