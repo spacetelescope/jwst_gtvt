@@ -438,8 +438,8 @@ class Ephemeris:
         self.fixed = True
 
         if ':' in ra:
-            ra = self.convert_ddmmss_to_float(ra) * 15.
-            dec = self.convert_ddmmss_to_float(dec)
+            ra = round(self.convert_ddmmss_to_float(ra) * 15., 4)
+            dec = round(self.convert_ddmmss_to_float(dec), 4)
         else:
             ra, dec = float(ra), float(dec)
 
@@ -450,7 +450,7 @@ class Ephemeris:
 
         return self.dataframe
 
-    def get_moving_target_positions(self, desg):
+    def get_moving_target_positions(self, desg, smallbody):
         """Ephemeris from JPL/HORIZONS.
         desg : str
             Name of target
@@ -462,7 +462,7 @@ class Ephemeris:
         obj = Horizons(id=desg, location='500@-170',
                        epochs={'start':self.start_date.to_value('iso', subfmt='date'), 
                                'stop':self.end_date.to_value('iso', subfmt='date'),
-                               'step':'1d'})
+                               'step':'1d', 'id_type':smallbody})
 
         eph = obj.ephemerides(cache=False, quantities=(1))
         self.target_name = eph['targetname'][0]

@@ -80,14 +80,27 @@ Periodic comets and most asteroids benefit from using the `--smallbody` flag.
 
 `$ jwst_mtvt 2`  # Venus (no windows)
 
-`$ jwst_mtvt 2 --smallbody`  # Pallas
+Occasionally there will be too many matching `desg` entries for a single target
 
 `$ jwst_mtvt 2P --smallbody`  # Comet Encke
+
+    Record #  Epoch-yr  >MATCH DESIG<  Primary Desig  Name  
+    --------  --------  -------------  -------------  -------------------------
+    90000031    1786    2P             2P              Encke
+    90000032    1796    2P             2P              Encke
+    90000033    1805    2P             2P              Encke
+    90000034    1819    2P             2P              Encke
+    ........    ....    ..             ..              .....
+    ........    ....    ..             ..              .....
+    90000090    2016    2P             2P              Encke
+
+`$ jwst_mtvt 90000090`  # Comet Encke
+
+![Example Plot](docs/encke_visibility.png "Comet Encke.")
 
 `$ jwst_mtvt 'C/2016 M1'`  # works with or without --smallbody
 
 ![Example Plot](docs/jwst_moving_target_visibility.png "A moving target example.")
-
 
 You can specify the instrument via the `--instrument` flag.
 

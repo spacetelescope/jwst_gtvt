@@ -40,7 +40,7 @@ def main(args):
     else:
         eph = Ephemeris()
 
-    eph.get_moving_target_positions(args['<desg>'])
+    eph.get_moving_target_positions(args['<desg>'], smallbody=args['--smallbody'])
 
     if not eph.dataframe['in_FOR'].any():
         in_FOR_msg = ("No position angles in field of regard! "
