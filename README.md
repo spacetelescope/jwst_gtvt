@@ -119,7 +119,7 @@ Sharing output and reading data back in is easy:
 
     $ python
     >>> import pandas as pd
-    >>> data = pd.read_csv('visibility')
+    >>> data = pd.read_csv('visibility.csv')
     >>> print(data[['MJD', ''NIRCAM_max_pa_angle']])
               MJD  NIRCAM_max_pa_angle
     0     59574.0                  NaN
