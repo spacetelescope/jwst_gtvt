@@ -8,7 +8,7 @@ from jwst_gtvt.plotting import plot_visibility
 def test_moving_target():
     """Test end-to-end for moving target portion of tool"""
     eph = Ephemeris()
-    eph.get_moving_target_positions('Ceres')
+    eph.get_moving_target_positions('Ceres',False)
 
 
 def test_ra_dec_hour_min_sec():
@@ -33,6 +33,6 @@ def test_gtvt_single_instrument(instrument, mode):
         ra, dec = '253.2458', '2.4008'
         eph.get_fixed_target_positions(ra, dec)
     else:
-        eph.get_moving_target_positions('Ceres')
+        eph.get_moving_target_positions('Ceres',False)
 
     plot_visibility(eph, instrument)
