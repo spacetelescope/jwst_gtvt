@@ -50,7 +50,7 @@ obliquity_of_the_ecliptic *=  D2R
 
 
 class Ephemeris:
-    def __init__(self, start_date=Time(LAUNCH_DATE), end_date=Time('2025-06-12')):
+    def __init__(self, start_date=Time(LAUNCH_DATE), end_date=Time('2025-06-11')):
         """
         ephermeride_filename : str
             path to ephemeris file
@@ -63,14 +63,14 @@ class Ephemeris:
         """
 
         # Using a code snippet writeen by Melanie Clarke to check the max date of the ephemeris.
-        # On June 8th, 2023, the furthest projected date is 2025-06-12.
+        # On June 8th, 2023, the furthest projected date is 2025-06-11.
         # This date derived from the intentially failed ephemeris call relies on the first line of the
         # returned call containing a message about what the furthest projected date is.
         # IF there are changes to HORIZONS ephemerides structure, this code could potentially fail. 
         try:
             self.max_date = self.ephemeris_maximum_date()
         except:
-            self.max_date = '2025-06-12'
+            self.max_date = '2025-06-11'
 
         if start_date < Time(LAUNCH_DATE) or end_date > Time(self.max_date):
             date_out_of_bound_msg = ("Time frame selected {} ----> {} is out of bounds!".format(start_date, end_date),
@@ -409,8 +409,9 @@ class Ephemeris:
             self.url = URL.format(start_date, end_date)  # Get Horizons url for JWST ephemeris and add user specified dates
             self.eph_request = requests.get(self.url)
             ephemeris = np.array(self.eph_request.text.splitlines())
-        except requests.exceptions.ConnectionError as err:
-            print(err)
+        except Exception as e:
+            print('Issue reading ephemeris from HORIZONS. Using local ephemeris {} Full traceback below:'.format(self.ephemeris_filename))
+            print(e)
             print('No internet connection, using local file: {}'.format(self.ephemeris_filename))
             with open(self.ephemeris_filename) as f:
                 lines = np.array(f.read().splitlines())
