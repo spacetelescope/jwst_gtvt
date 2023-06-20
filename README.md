@@ -31,11 +31,9 @@ Alternatively, you can clone the respository from GitHub and install the tool fr
 `pip install -e .`
 
 We also provide conda environments:
-   ` $ conda env create -f environment_python_3.10.yml'
-    
-    `$ conda activate jwst-gtvt-3.10'
-    
-    `$ pip install -e .'
+        $ conda env create -f environment_python_3.10.yml 
+        $ conda activate jwst-gtvt-3.10'
+        $ pip install -e .
 
 # Usage
 
@@ -107,7 +105,7 @@ You can specify the instrument via the `--instrument` flag.
 `$ jwst_gtvt 16:52:58.9 02:24:03 --instrument nircam`,
 
 and the resulting plot will only contain the windows for the specified instrument.
-The allowed values for `--instrument` are 'nircam', 'nirspec', 'niriss', 'miri', 'fgs', and 'v3' (case insensitive).
+The allowed values for `--instrument` are 'nircam', 'nirspec', 'niriss', 'miri', 'fgs', and 'v3pa' (case insensitive).
 
 ![Example Plot](docs/nircam_target_visibility.png "Example plot output when specifying instrument.")
 

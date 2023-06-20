@@ -50,7 +50,7 @@ obliquity_of_the_ecliptic *=  D2R
 
 
 class Ephemeris:
-    def __init__(self, start_date=Time(LAUNCH_DATE), end_date=Time('2025-05-29')):
+    def __init__(self, start_date=Time(LAUNCH_DATE), end_date=Time('2025-06-12')):
         """
         ephermeride_filename : str
             path to ephemeris file
@@ -63,14 +63,14 @@ class Ephemeris:
         """
 
         # Using a code snippet writeen by Melanie Clarke to check the max date of the ephemeris.
-        # On June 8th, 2023, the furthest projected date is 2025-05-29.
+        # On June 8th, 2023, the furthest projected date is 2025-06-12.
         # This date derived from the intentially failed ephemeris call relies on the first line of the
         # returned call containing a message about what the furthest projected date is.
         # IF there are changes to HORIZONS ephemerides structure, this code could potentially fail. 
         try:
             self.max_date = self.ephemeris_maximum_date()
         except:
-            self.max_date = '2025-05-29'
+            self.max_date = '2025-06-12'
 
         if start_date < Time(LAUNCH_DATE) or end_date > Time(self.max_date):
             date_out_of_bound_msg = ("Time frame selected {} ----> {} is out of bounds!".format(start_date, end_date),

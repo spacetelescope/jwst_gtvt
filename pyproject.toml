@@ -48,6 +48,7 @@ build-backend = 'setuptools.build_meta'
 jwst_gtvt = "jwst_gtvt.scripts.jwst_gtvt:driver"
 jwst_mtvt = "jwst_gtvt.scripts.jwst_mtvt:driver"
 delete_cache = "jwst_gtvt.scripts.delete_cache:driver"
+create_ephemeris = "jwst_gtvt.scripts.create_new_ephemeris:driver"
 
 [tool.setuptools]
 include-package-data = true
