@@ -31,9 +31,9 @@ Alternatively, you can clone the respository from GitHub and install the tool fr
 `pip install -e .`
 
 We also provide conda environments:
-        $ conda env create -f environment_python_3.10.yml 
-        $ conda activate jwst-gtvt-3.10'
-        $ pip install -e .
+    $ conda env create -f environment_python_3.10.yml 
+    $ conda activate jwst-gtvt-3.10'
+    $ pip install -e .
 
 # Usage
 
