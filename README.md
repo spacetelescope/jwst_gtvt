@@ -74,11 +74,19 @@ For moving targets, use `jwst_mtvt`:
 
 `$ jwst_mtvt Ceres`
 
+You can achieve the same result above using the `--smallbody` flag and the HORIZONS Target designation ID:
+
+`$ jwst_mtvt 1 --smallbody`
+
 Periodic comets and most asteroids benefit from using the `--smallbody` flag.
 
 `$ jwst_mtvt 2`  # Venus (no windows)
 
-Occasionally there will be too many matching `desg` entries for a single target
+`$ jwst_mtvt 2 --smallbody`
+
+![Example Plot](docs/mtvt_pallas.png "Example default plot output.")
+
+Occasionally there will be too many matching designations entries for a single target
 
 `$ jwst_mtvt 2P --smallbody`  # Comet Encke
 
