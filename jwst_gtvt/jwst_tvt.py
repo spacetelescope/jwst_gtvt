@@ -298,7 +298,7 @@ class Ephemeris:
         row_data = [row_data.split(',') for row_data in ephemeris[start_index:end_index]]
         result = [filter(None, row) for row in row_data]
 
-        df = pd.DataFrame(result, columns=['JDTDB','Calendar Date (TDB)','X','Y','Z','VX', 'VY', 'VZ'])
+        df = pd.DataFrame(result, columns=['JDTDB','Calendar Date (TDB)','X','Y','Z','VX','VY','VZ'])
         convert_dict = {'JDTDB': float,
                         'X': float,
                         'Y': float,
@@ -359,7 +359,7 @@ class Ephemeris:
             end_date = datetime.datetime.strptime(dt, '%Y-%b-%d').strftime('%Y-%m-%d')
         except Exception:
             # if the above fails for any reason, fall back to a known good date
-            end_date = '2023-05-19'
+            end_date = '2025-06-11'
 
         return end_date
 
@@ -412,7 +412,6 @@ class Ephemeris:
         except Exception as e:
             print('Issue reading ephemeris from HORIZONS. Using local ephemeris {} Full traceback below:'.format(self.ephemeris_filename))
             print(e)
-            print('No internet connection, using local file: {}'.format(self.ephemeris_filename))
             with open(self.ephemeris_filename) as f:
                 lines = np.array(f.read().splitlines())
             ephemeris = np.array(lines)
@@ -460,10 +459,15 @@ class Ephemeris:
 
         self.fixed = False
 
+        if smallbody:
+            id_type = 'smallbody'
+        else:
+            id_type = None
+
         obj = Horizons(id=desg, location='500@-170',
                        epochs={'start':self.start_date.to_value('iso', subfmt='date'), 
                                'stop':self.end_date.to_value('iso', subfmt='date'),
-                               'step':'1d', 'id_type':smallbody})
+                               'step':'1d'}, id_type=id_type)
 
         eph = obj.ephemerides(cache=False, quantities=(1))
         self.target_name = eph['targetname'][0]
