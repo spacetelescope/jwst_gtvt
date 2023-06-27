@@ -1,0 +1,62 @@
+[project]
+name = "jwst_gtvt"
+description = "JWST General and Moving Target Visibility Tool"
+readme = "README.md"
+authors = [
+  { name = "Mees Fix" },
+  { name = "Bryan Holler" },
+  { name = "Matthew Hill" },
+]
+keywords = ["astronomy", "python"]
+classifiers = ["Programming Language :: Python"]
+requires-python = ">=3.9"
+dependencies = [
+    "astropy>=5.2.2",
+    "astroquery>=0.4.6",
+    "docopt>=0.6.2",
+    "matplotlib>=3.7.1",
+    "numpy>=1.24.3",
+    "pysiaf>=0.19.0",
+    "pandas>=2.0.1",
+    "docopt>=0.6.2",
+    "tabulate>=0.9.0",
+]
+
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+  "pytest",
+  "pytest-cov",
+]  
+docs = [
+  "sphinx",
+  "sphinx_rtd_theme",
+  "stsci_rtd_theme",
+]
+
+[project.license]
+file = "LICENSE"
+content-type = "text/plain"
+
+[build-system]
+requires = ["setuptools >= 61.2",
+            "setuptools_scm[toml]>=7.1"]
+build-backend = 'setuptools.build_meta'
+
+[project.scripts]
+jwst_gtvt = "jwst_gtvt.scripts.jwst_gtvt:driver"
+jwst_mtvt = "jwst_gtvt.scripts.jwst_mtvt:driver"
+delete_cache = "jwst_gtvt.scripts.delete_cache:driver"
+create_ephemeris = "jwst_gtvt.scripts.create_new_ephemeris:driver"
+
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.packages.find]
+namespaces = false
+
+[tool.setuptools_scm]
+
+[tool.pytest]
+junit_family = "xunit2"

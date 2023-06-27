@@ -5,5 +5,5 @@ Utility functions for package
 
 from jwst_gtvt.utils import delete_cache
 
-if __name__ == '__main__':
+def driver():
     delete_cache()
