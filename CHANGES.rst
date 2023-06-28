@@ -7,6 +7,7 @@
 - Command line arguments now use `docopt`.
 - Conda and pip requirements files are included with Package
 - Project now uses `pyproject.toml` to setup and install package 
+- The --v3pa flag is now deprecated in favor of --instrument v3pa
 
 0.3.0
 =====
