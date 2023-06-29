@@ -1,9 +1,9 @@
 1.0
 ===
 
-- Package went through a major refactor, took an object oriented approach and rewrote most of the API and modules
-- Tool now dynamically reads ephemerides from JPL HORIZONS using astroqury. Back up ephemerides are available in repo along with tools to update it.
-- Plotting display and control is different but still displays results to previous releases
+- Package went through a major refactor, list below describes new features
+- Tool now dynamically reads ephemerides from JPL HORIZONS using astroquery. Back-up ephemerides are available in repo along with tools to update it.
+- Plotting display and control is updated but still presents results similar to previous releases
 - Command line arguments now use `docopt`.
 - Conda and pip requirements files are included with Package
 - Project now uses `pyproject.toml` to setup and install package 
