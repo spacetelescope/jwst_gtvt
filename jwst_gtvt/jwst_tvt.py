@@ -222,13 +222,16 @@ class Ephemeris:
         max_boresight_roll = dataframe['max_boresight']
 
         if instrument == 'V3PA':
+            nominal_angle = V3PA
             minimum_angle = V3PA - max_boresight_roll
             maximum_angle = V3PA + max_boresight_roll
         else:
             instrument_ideal_v3_angle = self.get_angle(instrument, aperture, angle_name)
+            nominal_angle = V3PA + instrument_ideal_v3_angle
             minimum_angle = V3PA - max_boresight_roll + instrument_ideal_v3_angle
             maximum_angle = V3PA + max_boresight_roll + instrument_ideal_v3_angle
 
+        dataframe[instrument + '_nominal_angle'] = nominal_angle
         dataframe[instrument + '_max_pa_angle'] = maximum_angle
         dataframe[instrument + '_min_pa_angle'] = minimum_angle
 
@@ -237,6 +240,9 @@ class Ephemeris:
 
         dataframe.loc[dataframe[instrument + '_min_pa_angle'] < 0., instrument + '_min_pa_angle'] += 360
         dataframe.loc[dataframe[instrument + '_min_pa_angle'] > 360., instrument + '_min_pa_angle'] -= 360
+
+        dataframe.loc[dataframe[instrument + '_nominal_angle'] < 0., instrument + '_nominal_angle'] += 360
+        dataframe.loc[dataframe[instrument + '_nominal_angle'] > 360., instrument + '_nominal_angle'] -= 360
 
         return dataframe
 
