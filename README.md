@@ -41,26 +41,23 @@ We also provide conda environments:
 There are two scripts available: `jwst_gtvt` for fixed targets and `jwst_mtvt` for moving targets. To see the help info use:
 
     $ jwst_gtvt -h
-    
-    Driver for JWST GTVT fixed target tool.
-
     Usage:
-    jwst_gtvt --ra=<ra> --dec=<dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
+        jwst_gtvt --ra=<ra> --dec=<dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
 
     Arguments:
-    --ra=<ra>     Right ascension of target to observe with JWST.
-    --dec=<dec>   Declination of target to observe with JWST.
+        --ra=<ra>    Right ascension of target to observe with JWST.
+        --dec=<dec>   Declination of target to observe with JWST.
 
-    Options:
-    [--start_date]         Start date for plot
-    [--end_date]           End date for plot
-    [--instrument]         JWST instrument to plot individually
-    [--target_name]        User provided name for target
-    [--write_ephemeris]    File name to write ephemeris to
-    [--write_plot]         File name to write plot out to
-    [--silent]             Boolean to print results to screen [default: False]
-    --help                 Show this screen.
-    --version              Show version.
+        Options:
+        [--start_date]         Start date for plot
+        [--end_date]           End date for plot
+        [--instrument]         JWST instrument to plot individually
+        [--target_name]        User provided name for target
+        [--write_ephemeris]    File name to write ephemeris to
+        [--write_plot]         File name to write plot out to
+        [--silent]             Boolean to print results to screen [default: False]
+        -h --help              Show this screen.
+        --version              Show version.
 
 
 # Example
