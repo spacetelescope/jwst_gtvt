@@ -40,7 +40,7 @@ We also provide conda environments:
 
 There are two scripts available: `jwst_gtvt` for fixed targets and `jwst_mtvt` for moving targets. To see the help info use:
 
-    $ jwst_gtvt -h
+    $ jwst_gtvt --help
     Usage:
         jwst_gtvt --ra=<ra> --dec=<dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
 
