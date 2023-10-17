@@ -1,3 +1,12 @@
+1.0.1
+=====
+- Bug fix: Negative declinations resulted in the GTVT throwing an
+  error because the argument parser accepts arguments that start with
+  '--' and '-', so was unable to interpret the minus sign. Updates to
+  the jwst_gtvt call were implemented to get around this issue by
+  requiring '--ra=' and '--dec=' in front of the right ascension and
+  declination values, respectively. The readme was updated with this information.
+
 1.0
 ===
 
