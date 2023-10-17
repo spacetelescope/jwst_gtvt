@@ -110,10 +110,10 @@ class Ephemeris:
         """Convert date ra dec to sexigesimal
         """
         aline = astring.split(':')
-        d= float(aline[0])
-        m= float(aline[1])
-        s= float(aline[2])
-        hour_or_deg = (s/60.+m)/60.+d
+        d = float(aline[0])
+        m = float(aline[1])
+        s = float(aline[2])
+        hour_or_deg = np.sign(d)*((s/60. + m)/60. + np.abs(d))
 
         return hour_or_deg
 
