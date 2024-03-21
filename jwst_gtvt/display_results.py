@@ -36,8 +36,8 @@ def display_results(ephemeris):
     df = ephemeris.dataframe
 
     if ephemeris.fixed is True:
-        ra = max(df['ra'])
-        dec = max(df['dec'])
+        ra = max(df['RA'])
+        dec = max(df['DEC'])
         target_info_string = 'RA: %-*s  Dec: %-*s  Ecliptic Latitude: %s' % (10, ra, 10, dec, 24.284867)
     else:
         target_info_string = 'Target Name: %-*s Ecliptic Latitude: %s' % (10, ephemeris.target_name, 24.284867)
