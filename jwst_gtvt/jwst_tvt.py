@@ -549,7 +549,7 @@ class Ephemeris:
         eph = obj.ephemerides(cache=False)
         self.target_name = eph["targetname"][0]
 
-        for quantity in ["RA", "DEC", "elong", "elongFlag" "V"]:
+        for quantity in ["RA", "DEC", "elong", "elongFlag", "V"]:
             self.dataframe[quantity] = eph[quantity].data.data
 
         self.dataframe = self.build_dataframe()
