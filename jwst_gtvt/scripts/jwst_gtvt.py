@@ -31,9 +31,9 @@ from jwst_gtvt.plotting import plot_visibility
 
 
 def main(args):
-    if args['--start_date'] and args['--end_date']:
-        start = Time(args['--start_date'])
-        end = Time(args['--end_date'])
+    if args["--start_date"] and args["--end_date"]:
+        start = Time(args["--start_date"])
+        end = Time(args["--end_date"])
         if start > end:
             raise ValueError("Date mismatch, end date is before start date.")
         else:
@@ -41,26 +41,31 @@ def main(args):
     else:
         eph = Ephemeris()
 
-    eph.get_fixed_target_positions(args['--ra'], args['--dec'])
+    eph.get_fixed_target_positions(args["--ra"], args["--dec"])
 
-    if not eph.dataframe['in_FOR'].any():
-        in_FOR_msg = ("No position angles in field of regard! "
-                      "Check constraints for your target and if it is observable with JWST. \n"
-                      "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-observatory-coordinate-system-and-field-of-regard for more information")
+    if not eph.dataframe["in_FOR"].any():
+        in_FOR_msg = (
+            "No position angles in field of regard! "
+            "Check constraints for your target and if it is observable with JWST. \n"
+            "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-observatory-coordinate-system-and-field-of-regard for more information"
+        )
         raise IndexError(in_FOR_msg)
 
-    if args['--write_ephemeris']:
-        args['--silent'] = True
-        eph.write_ephemeris(eph.dataframe, args['--write_ephemeris'])
+    if args["--write_ephemeris"]:
+        args["--silent"] = True
+        eph.write_ephemeris(eph.dataframe, args["--write_ephemeris"])
 
-    if not args['--silent']:
-            display_results(eph)
+    if not args["--silent"]:
+        display_results(eph)
 
-    plot_visibility(eph, args['--instrument'], name=args['--target_name'], write_plot=args['--write_plot'])
-
-
+    plot_visibility(
+        eph,
+        args["--instrument"],
+        name=args["--target_name"],
+        write_plot=args["--write_plot"],
+    )
 
 
 def driver():
-    args = docopt(usage, version='0.6.2')
+    args = docopt(usage, version="0.6.2")
     main(args)
