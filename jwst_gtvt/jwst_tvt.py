@@ -69,10 +69,7 @@ class Ephemeris:
         # This date derived from the intentially failed ephemeris call relies on the first line of the
         # returned call containing a message about what the furthest projected date is.
         # IF there are changes to HORIZONS ephemerides structure, this code could potentially fail.
-        try:
-            self.max_date = self.ephemeris_maximum_date()
-        except:
-            self.max_date = "2030-03-16"
+        self.max_date = self.ephemeris_maximum_date()
 
         if start_date < Time(LAUNCH_DATE) or end_date > Time(self.max_date):
             date_out_of_bound_msg = (
