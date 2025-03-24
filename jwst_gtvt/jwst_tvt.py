@@ -22,6 +22,7 @@ Use
 """
 
 from astropy.time import Time
+import astropy.units as u
 from astroquery.jplhorizons import Horizons
 import datetime
 import glob
@@ -48,9 +49,10 @@ obliquity_of_the_ecliptic = -23.439291  # At J2000 equinox
 obliquity_of_the_ecliptic *= D2R
 # Qecl2eci = QX(obliquity_of_the_ecliptic)
 
+NOW = Time.now()
 
 class Ephemeris:
-    def __init__(self, start_date=Time(LAUNCH_DATE), end_date=Time("2030-03-16")):
+    def __init__(self, start_date=NOW, end_date=NOW + 2 * u.year):
         """
         ephermeride_filename : str
             path to ephemeris file
