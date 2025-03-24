@@ -59,7 +59,7 @@ class Ephemeris:
         start_date : astropy.Time.time
             Start time of observering, default is current date
         end_date : astropy.Time.time
-            End time of observing, default is end of mission lifetime
+            End time of observing, default is current date plus two years
         verbose : bool
             Print jwst_gtvt results to screen
         """
