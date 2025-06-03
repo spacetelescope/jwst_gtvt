@@ -1,3 +1,7 @@
+1.1.1 (2025-06-03)
+==================
+- Bug fix for version and function match.
+
 1.1 (2025-06-03)
 ================
 - Updated default start and end dates to cover the period from the current local date to 2 years in the future.

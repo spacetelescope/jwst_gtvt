@@ -9,10 +9,10 @@ def display_results(ephemeris):
     """print out results to screen"""
 
     now = datetime.datetime.now()
-    version = version("jwst_gtvt")
+    gtvt_version = version("jwst_gtvt")
     welcome_string = "JWST General Target Visibility Tool"
     date_string = "Runtime/Date: {}".format(now)
-    version_string = "Version Number: {}".format(version)
+    version_string = "Version Number: {}".format(gtvt_version)
 
     print(tabulate([[welcome_string],
                     [date_string],
