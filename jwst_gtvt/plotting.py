@@ -4,6 +4,7 @@ from astropy.time import Time
 
 from jwst_gtvt.display_results import get_visibility_windows 
 
+
 def plot_visibility(ephemeris, instrument=None, name=None, write_plot=None, test=False):
     # Just incase dataframe hasn't been sorted yet
     dataframe = ephemeris.dataframe
@@ -29,9 +30,9 @@ def plot_visibility(ephemeris, instrument=None, name=None, write_plot=None, test
             plt.fmt_xdata = DateFormatter('%Y-%m-%d')
 
         if instrument=='v3pa':
-            plt.ylabel('Available Position Angles ($^\circ$)', fontsize=18)
+            plt.ylabel(r'Available Position Angles ($^\circ$)', fontsize=18)
         else:
-            plt.ylabel('Available Aperture Position Angles ($^\circ$)', fontsize=18)
+            plt.ylabel(r'Available Aperture Position Angles ($^\circ$)', fontsize=18)
 
         if ephemeris.fixed:
             ra, dec = max(df['ra']), max(df['dec'])
@@ -72,9 +73,9 @@ def plot_visibility(ephemeris, instrument=None, name=None, write_plot=None, test
                 ax.tick_params('x', labelrotation=45)
                 ax.grid(color='k', linestyle='--', linewidth=2, alpha=0.3)
                 if instrument_name == 'V3PA':
-                    ax.set_ylabel('Available Position Angles ($^\circ$)')
+                    ax.set_ylabel(r'Available Position Angles ($^\circ$)')
                 else:
-                    ax.set_ylabel('Available Aperture Position Angles ($^\circ$)')
+                    ax.set_ylabel(r'Available Aperture Position Angles ($^\circ$)')
 
         fig.tight_layout()
 

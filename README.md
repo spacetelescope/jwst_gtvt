@@ -27,47 +27,49 @@ This tool requires a few packages, all of which are included in the Anaconda Pyt
 You can install the tool using `pip` with 
 `pip install jwst-gtvt`
 
-Alternatively, you can clone the respository from GitHub and install the tool from inside the resulting directory with
-`pip install -e .`
+Alternatively, you can clone the respository from GitHub and install the tool from inside the resulting directory with:
 
-We also provide conda environments:
+	$ conda create -n jwst-gtvt-3.12 python=3.12
+	$ conda activate jwst-gtvt-3.12
+	$ pip install -e .
 
-    $ conda env create -f environment_python_3.10.yml 
-    $ conda activate jwst-gtvt-3.10'
-    $ pip install -e .
+(The period in the last command is required and is not punctuation.)
 
 # Usage
 
 There are two scripts available: `jwst_gtvt` for fixed targets and `jwst_mtvt` for moving targets. To see the help info use:
+		
+	$ jwst_gtvt -h
+	Usage:
+	jwst_gtvt --ra=<ra> --dec=<dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
+	
+	Arguments:
+	--ra=<ra>     Right ascension of target in degrees
+	--dec=<dec>   Declination of target in degrees
+	
+	Options:
+	[--start_date]         Start date for plot (YYYY-MM-DD)
+	[--end_date]           End date for plot (YYYY-MM-DD)
+	[--instrument]         Instrument (fgs, miri, nircam, niriss, nirspec, default=all)
+	[--target_name]        User provided name for target (name for output, double-quoted if there are spaces)
+	[--write_ephemeris]    File name to write ephemeris to
+	[--write_plot]         File name to write plot out to
+	[--silent]             Boolean to print results to screen [default: False]
+	--help                 Show this screen.
+	--version              Show version.
 
-    $ jwst_gtvt -h
-    Usage:
-        jwst_gtvt <ra> <dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
+The default start date is the local date for the user and the default end date is 2 years after the start date. This range can be updated by specifying both `--start_date` and `--end_date` values. Note that both `--start_date` and `--end_date` must be supplied in order to modify the date range; specifying either a start or end date will result in the default window being used instead. The JWST ephemeris extends roughly 5 years into the future from the current date but results for later dates are likely to be less accurate due to future station-keeping maneuvers.
 
-    Arguments:
-        <ra>    Right ascension of target to observe with JWST.
-        <dec>   Declination of target to observe with JWST.
-
-        Options:
-        [--start_date]         Start date for plot
-        [--end_date]           End date for plot
-        [--instrument]         JWST instrument to plot individually
-        [--target_name]        User provided name for target
-        [--write_ephemeris]    File name to write ephemeris to
-        [--write_plot]         File name to write plot out to
-        [--silent]             Boolean to print results to screen [default: False]
-        -h --help              Show this screen.
-        --version              Show version.
-
+Note: The `--version flag` is currently subject to a bug where the version output is that of the docopt package, rather than the version of the GTVT itself. If you type `jwst_gtvt --version` and you do not receive an error, you are using version 1.0 or greater, since the `--version` flag was not available previously. This issue will be fixed in a future update.
 
 # Example
 
 By default you need only specify R.A. and Dec. in either sexigesimal or degrees.
 The observability windows will be printed to the terminal and a plot showing the windows for each instrument will pop up.
 
-`$ jwst_gtvt 16:52:58.9 02:24:03`
+`$ jwst_gtvt --ra=16:52:58.9 --dec=02:24:03`
 
-`$ jwst_gtvt 253.2458 2.4008`
+`$ jwst_gtvt --ra=253.2458 --dec=2.4008`
 
 ![Example Plot](docs/jwst_target_visibility.png "Example default plot output.")
 
@@ -111,7 +113,7 @@ Occasionally there will be too many matching designations entries for a single t
 
 You can specify the instrument via the `--instrument` flag.
 
-`$ jwst_gtvt 16:52:58.9 02:24:03 --instrument nircam`,
+`$ jwst_gtvt --ra=16:52:58.9 --dec=02:24:03 --instrument nircam`,
 
 and the resulting plot will only contain the windows for the specified instrument.
 The allowed values for `--instrument` are 'nircam', 'nirspec', 'niriss', 'miri', 'fgs', and 'v3pa' (case insensitive).
@@ -120,7 +122,7 @@ The allowed values for `--instrument` are 'nircam', 'nirspec', 'niriss', 'miri',
 
 You can save the text and figure ouput to a file instead of having it output to terminal with `--write_ephemeris` and `--write_plot`.
 
-`$ jwst_gtvt 16:52:58.9 02:24:03 --write_ephemeris visibility.csv --write_plot visibility.png`
+`$ jwst_gtvt --ra=16:52:58.9 --dec=02:24:03 --write_ephemeris visibility.csv --write_plot visibility.png`
 
 Sharing output and reading data back in is easy:
 
@@ -141,16 +143,16 @@ Sharing output and reading data back in is easy:
     1011  60585.0            75.906550
     1012  60586.0            74.687072
 
-If you only want to plot a specific range of dates, rather than the entire available ephemeris you specify a `--start_date` or `--end_date` in ISO format (yyyy-mm-dd).
+If you only want to plot a specific range of dates, rather than the next 2 years, specify a `--start_date` and `--end_date` in ISO format (YYYY-MM-DD).
 For example:
 
-`$ jwst_gtvt 16:52:58.9 02:24:03 --target_name "NGC 6240" --start_date 2023-01-01 --end_date 2024-01-01`
+`$ jwst_gtvt --ra=16:52:58.9 --dec=02:24:03 --target_name "NGC 6240" --start_date 2023-01-01 --end_date 2024-01-01`
 
 ![Example Plot](docs/jwst_visibility_2023.png "Example plot output when specifying start and end dates.")
 
-Below is an example of the full text output:
+Below is an example of a generic `jwst_gtvt` call:
 
-    $ jwst_gtvt 16:52:58.9 02:24:03
+    $ jwst_gtvt --ra=16:52:58.9 --dec=02:24:03
 
 
     +------------------------------------------+

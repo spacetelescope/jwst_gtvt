@@ -1,7 +1,7 @@
 import datetime
 from collections import defaultdict
+from importlib.metadata import version
 import pandas as pd
-import pkg_resources
 from tabulate import tabulate
 
 
@@ -9,7 +9,7 @@ def display_results(ephemeris):
     """print out results to screen"""
 
     now = datetime.datetime.now()
-    version = pkg_resources.get_distribution("jwst_gtvt").version
+    version = version("jwst_gtvt")
     welcome_string = "JWST General Target Visibility Tool"
     date_string = "Runtime/Date: {}".format(now)
     version_string = "Version Number: {}".format(version)

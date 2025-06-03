@@ -1,23 +1,23 @@
 usage = """
 
-Database utility scripts.
+Driver for JWST GTVT fixed target tool.
 
 Usage:
-  jwst_gtvt <ra> <dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
+  jwst_gtvt --ra=<ra> --dec=<dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
 
 Arguments:
-  <ra>    Right ascension of target to observe with JWST.
-  <dec>   Declination of target to observe with JWST.
+  --ra=<ra>     Right ascension of target in degrees
+  --dec=<dec>   Declination of target in degrees
 
 Options:
-  [--start_date]         Start date for plot
-  [--end_date]           End date for plot
-  [--instrument]         JWST instrument to plot individually
-  [--target_name]        User provided name for target
+  [--start_date]         Start date for plot (YYYY-MM-DD)
+  [--end_date]           End date for plot (YYYY-MM-DD)
+  [--instrument]         Instrument (fgs, miri, nircam, niriss, nirspec, default=all)
+  [--target_name]        User provided name for target (name for output, double-quoted if there are spaces)
   [--write_ephemeris]    File name to write ephemeris to
   [--write_plot]         File name to write plot out to
   [--silent]             Boolean to print results to screen [default: False]
-  -h --help              Show this screen.
+  --help                 Show this screen.
   --version              Show version.
 """
 
@@ -41,7 +41,7 @@ def main(args):
     else:
         eph = Ephemeris()
 
-    eph.get_fixed_target_positions(args['<ra>'], args['<dec>'])
+    eph.get_fixed_target_positions(args['--ra'], args['--dec'])
 
     if not eph.dataframe['in_FOR'].any():
         in_FOR_msg = ("No position angles in field of regard! "
