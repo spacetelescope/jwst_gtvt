@@ -31,7 +31,7 @@ from jwst_gtvt.plotting import plot_visibility
 
 
 def main(args):
-    if args['--start_date'] and args['--end_date']:
+    if args['--start_date'] and args['--end_date']: # TODO: what if only one
         start = Time(args['--start_date'])
         end = Time(args['--end_date'])
         if start > end:
@@ -54,7 +54,7 @@ def main(args):
         eph.write_ephemeris(eph.dataframe, args['--write_ephemeris'])
 
     if not args['--silent']:
-            display_results(eph)
+        display_results(eph)
 
     plot_visibility(eph, args['--instrument'], name=args['--target_name'], write_plot=args['--write_plot'])
 
