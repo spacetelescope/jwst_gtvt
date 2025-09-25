@@ -4,6 +4,10 @@ from astropy.time import Time
 import pandas as pd 
 import numpy as np
 
+
+### FIXTURES ###
+
+
 @pytest.fixture(scope="module")
 def ephemeris():
 
@@ -13,6 +17,8 @@ def ephemeris():
 
     return Ephemeris(start_date=arbitrary_start_date, end_date=arbitrary_end_date)
 
+
+### TESTS ###
 
 
 def test_ephemeris_in_FOR(ephemeris):
@@ -31,3 +37,35 @@ def test_ephemeris_in_FOR(ephemeris):
 
     expected = pd.Series([False, False, True, True, False, False, False, True, False])
     assert result_df["in_FOR"].equals(expected)
+
+
+@pytest.mark.parametrize(
+    "input, expected", 
+    [
+        ("0:0:0", 0),
+        ("-0:0:0", 0),
+        ("12:30:15", 12.5041666667),
+        ("23:59:59", 23.9997222222),
+        ("-1:15:37", -1.2602777778),
+        ("-89:59:59", -89.9997222222),
+    ]
+)
+def test_ephemeris_convert_ddmmss_to_float_success(ephemeris, input, expected):
+
+    assert ephemeris.convert_ddmmss_to_float(input) == pytest.approx(expected)
+
+
+@pytest.mark.skip(reason="No Error Handling Yet")
+@pytest.mark.parametrize(
+    "input",
+    [
+        "",
+        "3:6:"
+        "77",
+        "a:b:c",
+        "5:5:5:5",
+    ]
+)
+def test_ephemeris_convert_ddmmss_to_float_bad_input(ephemeris, input):
+
+    ephemeris.convert_ddmmss_to_float(input)
