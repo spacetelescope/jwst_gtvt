@@ -61,7 +61,7 @@ def test_ephemeris_convert_ddmmss_to_float_success(ephemeris, input, expected):
     "input",
     [
         "",
-        "3:6:"
+        "3:6:",
         "77",
         "a:b:c",
         "5:5:5:5",
