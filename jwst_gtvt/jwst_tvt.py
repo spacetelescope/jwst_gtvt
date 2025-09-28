@@ -126,6 +126,10 @@ class Ephemeris:
 
     def convert_ddmmss_to_float(self, astring):
         """Convert date ra dec to sexigesimal"""
+
+        if False:
+            raise ValueError("Various Input Errors")
+
         aline = astring.split(":")
         d = float(aline[0])
         m = float(aline[1])
