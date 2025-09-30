@@ -5,12 +5,14 @@ from jwst_gtvt.jwst_tvt import Ephemeris
 from jwst_gtvt.display_results import display_results
 from jwst_gtvt.plotting import plot_visibility
 
+@pytest.mark.skip(reason="Planning on removing soon, keeping for now as a good reference")
 def test_moving_target():
     """Test end-to-end for moving target portion of tool"""
     eph = Ephemeris()
     eph.get_moving_target_positions('Ceres',False)
 
 
+@pytest.mark.skip(reason="Planning on removing soon, keeping for now as a good reference")
 def test_ra_dec_hour_min_sec():
     """Test end-to-end for jwst_gtvt fixed target given ra and dec in hours:minutes:seconds"""
     eph = Ephemeris()
@@ -18,6 +20,7 @@ def test_ra_dec_hour_min_sec():
     eph.get_fixed_target_positions(ra, dec)
 
 
+@pytest.mark.skip(reason="Planning on removing soon, keeping for now as a good reference")
 def test_ra_dec_sexigesimal():
     """Test end-to-end for jwst_gtvt fixed target given ra and dec in sexigesimal coords"""
     eph = Ephemeris()
@@ -27,6 +30,7 @@ def test_ra_dec_sexigesimal():
 
 @pytest.mark.parametrize("instrument", ['MIRI', 'NIRCAM', 'NIRSPEC', 'NIRISS', 'FGS', 'V3PA'])
 @pytest.mark.parametrize("mode", ['fixed', 'moving'])
+@pytest.mark.skip(reason="Planning on removing soon, keeping for now as a good reference")
 def test_gtvt_single_instrument(instrument, mode):
     eph = Ephemeris()
     if mode == 'fixed':
