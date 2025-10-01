@@ -24,7 +24,7 @@ Use
 from astropy.time import Time
 import astropy.units as u
 from astroquery.jplhorizons import Horizons
-import datetime
+from datetime import datetime, timedelta
 import glob
 import pandas as pd
 import pysiaf
@@ -111,6 +111,10 @@ class Ephemeris:
 
             self.start_date_mjd = int(start_date.mjd)
             self.end_date_mjd = int(end_date.mjd)
+
+            # Create Display Calendar Date
+            mjd_epoch = datetime(1858, 11, 17)
+            self.dataframe['Display Date'] = self.dataframe['MJD'].apply(lambda x: mjd_epoch + timedelta(days=x))
 
             # only build dataframe based on start and end date and reset the index
             self.dataframe = self.dataframe[
@@ -420,7 +424,7 @@ class Ephemeris:
                 r".*after A\.D\. (\d{4}-[a-zA-Z]+-\d{1,2})", ephemeris_request.text
             )
             dt = m.groups()[0]
-            end_date = datetime.datetime.strptime(dt, "%Y-%b-%d").strftime("%Y-%m-%d")
+            end_date = datetime.strptime(dt, "%Y-%b-%d").strftime("%Y-%m-%d")
         except Exception:
             # if the above fails for any reason, fall back to a known good date
             end_date = "2030-03-16"
