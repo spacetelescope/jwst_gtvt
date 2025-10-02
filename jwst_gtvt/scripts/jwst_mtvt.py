@@ -4,7 +4,7 @@ Main driver for moving target support. This script will display and
 generate the figure for 
 
 Usage:
-  jwst_mtvt <desg> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--smallbody] [--silent]
+  jwst_mtvt <desg> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--smallbody] [--interactive] [--silent]
 
 Arguments:
   <desg>    Resolvable name or designation of moving target 
@@ -16,6 +16,7 @@ Options:
   [--write_ephemeris]    File name to write ephemeris to
   [--write_plot]         File name to write plot out to
   [--smallbody]          Boolean to force <desg> to be a minor body designation
+  [--interactive]        Option to display interactive plot
   --silent               Boolean to print results to screen [default: False]
   -h --help              Show this screen.
   --version              Show version.
@@ -26,7 +27,7 @@ from astropy.time import Time
 from jwst_gtvt.display_results import display_results
 from docopt import docopt
 from jwst_gtvt.jwst_tvt import Ephemeris
-from jwst_gtvt.plotting import plot_visibility
+from jwst_gtvt.plotting import plot_visibility, plot_interactive_visibility
 
 
 def main(args):
@@ -57,7 +58,10 @@ def main(args):
     if not args["--silent"]:
         display_results(eph)
 
-    plot_visibility(eph, args["--instrument"], write_plot=args["--write_plot"])
+    if args["--interactive"]:
+        plot_interactive_visibility(eph, args["--instrument"])
+    else:
+        plot_visibility(eph, args["--instrument"], write_plot=args["--write_plot"])
 
 
 def driver():

@@ -3,7 +3,7 @@ usage = """
 Driver for JWST GTVT fixed target tool.
 
 Usage:
-  jwst_gtvt --ra=<ra> --dec=<dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
+  jwst_gtvt --ra=<ra> --dec=<dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent] [--interactive]
 
 Arguments:
   --ra=<ra>     Right ascension of target in degrees
@@ -17,6 +17,7 @@ Options:
   [--write_ephemeris]    File name to write ephemeris to
   [--write_plot]         File name to write plot out to
   [--silent]             Boolean to print results to screen [default: False]
+  [--interactive]        Option to display interactive plot
   --help                 Show this screen.
   --version              Show version.
 """
@@ -27,7 +28,7 @@ from jwst_gtvt.constants import D2R
 from jwst_gtvt.display_results import display_results
 from docopt import docopt
 from jwst_gtvt.jwst_tvt import Ephemeris
-from jwst_gtvt.plotting import plot_visibility
+from jwst_gtvt.plotting import plot_visibility, plot_interactive_visibility
 
 
 def main(args):
@@ -56,7 +57,10 @@ def main(args):
     if not args['--silent']:
             display_results(eph)
 
-    plot_visibility(eph, args['--instrument'], name=args['--target_name'], write_plot=args['--write_plot'])
+    if args["--interactive"]:
+        plot_interactive_visibility(eph, args["--instrument"])
+    else:
+        plot_visibility(eph, args['--instrument'], name=args['--target_name'], write_plot=args['--write_plot'])
 
 
 

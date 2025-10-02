@@ -13,6 +13,7 @@ requires-python = ">=3.10"
 dependencies = [
     "astropy>=5.2.2",
     "astroquery>=0.4.6",
+    "bokeh>=3.8.0",
     "docopt>=0.6.2",
     "matplotlib>=3.7.1",
     "numpy>=1.24.3",
