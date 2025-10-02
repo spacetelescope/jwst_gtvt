@@ -55,7 +55,6 @@ def test_ephemeris_convert_ddmmss_to_float_success(ephemeris, input, expected):
     assert ephemeris.convert_ddmmss_to_float(input) == pytest.approx(expected)
 
 
-@pytest.mark.skip(reason="No Error Handling Yet")
 @pytest.mark.xfail(reason="Faulty Inputs")
 @pytest.mark.parametrize(
     "input",

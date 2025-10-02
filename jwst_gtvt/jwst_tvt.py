@@ -130,6 +130,17 @@ class Ephemeris:
 
     def convert_ddmmss_to_float(self, astring):
         """Convert date ra dec to sexigesimal"""
+
+        SEXAGESIMAL_RE = r"^[+\-]?\d+:[0-5]?\d:[0-5]?\d(?:\.\d+)?$"
+
+        m = re.match(SEXAGESIMAL_RE, astring)
+
+        if not m:
+            raise ValueError(
+                f"Invalid sexagesimal input: {astring!r}. "
+                "Format must be DD:MM:SS[.sss] with minutes and seconds in 0–59."
+            )
+
         aline = astring.split(":")
         d = float(aline[0])
         m = float(aline[1])
