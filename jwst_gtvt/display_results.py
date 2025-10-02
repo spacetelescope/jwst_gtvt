@@ -20,7 +20,8 @@ def display_results(ephemeris):
 
     print('')
 
-    pa_columns = {'NIRCAM_max_pa_angle': 'NRC Max PA', 
+    pa_columns = {'Display Date': 'Date',
+                  'NIRCAM_max_pa_angle': 'NRC Max PA', 
                   'NIRCAM_min_pa_angle': 'NRC Min PA',
                   'NIRSPEC_max_pa_angle': 'NRS Max PA', 
                   'NIRSPEC_min_pa_angle': 'NRS Min PA', 
@@ -56,8 +57,8 @@ def display_results(ephemeris):
     window_dict = defaultdict(list)
 
     for start, end in window_indices:
-        window_dict['Window Start'].append(ephemeris.dataframe.iloc[start]['Calendar Date (TDB)'])
-        window_dict['Window End'].append(ephemeris.dataframe.iloc[end]['Calendar Date (TDB)'])
+        window_dict['Window Start'].append(ephemeris.dataframe.iloc[start]['Display Date'])
+        window_dict['Window End'].append(ephemeris.dataframe.iloc[end]['Display Date'])
         window_dict['Window Duration'].append(end - start)
         window_dict['V3 Angle Start'].append(ephemeris.dataframe.iloc[start]['V3PA'])
         window_dict['V3 Angle End'].append(ephemeris.dataframe.iloc[end]['V3PA'])
