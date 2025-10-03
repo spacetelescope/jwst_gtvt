@@ -38,27 +38,30 @@ Alternatively, you can clone the respository from GitHub and install the tool fr
 # Usage
 
 There are two scripts available: `jwst_gtvt` for fixed targets and `jwst_mtvt` for moving targets. To see the help info use:
-		
-	$ jwst_gtvt -h
-	Usage:
-	jwst_gtvt --ra=<ra> --dec=<dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent]
-	
-	Arguments:
-	--ra=<ra>     Right ascension of target in degrees
-	--dec=<dec>   Declination of target in degrees
-	
-	Options:
-	[--start_date]         Start date for plot (YYYY-MM-DD)
-	[--end_date]           End date for plot (YYYY-MM-DD)
-	[--instrument]         Instrument (fgs, miri, nircam, niriss, nirspec, default=all)
-	[--target_name]        User provided name for target (name for output, double-quoted if there are spaces)
-	[--write_ephemeris]    File name to write ephemeris to
-	[--write_plot]         File name to write plot out to
-	[--silent]             Boolean to print results to screen [default: False]
-	--help                 Show this screen.
-	--version              Show version.
+
+    Driver for JWST GTVT fixed target tool.
+    Usage:
+    jwst_gtvt --ra=<ra> --dec=<dec> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--target_name=<name>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--silent] [--interactive]
+
+    Arguments:
+    --ra=<ra>     Right ascension of target in degrees
+    --dec=<dec>   Declination of target in degrees
+
+    Options:
+    [--start_date]         Start date for plot (YYYY-MM-DD)
+    [--end_date]           End date for plot (YYYY-MM-DD)
+    [--instrument]         Instrument (fgs, miri, nircam, niriss, nirspec, default=all)
+    [--target_name]        User provided name for target (name for output, double-quoted if there are spaces)
+    [--write_ephemeris]    File name to write ephemeris to
+    [--write_plot]         File name to write plot out to
+    [--silent]             Boolean to print results to screen [default: False]
+    [--interactive]        Option to display interactive plot
+    --help                 Show this screen.
+    --version              Show version.
 
 The default start date is the local date for the user and the default end date is 2 years after the start date. This range can be updated by specifying both `--start_date` and `--end_date` values. Note that both `--start_date` and `--end_date` must be supplied in order to modify the date range; specifying either a start or end date will result in the default window being used instead. The JWST ephemeris extends roughly 5 years into the future from the current date but results for later dates are likely to be less accurate due to future station-keeping maneuvers.
+
+The `--interactive` plan will display the same data seen in previous versions of the JWST GTVT but will provide and interactive plot in the web browser. This interactive plot can be saved using the `--write_plot` arguement and should be saved with a `.html` extension (example: `interactive_plot.html`).
 
 Note: The `--version flag` is currently subject to a bug where the version output is that of the docopt package, rather than the version of the GTVT itself. If you type `jwst_gtvt --version` and you do not receive an error, you are using version 1.0 or greater, since the `--version` flag was not available previously. This issue will be fixed in a future update.
 
@@ -530,6 +533,24 @@ Below is an example of a generic `jwst_gtvt` call:
     |      99.9762 |      90.9553 |     238.581  |     229.56   |     100.659  |      91.6378 |      104.923 |      95.9021 |      98.8379 |      89.8171 |    100.    089     |     91.0679 |
     |      99.0046 |      91.0951 |     237.609  |     229.7    |      99.687  |      91.7775 |      103.951 |      96.0419 |      97.8663 |      89.9569 |     99.    1171    |     91.2077 |
     +--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------+--------------    +-------------   +-------------+
+
+# Interactive Plotting
+
+`$ jwst_gtvt --ra=253.2458 --dec=2.4008 --interactive`
+
+![Interactivet Plot](docs/jwst_gtvt_interactive.png "Interactive plot with JWST GTVT")
+
+The JWST GTVT interactive plots include a `hover tool` feature that allows users to hover over data in the plot to display the date and min/max PA range.
+
+All flags that were included with static plotting work the same here as well
+
+`$ jwst_gtvt --ra=16:52:58.9 --dec=02:24:03 --target_name "NGC 6240" --start_date 2023-01-01 --end_date 2024-01-01 --interactive`
+
+![Interactivet Plot Params](docs/jwst_gtvt_interactive_params.png "Interactive plot including paramaters")
+
+To write html plot to disk:
+
+`$ jwst_gtvt --ra=16:52:58.9 --dec=02:24:03 --target_name "NGC 6240" --start_date 2023-01-01 --end_date 2024-01-01 --write_plot visibility.html --interactive`
 
 
 # API

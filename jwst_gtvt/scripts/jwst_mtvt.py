@@ -4,7 +4,7 @@ Main driver for moving target support. This script will display and
 generate the figure for 
 
 Usage:
-  jwst_mtvt <desg> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--smallbody] [--interactive] [--silent]
+  jwst_mtvt <desg> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>][--target_name=<target_name>] [--smallbody] [--interactive] [--silent]
 
 Arguments:
   <desg>    Resolvable name or designation of moving target 
@@ -16,6 +16,7 @@ Options:
   [--write_ephemeris]    File name to write ephemeris to
   [--write_plot]         File name to write plot out to
   [--smallbody]          Boolean to force <desg> to be a minor body designation
+  [--target_name]        User provided name for target (name for output, double-quoted if there are spaces)
   [--interactive]        Option to display interactive plot
   --silent               Boolean to print results to screen [default: False]
   -h --help              Show this screen.
@@ -58,18 +59,23 @@ def main(args):
     if not args["--silent"]:
         display_results(eph)
 
+    if args["--target_name"]:
+        target_name = args["--target_name"]
+    else:
+        target_name = eph.target_name
+
     if args["--interactive"]:
         plot_interactive_visibility(
             eph,
             args["--instrument"],
-            name=eph.target_name,
+            name=target_name,
             write_name=args["--write_plot"],
         )
     else:
         plot_visibility(
             eph,
             args["--instrument"],
-            name=eph.target_name,
+            name=target_name,
             write_name=args["--write_plot"],
         )
 
