@@ -1,5 +1,6 @@
 from math import pi
 
+from bokeh.io import output_file, save
 from bokeh.layouts import gridplot
 from bokeh.models import HoverTool, DatetimeTickFormatter
 from bokeh.plotting import figure, show
@@ -13,12 +14,23 @@ from jwst_gtvt.display_results import get_visibility_windows
 INSTRUMENT_NAMES = ["NIRCAM", "NIRSPEC", "NIRISS", "MIRI", "FGS", "V3PA"]
 
 
-def plot_visibility(ephemeris, instrument=None, name=None, write_plot=None, test=False):
-    # Just incase dataframe hasn't been sorted yet
+def plot_visibility(ephemeris, instrument=None, name=None, write_name=None):
+    """Make static visibility plot
+    Parameters
+    ----------
+    ephemeris : jwst_gtvt.jwst_tvt.ephemeris
+        Ephemeris class with fixed or moving target positions calculated.
+    instrument : str
+        JWST instrument name
+    name : str
+        Target name (designation from Horizons)
+    write_name : str
+        Filename to write plot out to
+    """
     dataframe = ephemeris.dataframe
     dataframe["times"] = Time(dataframe["MJD"], format="mjd").datetime
 
-    df = dataframe.loc[dataframe["in_FOR"] == True]
+    df = dataframe.loc[dataframe["in_FOR"]]
 
     # These indices allow us to get the visible regions regions
     window_indices = get_visibility_windows(df.index.tolist())
@@ -61,14 +73,13 @@ def plot_visibility(ephemeris, instrument=None, name=None, write_plot=None, test
                 fontsize=18,
             )
 
-        if write_plot:
-            plt.savefig(write_plot)
+        if write_name:
+            plt.savefig(write_name)
         else:
             plt.show()
 
     else:
         # plot all instruments here.
-        instrument_names = ["NIRCAM", "NIRSPEC", "NIRISS", "MIRI", "FGS", "V3PA"]
         fig, axs = plt.subplots(2, 3, figsize=(14, 8))
 
         if ephemeris.fixed:
@@ -93,48 +104,59 @@ def plot_visibility(ephemeris, instrument=None, name=None, write_plot=None, test
                 ax.tick_params("x", labelrotation=45)
                 ax.grid(color="k", linestyle="--", linewidth=2, alpha=0.3)
                 if instrument_name == "V3PA":
-                    ax.set_ylabel(r"Available Position Angles ($^\circ$)")
+                    ax.set_ylabel("Available Position Angles (°)")
                 else:
-                    ax.set_ylabel(r"Available Aperture Position Angles ($^\circ$)")
+                    ax.set_ylabel("Available Aperture Position Angles (°)")
 
         fig.tight_layout()
 
-        if write_plot:
-            plt.savefig(write_plot)
+        if write_name:
+            plt.savefig(write_name)
         else:
             plt.show()
 
 
-def plot_interactive_visibility(ephemeris, instrument=None):
+def plot_interactive_visibility(ephemeris, instrument=None, name=None, write_name=None):
     """Make interactive visibility plot
 
     Parameters
     ----------
     ephemeris : jwst_gtvt.jwst_tvt.ephemeris
         Ephemeris class with fixed or moving target positions calculated.
-
     instrument : str
         JWST instrument name
+    name : str
+        Target name (designation from Horizons)
+    write_name : str
+        Filename to write plot out to
     """
-    def _make_plot(instrument, height, width):
+
+    def _make_plot(instrument, height, width, name=None):
         """Make bokeh plot with hover feature.
 
         Parameters
         ----------
         instrument : str
             JWST instrument name
-
         height : int
             Height size of plot in px
-
         width : int
             Width size of plot in px
         """
+        if instrument == "v3pa":
+            ylabel = "Available Position Angles (°)"
+        else:
+            ylabel = "Available Aperture Position Angles (°)"
+
+        if name:
+            title = f"{name} visibility for {instrument}"
+        else:
+            title = f"{instrument}"
         p = figure(
-            title=f"{instrument}",
+            title=title,
             x_axis_type="datetime",
             x_axis_label="Date",
-            y_axis_label="Position Angle",
+            y_axis_label=ylabel,
             height=height,
             width=width,
         )
@@ -152,12 +174,12 @@ def plot_interactive_visibility(ephemeris, instrument=None):
 
             # axis formatting
             p.xaxis.major_label_orientation = pi / 4
-            p.title.text_font_style = "bold"  # Set to bold
-            p.title.text_font_size = "20pt"  # Set to 20 points
+            p.title.text_font_style = "bold"
+            p.title.text_font_size = "20pt"
             p.xaxis.axis_label_text_font_style = "bold"
             p.xaxis.axis_label_text_font_size = "15pt"
             p.yaxis.axis_label_text_font_style = "bold"
-            p.yaxis.axis_label_text_font_size = "15pt"
+            p.yaxis.axis_label_text_font_size = "10pt"
             p.xaxis.major_label_text_font_style = "bold"
             p.xaxis.major_label_text_font_size = "12pt"
             p.yaxis.major_label_text_font_style = "bold"
@@ -189,13 +211,23 @@ def plot_interactive_visibility(ephemeris, instrument=None):
     window_indices = get_visibility_windows(df.index.tolist())
 
     if instrument:
-        single_instrument_plot = _make_plot(instrument, height=800, width=1200)
-        show(single_instrument_plot)
+        single_instrument_plot = _make_plot(
+            instrument, height=800, width=1200, name=name
+        )
+        if write_name:
+            output_file(write_name)
+            save(single_instrument_plot)
+        else:
+            show(single_instrument_plot)
     else:
         plots = []
         for instrument_name in INSTRUMENT_NAMES:
-            plots.append(_make_plot(instrument_name, height=400, width=600))
+            plots.append(_make_plot(instrument_name, height=400, width=600, name=name))
         layout = gridplot(
             plots, ncols=3, merge_tools=False
         )  # Arrange in a grid with 3 columns
-        show(layout)
+        if write_name:
+            output_file(write_name)
+            save(single_instrument_plot)
+        else:
+            show(layout)

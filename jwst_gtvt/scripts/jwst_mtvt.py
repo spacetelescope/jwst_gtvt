@@ -47,7 +47,7 @@ def main(args):
         in_FOR_msg = (
             "No position angles in field of regard! "
             "Check constraints for your target and if it is observable with JWST. \n"
-            "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-observatory-coordinate-system-and-field-of-regard for more information"
+            "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics-and-performance/jwst-target-viewing-constraints/jwst-field-of-regard-for#gsc.tab=0 for more information"
         )
         raise IndexError(in_FOR_msg)
 
@@ -59,9 +59,19 @@ def main(args):
         display_results(eph)
 
     if args["--interactive"]:
-        plot_interactive_visibility(eph, args["--instrument"])
+        plot_interactive_visibility(
+            eph,
+            args["--instrument"],
+            name=args["<desg>"],
+            write_name=args["--write_plot"],
+        )
     else:
-        plot_visibility(eph, args["--instrument"], write_plot=args["--write_plot"])
+        plot_visibility(
+            eph,
+            args["--instrument"],
+            name=args["<desg>"],
+            write_name=args["--write_plot"],
+        )
 
 
 def driver():
