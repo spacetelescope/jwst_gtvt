@@ -175,7 +175,7 @@ def plot_interactive_visibility(ephemeris, instrument=None, name=None, write_nam
             # axis formatting
             p.xaxis.major_label_orientation = pi / 4
             p.title.text_font_style = "bold"
-            p.title.text_font_size = "20pt"
+            p.title.text_font_size = "15pt"
             p.xaxis.axis_label_text_font_style = "bold"
             p.xaxis.axis_label_text_font_size = "15pt"
             p.yaxis.axis_label_text_font_style = "bold"

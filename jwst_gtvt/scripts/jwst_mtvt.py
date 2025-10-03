@@ -62,14 +62,14 @@ def main(args):
         plot_interactive_visibility(
             eph,
             args["--instrument"],
-            name=args["<desg>"],
+            name=eph.target_name,
             write_name=args["--write_plot"],
         )
     else:
         plot_visibility(
             eph,
             args["--instrument"],
-            name=args["<desg>"],
+            name=eph.target_name,
             write_name=args["--write_plot"],
         )
 
