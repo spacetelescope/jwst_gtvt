@@ -69,3 +69,19 @@ def test_ephemeris_convert_ddmmss_to_float_success(ephemeris, input, expected):
 def test_ephemeris_convert_ddmmss_to_float_bad_input(ephemeris, input):
 
     ephemeris.convert_ddmmss_to_float(input)
+
+
+def test_allowed_max_vehicle_roll(ephemeris):
+    pass 
+
+def test_allowed_max_sun_roll(ephemeris):
+    pass
+
+def test_angular_sep(ephemeris):
+    pass 
+
+def test_calculate_sun_pa(ephemeris):
+    pass
+
+def test_ephemeris_maximum_date(ephemeris):
+    pass
