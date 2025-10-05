@@ -77,8 +77,32 @@ def test_allowed_max_vehicle_roll(ephemeris):
 def test_allowed_max_sun_roll(ephemeris):
     pass
 
-def test_angular_sep(ephemeris):
-    pass 
+
+@pytest.mark.parametrize(
+    "obj1_c1, obj1_c2, obj2_c1, obj2_c2, expected",
+    [
+        (0, 0, 0, 0, 0),
+        (0, 0, np.pi/2, 0, np.pi/2),
+        (0, np.pi/4, 0, -np.pi/4, np.pi/2),
+    ]
+)
+def test_angular_sep_equal(ephemeris, obj1_c1, obj1_c2, obj2_c1, obj2_c2, expected):
+
+    assert ephemeris.angular_sep(obj1_c1, obj1_c2, obj2_c1, obj2_c2) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    "obj1_c1, obj1_c2, obj2_c1, obj2_c2",
+    [
+        (0, np.pi/4, 2*np.pi, np.pi/4),
+        (0, 0, np.pi/2, 0),
+        (0, np.pi/4, 0, -np.pi/4),
+    ]
+)
+def test_angular_sep_communative(ephemeris, obj1_c1, obj1_c2, obj2_c1, obj2_c2):
+
+    assert ephemeris.angular_sep(obj1_c1, obj1_c2, obj2_c1, obj2_c2) == ephemeris.angular_sep(obj2_c1, obj2_c2, obj1_c1, obj1_c2)
+
 
 def test_calculate_sun_pa(ephemeris):
     pass
