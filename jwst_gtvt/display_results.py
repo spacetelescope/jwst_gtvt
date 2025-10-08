@@ -4,7 +4,6 @@ from importlib.metadata import version
 import pandas as pd
 from tabulate import tabulate
 
-
 def display_results(ephemeris):
     """print out results to screen"""
 
@@ -36,12 +35,16 @@ def display_results(ephemeris):
 
     df = ephemeris.dataframe
 
+    # For fixed targets, just get a single ra dec and calculuate value to display at top of output for GTVT
+    # else for moving targets, display ecliptic latitude in column since RA, Dec is changing with time
     if ephemeris.fixed is True:
         ra = max(df['ra'])
         dec = max(df['dec'])
-        target_info_string = 'RA: %-*s  Dec: %-*s  Ecliptic Latitude: %s' % (10, ra, 10, dec, 24.284867)
+        ecliptic_latitude = ephemeris.calculate_ecliptic_latitude(ra, dec)
+        target_info_string = 'RA: %-*s  Dec: %-*s  Ecliptic Latitude: %s' % (10, ra, 10, dec, ecliptic_latitude)
     else:
-        target_info_string = 'Target Name: %-*s Ecliptic Latitude: %s' % (10, ephemeris.target_name, 24.284867)
+        pa_columns["ecliptic_latitude"] = "Ecliptic Latitude"
+        target_info_string = 'Target Name: %-*s' % (10, ephemeris.target_name)
 
     df = df.loc[df['in_FOR']==True]
 
