@@ -71,8 +71,19 @@ def test_ephemeris_convert_ddmmss_to_float_bad_input(ephemeris, input):
     ephemeris.convert_ddmmss_to_float(input)
 
 
-def test_allowed_max_vehicle_roll(ephemeris):
-    pass 
+
+
+@pytest.mark.parametrize(
+        "input_sun_ra, input_sun_dec, input_ra, input_dec, expected",
+        [
+            (0, 0, 0, 0, -np.pi / 2),
+            (0, 0, np.pi / 4, 0, -0.6682893715286274),
+            (np.pi / 2, -np.pi / 3, np.pi / 6, np.pi / 4, 0.09891704637493678),
+        ]
+)
+def test_allowed_max_vehicle_roll(ephemeris, input_sun_ra, input_sun_dec, input_ra, input_dec, expected):
+    
+    assert ephemeris.allowed_max_vehicle_roll(input_sun_ra, input_sun_dec, input_ra, input_dec) == pytest.approx(expected)
 
 
 @pytest.mark.parametrize(
@@ -85,7 +96,7 @@ def test_allowed_max_vehicle_roll(ephemeris):
     ]
 )
 def test_allowed_max_sun_roll(ephemeris, input_sun_p, expected):
-    
+
     assert ephemeris.allowed_max_sun_roll(input_sun_p) == pytest.approx(expected)
 
 
