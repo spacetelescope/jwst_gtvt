@@ -21,6 +21,7 @@ Use
         >>> eph = Ephemeris()
 """
 
+from astropy.coordinates import SkyCoord
 from astropy.time import Time
 import astropy.units as u
 from astroquery.jplhorizons import Horizons
@@ -50,6 +51,7 @@ obliquity_of_the_ecliptic *= D2R
 # Qecl2eci = QX(obliquity_of_the_ecliptic)
 
 NOW = Time.now()
+
 
 class Ephemeris:
     def __init__(self, start_date=NOW, end_date=NOW + 2 * u.year):
@@ -114,7 +116,11 @@ class Ephemeris:
 
             # Create Display Calendar Date
             mjd_epoch = datetime(1858, 11, 17)
-            self.dataframe['Display Date'] = self.dataframe['MJD'].apply(lambda x: mjd_epoch + timedelta(days=x))
+            self.dataframe["Display Date"] = self.dataframe["MJD"].apply(
+                lambda x: mjd_epoch + timedelta(days=x)
+            )
+
+            self.dataframe['Display Date'] = self.dataframe['Display Date'].dt.date
 
             # only build dataframe based on start and end date and reset the index
             self.dataframe = self.dataframe[
@@ -127,6 +133,13 @@ class Ephemeris:
                 self.dataframe[coordinate] = (
                     self.dataframe[coordinate].shift() - self.dataframe[coordinate]
                 ) * 1 + self.dataframe[coordinate]
+
+    def calculate_ecliptic_latitude(self, ra, dec):
+        coord_eq = SkyCoord(ra=ra * u.degree, dec=dec * u.degree, frame="icrs")
+        coord_ecl = coord_eq.transform_to("barycentrictrueecliptic")
+        ecliptic_latitude = coord_ecl.lat.degree
+
+        return ecliptic_latitude
 
     def convert_ddmmss_to_float(self, astring):
         """Convert date ra dec to sexigesimal"""
@@ -565,7 +578,9 @@ class Ephemeris:
 
         self.dataframe["ra"] = eph["RA"].data.data
         self.dataframe["dec"] = eph["DEC"].data.data
-
+        self.dataframe["ecliptic_latitude"] = self.calculate_ecliptic_latitude(
+            self.dataframe["ra"].values, self.dataframe["dec"].values
+        )
         self.dataframe = self.build_dataframe()
 
         return self.dataframe
