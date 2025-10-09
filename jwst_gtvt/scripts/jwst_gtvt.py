@@ -29,9 +29,15 @@ from jwst_gtvt.display_results import display_results
 from docopt import docopt
 from jwst_gtvt.jwst_tvt import Ephemeris
 from jwst_gtvt.plotting import plot_visibility, plot_interactive_visibility
+from jwst_gtvt.utils import check_jwst_instrument_name
 
 
 def main(args):
+
+    # if instrument name provided, check that it is actually a JWST instrument
+    if args["--instrument"]:
+        check_jwst_instrument_name(args["--instrument"])
+
     if args["--start_date"] and args["--end_date"]:
         start = Time(args["--start_date"])
         end = Time(args["--end_date"])

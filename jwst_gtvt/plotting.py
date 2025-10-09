@@ -9,10 +9,7 @@ from matplotlib.dates import DateFormatter
 from astropy.time import Time
 
 from jwst_gtvt.display_results import get_visibility_windows
-
-
-INSTRUMENT_NAMES = ["NIRCAM", "NIRSPEC", "NIRISS", "MIRI", "FGS", "V3PA"]
-
+from jwst_gtvt.utils import JWST_INSTRUMENTS
 
 def plot_visibility(ephemeris, instrument=None, name=None, write_name=None):
     """Make static visibility plot
@@ -51,7 +48,7 @@ def plot_visibility(ephemeris, instrument=None, name=None, write_name=None):
             )
             plt.fmt_xdata = DateFormatter("%Y-%m-%d")
 
-        if instrument == "v3pa":
+        if instrument.lower() == "v3pa":
             plt.ylabel(r"Available Position Angles ($^\circ$)", fontsize=18)
         else:
             plt.ylabel(r"Available Aperture Position Angles ($^\circ$)", fontsize=18)
@@ -91,19 +88,19 @@ def plot_visibility(ephemeris, instrument=None, name=None, write_name=None):
         else:
             plt.suptitle("Target {}".format(ephemeris.target_name), fontsize=18)
 
-        for instrument_name, ax in zip(INSTRUMENT_NAMES, axs.flatten()):
+        for instrument_name, ax in zip(JWST_INSTRUMENTS, axs.flatten()):
             for start, end in window_indices:
                 data_to_plot = df.loc[start:end]
-                min_PA_data = data_to_plot[instrument_name + "_min_pa_angle"]
-                max_PA_data = data_to_plot[instrument_name + "_max_pa_angle"]
+                min_PA_data = data_to_plot[instrument_name.upper() + "_min_pa_angle"]
+                max_PA_data = data_to_plot[instrument_name.upper() + "_max_pa_angle"]
                 ax.fill_between(
                     data_to_plot["times"], min_PA_data, max_PA_data, color="grey"
                 )
                 ax.fmt_xdata = DateFormatter("%Y-%m-%d")
-                ax.set_title(instrument_name)
+                ax.set_title(instrument_name.upper())
                 ax.tick_params("x", labelrotation=45)
                 ax.grid(color="k", linestyle="--", linewidth=2, alpha=0.3)
-                if instrument_name == "V3PA":
+                if instrument_name.lower() == "v3pa":
                     ax.set_ylabel("Available Position Angles (°)")
                 else:
                     ax.set_ylabel("Available Aperture Position Angles (°)")
@@ -221,13 +218,13 @@ def plot_interactive_visibility(ephemeris, instrument=None, name=None, write_nam
             show(single_instrument_plot)
     else:
         plots = []
-        for instrument_name in INSTRUMENT_NAMES:
+        for instrument_name in JWST_INSTRUMENTS:
             plots.append(_make_plot(instrument_name, height=400, width=600, name=name))
         layout = gridplot(
             plots, ncols=3, merge_tools=False
         )  # Arrange in a grid with 3 columns
         if write_name:
             output_file(write_name)
-            save(single_instrument_plot)
+            save(layout)
         else:
             show(layout)
