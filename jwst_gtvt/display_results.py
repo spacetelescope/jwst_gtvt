@@ -43,7 +43,7 @@ def display_results(ephemeris):
         ecliptic_latitude = ephemeris.calculate_ecliptic_latitude(ra, dec)
         target_info_string = 'RA: %-*s  Dec: %-*s  Ecliptic Latitude: %s' % (10, ra, 10, dec, ecliptic_latitude)
     else:
-        pa_columns["ecliptic_latitude"] = "Ecliptic Latitude"
+        pa_columns["ecliptic_latitude"] = "Ecliptic Lat."
         target_info_string = 'Target Name: %-*s' % (10, ephemeris.target_name)
 
     df = df.loc[df['in_FOR']==True]

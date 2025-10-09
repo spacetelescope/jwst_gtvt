@@ -120,6 +120,8 @@ class Ephemeris:
                 lambda x: mjd_epoch + timedelta(days=x)
             )
 
+            self.dataframe['Display Date'] = self.dataframe['Display Date'].dt.date
+
             # only build dataframe based on start and end date and reset the index
             self.dataframe = self.dataframe[
                 (self.dataframe["MJD"] >= self.start_date_mjd)
