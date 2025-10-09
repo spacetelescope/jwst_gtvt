@@ -143,7 +143,7 @@ def plot_interactive_visibility(ephemeris, instrument=None, name=None, write_nam
         width : int
             Width size of plot in px
         """
-        if instrument == "v3pa":
+        if instrument.lower() == "v3pa":
             ylabel = "Available Position Angles (°)"
         else:
             ylabel = "Available Aperture Position Angles (°)"
