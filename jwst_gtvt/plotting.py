@@ -139,6 +139,8 @@ def plot_interactive_visibility(ephemeris, instrument=None, name=None, write_plo
             Height size of plot in px
         width : int
             Width size of plot in px
+        name : str
+            Custom name provided by user via command line.
         """
         if instrument.lower() == "v3pa":
             ylabel = "Available Position Angles (°)"
@@ -146,9 +148,9 @@ def plot_interactive_visibility(ephemeris, instrument=None, name=None, write_plo
             ylabel = "Available Aperture Position Angles (°)"
 
         if name:
-            title = f"{name} visibility for {instrument}"
+            title = f"{name} visibility for {instrument.upper()}"
         else:
-            title = f"{instrument}"
+            title = f"{instrument.upper()}"
         p = figure(
             title=title,
             x_axis_type="datetime",
