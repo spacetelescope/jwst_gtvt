@@ -11,7 +11,7 @@ from astropy.time import Time
 from jwst_gtvt.display_results import get_visibility_windows
 from jwst_gtvt.utils import JWST_INSTRUMENTS
 
-def plot_visibility(ephemeris, instrument=None, name=None, write_name=None):
+def plot_visibility(ephemeris, instrument=None, name=None, write_plot=None):
     """Make static visibility plot
     Parameters
     ----------
@@ -21,7 +21,7 @@ def plot_visibility(ephemeris, instrument=None, name=None, write_name=None):
         JWST instrument name
     name : str
         Target name (designation from Horizons)
-    write_name : str
+    write_plot : str
         Filename to write plot out to
     """
     dataframe = ephemeris.dataframe
@@ -70,8 +70,8 @@ def plot_visibility(ephemeris, instrument=None, name=None, write_name=None):
                 fontsize=18,
             )
 
-        if write_name:
-            plt.savefig(write_name)
+        if write_plot:
+            plt.savefig(write_plot)
         else:
             plt.show()
 
@@ -107,13 +107,13 @@ def plot_visibility(ephemeris, instrument=None, name=None, write_name=None):
 
         fig.tight_layout()
 
-        if write_name:
-            plt.savefig(write_name)
+        if write_plot:
+            plt.savefig(write_plot)
         else:
             plt.show()
 
 
-def plot_interactive_visibility(ephemeris, instrument=None, name=None, write_name=None):
+def plot_interactive_visibility(ephemeris, instrument=None, name=None, write_plot=None):
     """Make interactive visibility plot
 
     Parameters
@@ -124,7 +124,7 @@ def plot_interactive_visibility(ephemeris, instrument=None, name=None, write_nam
         JWST instrument name
     name : str
         Target name (designation from Horizons)
-    write_name : str
+    write_plot : str
         Filename to write plot out to
     """
 
@@ -211,8 +211,8 @@ def plot_interactive_visibility(ephemeris, instrument=None, name=None, write_nam
         single_instrument_plot = _make_plot(
             instrument, height=800, width=1200, name=name
         )
-        if write_name:
-            output_file(write_name)
+        if write_plot:
+            output_file(write_plot)
             save(single_instrument_plot)
         else:
             show(single_instrument_plot)
@@ -223,8 +223,8 @@ def plot_interactive_visibility(ephemeris, instrument=None, name=None, write_nam
         layout = gridplot(
             plots, ncols=3, merge_tools=False
         )  # Arrange in a grid with 3 columns
-        if write_name:
-            output_file(write_name)
+        if write_plot:
+            output_file(write_plot)
             save(layout)
         else:
             show(layout)
