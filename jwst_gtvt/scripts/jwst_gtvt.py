@@ -33,7 +33,6 @@ from jwst_gtvt.utils import check_jwst_instrument_name
 
 
 def main(args):
-
     # if instrument name provided, check that it is actually a JWST instrument
     if args["--instrument"]:
         check_jwst_instrument_name(args["--instrument"])
@@ -67,7 +66,10 @@ def main(args):
 
     if args["--interactive"]:
         plot_interactive_visibility(
-            eph, args["--instrument"], name=args["--target_name"]
+            eph,
+            args["--instrument"],
+            name=args["--target_name"],
+            write_plot=args["--write_plot"],
         )
     else:
         plot_visibility(

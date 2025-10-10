@@ -74,14 +74,14 @@ def main(args):
             eph,
             args["--instrument"],
             name=target_name,
-            write_name=args["--write_plot"],
+            write_plot=args["--write_plot"],
         )
     else:
         plot_visibility(
             eph,
             args["--instrument"],
             name=target_name,
-            write_name=args["--write_plot"],
+            write_plot=args["--write_plot"],
         )
 
 
