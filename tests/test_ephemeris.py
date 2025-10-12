@@ -3,6 +3,7 @@ from jwst_gtvt.jwst_tvt import Ephemeris
 from astropy.time import Time
 import pandas as pd 
 import numpy as np
+from datetime import datetime
 
 
 ### FIXTURES ###
@@ -125,9 +126,31 @@ def test_angular_sep_communative(ephemeris, obj1_c1, obj1_c2, obj2_c1, obj2_c2):
 
     assert ephemeris.angular_sep(obj1_c1, obj1_c2, obj2_c1, obj2_c2) == ephemeris.angular_sep(obj2_c1, obj2_c2, obj1_c1, obj1_c2)
 
+@pytest.mark.parametrize(
+    "tgt_coord1, tgt_coord2, sun_coord1, sun_coord2, expected",
+    [
+        (0, 0, 0, 0, 0.0),
+        (np.deg2rad(180), np.deg2rad(0), np.deg2rad(179), np.deg2rad(0), np.deg2rad(270)),
+        (np.deg2rad(-90), np.deg2rad(90), np.deg2rad(-60), np.deg2rad(60), np.deg2rad(150)),
+    ]
+)
+def test_calculate_sun_pa(ephemeris, tgt_coord1, tgt_coord2, sun_coord1, sun_coord2, expected):
+    original_df = pd.DataFrame({
+        "placeholder" : [0]
+    })
 
-def test_calculate_sun_pa(ephemeris):
-    pass
+    result_df = ephemeris.calculate_sun_pa(original_df, tgt_coord1, tgt_coord2, sun_coord1, sun_coord2)
+
+    result_series = result_df["sun_pa"]
+    expected_series = pd.Series([expected])
+
+    assert result_series.equals(expected_series)
+    
 
 def test_ephemeris_maximum_date(ephemeris):
-    pass
+
+    result = datetime.strptime(ephemeris.ephemeris_maximum_date(), "%Y-%m-%d")
+    expected = datetime(2030, 3, 16)
+
+    # Assuming maximum date is variable, but should always be at least this fallback date
+    assert result > expected
