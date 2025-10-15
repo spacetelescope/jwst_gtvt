@@ -34,10 +34,9 @@ def test_ephemeris_in_FOR(ephemeris):
 
     result_df = ephemeris.in_FOR(original_df)
 
-    assert "in_FOR" in result_df
-
     expected = pd.Series([False, False, True, True, False, False, False, True, False])
-    assert result_df["in_FOR"].equals(expected)
+    
+    assert "in_FOR" in result_df and result_df["in_FOR"].equals(expected)
 
 
 @pytest.mark.parametrize(
