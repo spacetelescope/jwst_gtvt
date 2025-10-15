@@ -153,3 +153,24 @@ def test_ephemeris_maximum_date(ephemeris):
 
     # Assuming maximum date is variable, but should always be at least this fallback date
     assert result > expected
+
+
+
+
+### TO TEST ###
+
+# calculate_ecliptic_latitude
+
+# get_allowed_max_boresight
+
+# calculate_min_max_pa_angles
+
+# dist
+
+# get_angle ?
+
+# normal_pa
+
+# sun_position_vectors
+
+# sun_position_coordinates
