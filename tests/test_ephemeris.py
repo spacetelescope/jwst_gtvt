@@ -70,8 +70,20 @@ def test_ephemeris_convert_ddmmss_to_float_bad_input(ephemeris, input):
 
     ephemeris.convert_ddmmss_to_float(input)
 
+@pytest.mark.parametrize(
+    "input_ra, input_dec, expected",
+    [
+        (0, 0, 0),
+        (180, 0, 0),
+        (0, 90, 66.560719),
+        (270, 0, 23.439281),
+        (200, 10, 17.055630),
+    ]
+)
+def test_ephemeris_calculate_ecliptic_latitude(ephemeris, input_ra, input_dec, expected):
 
-
+    result = ephemeris.calculate_ecliptic_latitude(input_ra, input_dec)
+    assert result == pytest.approx(expected, abs=1e-5)
 
 @pytest.mark.parametrize(
         "input_sun_ra, input_sun_dec, input_ra, input_dec, expected",
@@ -158,8 +170,6 @@ def test_ephemeris_maximum_date(ephemeris):
 
 
 ### TO TEST ###
-
-# calculate_ecliptic_latitude
 
 # get_allowed_max_boresight
 
