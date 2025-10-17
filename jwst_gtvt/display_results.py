@@ -4,6 +4,7 @@ from importlib.metadata import version
 import pandas as pd
 from tabulate import tabulate
 
+
 def display_results(ephemeris):
     """print out results to screen"""
 
@@ -13,64 +14,81 @@ def display_results(ephemeris):
     date_string = "Runtime/Date: {}".format(now)
     version_string = "Version Number: {}".format(gtvt_version)
 
-    print(tabulate([[welcome_string],
-                    [date_string],
-                    [version_string]], tablefmt='grid'))
+    print(
+        tabulate([[welcome_string], [date_string], [version_string]], tablefmt="grid")
+    )
 
-    print('')
+    pa_columns = {
+        "display_date": "Date",
+        "NIRCAM_max_pa_angle": "NRC Max PA",
+        "NIRCAM_min_pa_angle": "NRC Min PA",
+        "NIRSPEC_max_pa_angle": "NRS Max PA",
+        "NIRSPEC_min_pa_angle": "NRS Min PA",
+        "NIRISS_max_pa_angle": "NIS Max PA",
+        "NIRISS_min_pa_angle": "NIS Min PA",
+        "MIRI_max_pa_angle": "MIR Max PA",
+        "MIRI_min_pa_angle": "MIR Min PA",
+        "FGS_max_pa_angle": "FGS Max PA",
+        "FGS_min_pa_angle": "FGS Min PA",
+        "V3PA_max_pa_angle": "V3 Max PA",
+        "V3PA_min_pa_angle": "V3 Min PA",
+    }
 
-    pa_columns = {'display_date': 'Date',
-                  'NIRCAM_max_pa_angle': 'NRC Max PA', 
-                  'NIRCAM_min_pa_angle': 'NRC Min PA',
-                  'NIRSPEC_max_pa_angle': 'NRS Max PA', 
-                  'NIRSPEC_min_pa_angle': 'NRS Min PA', 
-                  'NIRISS_max_pa_angle': 'NIS Max PA',
-                  'NIRISS_min_pa_angle': 'NIS Min PA', 
-                  'MIRI_max_pa_angle': 'MIR Max PA', 
-                  'MIRI_min_pa_angle': 'MIR Min PA',
-                  'FGS_max_pa_angle': 'FGS Max PA', 
-                  'FGS_min_pa_angle': 'FGS Min PA', 
-                  'V3PA_max_pa_angle': 'V3 Max PA',
-                  'V3PA_min_pa_angle': 'V3 Min PA'}
+    if not ephemeris.fixed:
+        pa_columns["ecliptic_latitude"] = "Ecliptic Lat."
 
     df = ephemeris.dataframe
 
     # For fixed targets, just get a single ra dec and calculuate value to display at top of output for GTVT
     # else for moving targets, display ecliptic latitude in column since RA, Dec is changing with time
     if ephemeris.fixed is True:
-        ra = max(df['ra'])
-        dec = max(df['dec'])
+        ra = max(df["ra"])
+        dec = max(df["dec"])
         ecliptic_latitude = ephemeris.calculate_ecliptic_latitude(ra, dec)
-        target_info_string = 'RA: %-*s  Dec: %-*s  Ecliptic Latitude: %s' % (10, ra, 10, dec, ecliptic_latitude)
+        target_info_string = "RA: %-*s  Dec: %-*s  Ecliptic Latitude: %s" % (
+            10,
+            ra,
+            10,
+            dec,
+            ecliptic_latitude,
+        )
     else:
         pa_columns["ecliptic_latitude"] = "Ecliptic Lat."
-        target_info_string = 'Target Name: %-*s' % (10, ephemeris.target_name)
+        target_info_string = "Target Name: %-*s" % (10, ephemeris.target_name)
 
-    df = df.loc[df['in_FOR']==True]
+    df = df.loc[df["in_FOR"] == True]
 
-    interval_string = 'Checked Interval [{}, {}]'.format(ephemeris.start_date, ephemeris.end_date)
+    interval_string = "Checked Interval [{}, {}]".format(
+        ephemeris.start_date, ephemeris.end_date
+    )
 
     print(target_info_string)
-    print('-' * len(target_info_string))
-    print('')
+    print("-" * len(target_info_string))
+    print("")
     print(interval_string)
-    print('')
+    print("")
 
     window_indices = get_visibility_windows(df.index.tolist())
     window_dict = defaultdict(list)
 
     for start, end in window_indices:
-        window_dict['Window Start'].append(ephemeris.dataframe.iloc[start]['display_date'])
-        window_dict['Window End'].append(ephemeris.dataframe.iloc[end]['display_date'])
-        window_dict['Window Duration'].append(end - start)
-        window_dict['V3 Angle Start'].append(ephemeris.dataframe.iloc[start]['V3PA'])
-        window_dict['V3 Angle End'].append(ephemeris.dataframe.iloc[end]['V3PA'])
+        window_dict["Window Start"].append(
+            ephemeris.dataframe.iloc[start]["display_date"]
+        )
+        window_dict["Window End"].append(ephemeris.dataframe.iloc[end]["display_date"])
+        window_dict["Window Duration"].append(end - start)
+        window_dict["V3 Angle Start"].append(ephemeris.dataframe.iloc[start]["V3PA"])
+        window_dict["V3 Angle End"].append(ephemeris.dataframe.iloc[end]["V3PA"])
 
     window_df = pd.DataFrame(window_dict)
-    print(tabulate(window_df, headers='keys', tablefmt='psql', showindex=False))
+    print(tabulate(window_df, headers="keys", tablefmt="psql", showindex=False))
 
     df = df[list(pa_columns.keys())]
-    print(tabulate(df, headers=list(pa_columns.values()), tablefmt='psql', showindex=False))
+    print(
+        tabulate(
+            df, headers=list(pa_columns.values()), tablefmt="psql", showindex=False
+        )
+    )
 
 
 def get_visibility_windows(df_indices):
@@ -80,7 +98,7 @@ def get_visibility_windows(df_indices):
 
     window_indices = []
     window_start_index = df_indices[0]
-    for x,y in zip(df_indices[::], df_indices[1::]):
+    for x, y in zip(df_indices[::], df_indices[1::]):
         difference = y - x
         if difference > 1:
             window_end_index = x
@@ -92,4 +110,3 @@ def get_visibility_windows(df_indices):
             continue
 
     return window_indices
-
