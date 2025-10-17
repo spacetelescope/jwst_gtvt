@@ -117,11 +117,7 @@ class Ephemeris:
             # Create Display Calendar Date
             mjd_epoch = datetime(1858, 11, 17)
             self.dataframe['display_date'] = self.dataframe['MJD'].apply(lambda x: mjd_epoch + timedelta(days=x))
-            self.dataframe["Display Date"] = self.dataframe["MJD"].apply(
-                lambda x: mjd_epoch + timedelta(days=x)
-            )
-
-            self.dataframe['Display Date'] = self.dataframe['Display Date'].dt.date
+            self.dataframe['display_date'] = self.dataframe['display_date'].dt.date
 
             # only build dataframe based on start and end date and reset the index
             self.dataframe = self.dataframe[
