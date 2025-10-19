@@ -166,6 +166,20 @@ def test_ephemeris_maximum_date(ephemeris):
     # Assuming maximum date is variable, but should always be at least this fallback date
     assert result > expected
 
+@pytest.mark.parametrize(
+    "instrument, aperture, angle_name, expected",
+    [
+        ("NIRCAM", "NRCALL_FULL", "V3IdlYAngle", -0.07457694),
+        ("NIRSPEC", "NRS_FULL_MSA", "V3IdlYAngle", 138.5745697),
+        ("NIRISS", "NIS_CEN", "V3IdlYAngle", 0.56126717),
+        ("MIRI", "MIRIM_FULL", "V3IdlYAngle", 4.83544897),
+        ("FGS", "FGS1_FULL", "V3IdlYAngle", -1.24120427),
+    ]
+)
+def test_ephemeris_get_angle(ephemeris, instrument, aperture, angle_name, expected):
+
+    result = ephemeris.get_angle(instrument, aperture, angle_name)
+    assert result == expected
 
 
 
@@ -174,10 +188,6 @@ def test_ephemeris_maximum_date(ephemeris):
 # get_allowed_max_boresight
 
 # calculate_min_max_pa_angles
-
-# dist
-
-# get_angle ?
 
 # normal_pa
 
