@@ -21,7 +21,7 @@ def ephemeris():
 
 ### TESTS ###
 
-
+# TODO: Refactor to use parameters to create more isolated tests, do in for cols
 def test_ephemeris_in_FOR(ephemeris):
 
     # Copied not imported because they shouldn't change, so we should catch changes
@@ -181,6 +181,31 @@ def test_ephemeris_get_angle(ephemeris, instrument, aperture, angle_name, expect
     result = ephemeris.get_angle(instrument, aperture, angle_name)
     assert result == expected
 
+@pytest.mark.parametrize(
+    "sun_ra, sun_dec, ra, dec, expected",
+    [
+        (0, 0, 0, 0, -90.0),
+        (0, 0, np.pi / 4, 0, -38.29016),
+        (np.pi / 2, -np.pi / 3, np.pi / 6, np.pi / 4, 5.667529),
+    ]
+)
+def test_get_allowed_max_boresight(ephemeris, sun_ra, sun_dec, ra, dec, expected):
+
+    input_df = pd.DataFrame({
+        "coord1" : [sun_ra],
+        "coord2" : [sun_dec],
+        "ra_radians" : [ra],
+        "dec_radians" : [dec]
+    })
+
+    expected_df_output = pd.DataFrame({
+        "max_boresight" : [expected]
+    })
+
+    df_output = ephemeris.get_allowed_max_boresight(input_df)
+
+    assert ("max_boresight" in df_output.columns) and np.allclose(df_output["max_boresight"], expected_df_output["max_boresight"], atol=1e-6)
+
 
 
 ### TO TEST ###
@@ -188,6 +213,8 @@ def test_ephemeris_get_angle(ephemeris, instrument, aperture, angle_name, expect
 # get_allowed_max_boresight
 
 # calculate_min_max_pa_angles
+
+# dist
 
 # normal_pa
 
