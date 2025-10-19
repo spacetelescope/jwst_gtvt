@@ -246,16 +246,50 @@ def test_calculate_min_max_pa_angles(ephemeris, instrument, aperture, v3pa, max_
         and np.allclose(df_output[max_col_name], expected_df_output[max_col_name], atol=1e-6)
     )
 
-    
+@pytest.mark.parametrize(
+    "sun_x, sun_y, sun_z, expected_coord1, expected_coord2",
+    [
+        (1, 0, 0, 0, 0),
+        (0, 1, 0, np.pi / 2, 0),
+        (0, 0, -1, 0,  - np.pi / 2),
+        (1 / np.sqrt(2), 1 / np.sqrt(2), 0, np.pi / 4, 0),
+        (1 / np.sqrt(2), - 1 / np.sqrt(2), 0, 7 * np.pi / 4, 0),
+        (0.5, 0.5, 0.5, np.pi / 4, np.pi / 6),
+        (-0.35, 0.22, 0.3, 2.580429, 0.304693),
+        (-0.7214, 0.5627, -0.4068, 2.479159, -0.418948)
+    ]
+)
+def test_sun_position_coordinates(ephemeris, sun_x, sun_y, sun_z, expected_coord1, expected_coord2):
+
+    input_df = pd.DataFrame({
+        "Vsun_X" : [sun_x],
+        "Vsun_Y" : [sun_y],
+        "Vsun_Z" : [sun_z],
+    })
+
+    expected_df_output = pd.DataFrame({
+        "coord1" : [expected_coord1],
+        "coord2" : [expected_coord2],
+    })
+
+    df_output = ephemeris.sun_position_coordinates(input_df)
+
+    assert (
+        np.allclose(df_output["coord1"], expected_df_output["coord1"], atol=1e-6)
+        and np.allclose(df_output["coord2"], expected_df_output["coord2"], atol=1e-6)
+    )
 
 
 ### TO TEST ###
-
 
 # dist
 
 # normal_pa
 
+<<<<<<< HEAD
 # sun_position_vectors
 
 # sun_position_coordinates
+=======
+# sun_position_vectors
+>>>>>>> 273c97b (Add test for Ephemeris sun_position_coordinates)
