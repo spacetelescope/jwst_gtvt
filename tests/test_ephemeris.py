@@ -6,6 +6,11 @@ import numpy as np
 from datetime import datetime
 
 
+"""
+A test suite that focuses on having correct output for class methods within the Ephemeris Class
+
+"""
+
 ### FIXTURES ###
 
 
@@ -206,13 +211,46 @@ def test_get_allowed_max_boresight(ephemeris, sun_ra, sun_dec, ra, dec, expected
 
     assert ("max_boresight" in df_output.columns) and np.allclose(df_output["max_boresight"], expected_df_output["max_boresight"], atol=1e-6)
 
+@pytest.mark.parametrize(
+    "instrument, aperture, v3pa, max_boresight, expected_min, expected_nom, expected_max",
+    [
+        ("NIRCAM",  "NRCALL_FULL",  82.55,      3 * np.pi / 180,    82.423063,  82.475423,  82.527783),
+        ("NIRCAM",  "NRCALL_FULL",  0.0012,     4.22 * np.pi / 180, 359.85297,  359.926623, 0.000276),
+        ("MIRI",    "MIRIM_FULL",   18.192831,  0.98 * np.pi / 180, 23.011176,  23.02828,   23.045384),
+        ("MIRI",    "MIRIM_FULL",   359.935,    2.5 * np.pi / 180,  4.726816,   4.770449,   4.814082),
+        ("V3PA",    None,           16,         5.2 * np.pi / 180,  15.909243,  16,         16.090757), 
+    ]
+)
+def test_calculate_min_max_pa_angles(ephemeris, instrument, aperture, v3pa, max_boresight, expected_min, expected_nom, expected_max):
+
+    input_df = pd.DataFrame({
+        "V3PA" : [v3pa],
+        "max_boresight" : [max_boresight]
+    })
+
+    min_col_name = instrument + "_min_pa_angle"
+    nom_col_name = instrument + "_nominal_angle"
+    max_col_name = instrument + "_max_pa_angle"
+
+    expected_df_output = pd.DataFrame({
+        min_col_name : [expected_min],
+        nom_col_name : [expected_nom],
+        max_col_name : [expected_max],
+    })
+
+    df_output = ephemeris.calculate_min_max_pa_angles(input_df, instrument, aperture, angle_name="V3IdlYAngle")
+
+    assert (
+        np.allclose(df_output[min_col_name], expected_df_output[min_col_name], atol=1e-6)
+        and np.allclose(df_output[nom_col_name], expected_df_output[nom_col_name], atol=1e-6)
+        and np.allclose(df_output[max_col_name], expected_df_output[max_col_name], atol=1e-6)
+    )
+
+    
 
 
 ### TO TEST ###
 
-# get_allowed_max_boresight
-
-# calculate_min_max_pa_angles
 
 # dist
 
