@@ -27,7 +27,7 @@ def ephemeris():
 ### TESTS ###
 
 # TODO: Refactor to use parameters to create more isolated tests, do in for cols
-def test_ephemeris_in_FOR(ephemeris):
+def test_in_FOR(ephemeris):
 
     # Copied not imported because they shouldn't change, so we should catch changes
     MIN_SUN_ANGLE = 84.8 * np.pi / 180.0
@@ -55,7 +55,7 @@ def test_ephemeris_in_FOR(ephemeris):
         ("-89:59:59", -89.9997222222),
     ]
 )
-def test_ephemeris_convert_ddmmss_to_float_success(ephemeris, input, expected):
+def test_convert_ddmmss_to_float_success(ephemeris, input, expected):
 
     assert ephemeris.convert_ddmmss_to_float(input) == pytest.approx(expected)
 
@@ -71,7 +71,7 @@ def test_ephemeris_convert_ddmmss_to_float_success(ephemeris, input, expected):
         "5:5:5:5",
     ]
 )
-def test_ephemeris_convert_ddmmss_to_float_bad_input(ephemeris, input):
+def test_convert_ddmmss_to_float_bad_input(ephemeris, input):
 
     ephemeris.convert_ddmmss_to_float(input)
 
@@ -85,7 +85,7 @@ def test_ephemeris_convert_ddmmss_to_float_bad_input(ephemeris, input):
         (200, 10, 17.055630),
     ]
 )
-def test_ephemeris_calculate_ecliptic_latitude(ephemeris, input_ra, input_dec, expected):
+def test_calculate_ecliptic_latitude(ephemeris, input_ra, input_dec, expected):
 
     result = ephemeris.calculate_ecliptic_latitude(input_ra, input_dec)
     assert result == pytest.approx(expected, abs=1e-5)
@@ -163,7 +163,7 @@ def test_calculate_sun_pa(ephemeris, tgt_coord1, tgt_coord2, sun_coord1, sun_coo
     assert result_series.equals(expected_series)
     
 
-def test_ephemeris_maximum_date(ephemeris):
+def test_maximum_date(ephemeris):
 
     result = datetime.strptime(ephemeris.ephemeris_maximum_date(), "%Y-%m-%d")
     expected = datetime(2030, 3, 16)
@@ -181,7 +181,7 @@ def test_ephemeris_maximum_date(ephemeris):
         ("FGS", "FGS1_FULL", "V3IdlYAngle", -1.24120427),
     ]
 )
-def test_ephemeris_get_angle(ephemeris, instrument, aperture, angle_name, expected):
+def test_get_angle(ephemeris, instrument, aperture, angle_name, expected):
 
     result = ephemeris.get_angle(instrument, aperture, angle_name)
     assert result == expected
@@ -286,10 +286,4 @@ def test_sun_position_coordinates(ephemeris, sun_x, sun_y, sun_z, expected_coord
 
 # normal_pa
 
-<<<<<<< HEAD
 # sun_position_vectors
-
-# sun_position_coordinates
-=======
-# sun_position_vectors
->>>>>>> 273c97b (Add test for Ephemeris sun_position_coordinates)
