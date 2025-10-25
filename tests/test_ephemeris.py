@@ -280,10 +280,59 @@ def test_sun_position_coordinates(ephemeris, sun_x, sun_y, sun_z, expected_coord
     )
 
 
+
+@pytest.mark.parametrize(
+    "tgt_ra, tgt_dec, sun_pa, expected_v3pa",
+    [
+        (0, 0, 0, 180),
+        (3.008, 0.730, 4 * np.pi / 3, 60),
+        (5.360, -0.411, 1.73211, 279.242593),
+    ]
+)
+def test_normal_pa_with_sunpa(ephemeris, tgt_ra, tgt_dec, sun_pa, expected_v3pa):
+
+    input_df = pd.DataFrame({
+        "sun_pa" : [sun_pa]
+    })
+
+    expected_df_output = pd.DataFrame({
+        "V3PA" : [expected_v3pa]
+    })
+
+    df_output = ephemeris.normal_pa(input_df, tgt_ra, tgt_dec)
+
+    assert (
+        np.allclose(df_output["V3PA"], expected_df_output["V3PA"], atol=1e-6)
+    )
+
+@pytest.mark.xfail(reason="Known bug outlined in Issue #107")
+@pytest.mark.parametrize(
+    "sun_x, sun_y, sun_z, tgt_ra, tgt_dec, expected_v3pa",
+    [
+        (1, 0, 0, 0, 0, 180)
+    ]
+)
+def test_normal_pa_no_sunpa(ephemeris, sun_x, sun_y, sun_z, tgt_ra, tgt_dec, expected_v3pa):
+
+    input_df = pd.DataFrame({
+        "Vsun_X" : [sun_x],
+        "Vsun_Y" : [sun_y],
+        "Vsun_Z" : [sun_z],
+    })
+
+    expected_df_output = pd.DataFrame({
+        "V3PA" : [expected_v3pa],
+    })
+
+    df_output = ephemeris.normal_pa(input_df, tgt_ra, tgt_dec)
+
+    assert (
+        np.allclose(df_output["V3PA"], expected_df_output["V3PA"], atol=1e-6)
+    )
+
+
 ### TO TEST ###
 
 # dist
-
-# normal_pa
 
 # sun_position_vectors
