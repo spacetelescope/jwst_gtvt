@@ -23,6 +23,8 @@ Options:
   --version              Show version.
 """
 
+import os
+
 from astropy.time import Time
 
 from jwst_gtvt.display_results import display_results
@@ -70,6 +72,10 @@ def main(args):
         target_name = eph.target_name
 
     if args["--interactive"]:
+        if args["--write_plot"]:
+            _, ext = os.path.splitext(args["--write_plot"])
+            assert ext == ".html", "Output filename for interactive plots must have extension '.html'"
+
         plot_interactive_visibility(
             eph,
             args["--instrument"],

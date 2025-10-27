@@ -34,9 +34,6 @@ def display_results(ephemeris):
         "V3PA_min_pa_angle": "V3 Min PA",
     }
 
-    if not ephemeris.fixed:
-        pa_columns["ecliptic_latitude"] = "Ecliptic Lat."
-
     df = ephemeris.dataframe
 
     # For fixed targets, just get a single ra dec and calculuate value to display at top of output for GTVT

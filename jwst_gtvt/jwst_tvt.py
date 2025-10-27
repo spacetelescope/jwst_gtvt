@@ -541,6 +541,8 @@ class Ephemeris:
         self.dataframe["ra"] = ra
         self.dataframe["dec"] = dec
 
+        self.ecliptic_lat = self.calculate_ecliptic_latitude(ra, dec)
+
         self.dataframe = self.build_dataframe()
 
         return self.dataframe

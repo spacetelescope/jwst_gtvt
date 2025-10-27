@@ -22,6 +22,8 @@ Options:
   --version              Show version.
 """
 
+import os
+
 from astropy.time import Time
 
 from jwst_gtvt.constants import D2R
@@ -65,6 +67,10 @@ def main(args):
         display_results(eph)
 
     if args["--interactive"]:
+        if args["--write_plot"]:
+            _, ext = os.path.splitext(args["--write_plot"])
+            assert ext == ".html", "Output filename for interactive plots must have extension '.html'"
+
         plot_interactive_visibility(
             eph,
             args["--instrument"],
