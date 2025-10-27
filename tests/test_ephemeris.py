@@ -142,6 +142,7 @@ def test_angular_sep_communative(ephemeris, obj1_c1, obj1_c2, obj2_c1, obj2_c2):
 
     assert ephemeris.angular_sep(obj1_c1, obj1_c2, obj2_c1, obj2_c2) == ephemeris.angular_sep(obj2_c1, obj2_c2, obj1_c1, obj1_c2)
 
+
 @pytest.mark.parametrize(
     "tgt_coord1, tgt_coord2, sun_coord1, sun_coord2, expected",
     [
@@ -364,7 +365,31 @@ def test_sun_position_vectors(ephemeris, x, y, z, expectedVX, expectedVY, expect
     )
 
 
+# Same values as tests for angular_sep, just ensuring they are passed correctly
+@pytest.mark.parametrize(
+    "obj1_c1, obj1_c2, obj2_c1, obj2_c2, expectedDist",
+    [
+        (0, 0, 0, 0, 0),
+        (0, 0, np.pi/2, 0, np.pi/2),
+        (0, np.pi/4, 0, -np.pi/4, np.pi/2),
+    ]
+)
+def test_dist(ephemeris, obj1_c1, obj1_c2, obj2_c1, obj2_c2, expectedDist):
 
-### TO TEST ###
+    input_df = pd.DataFrame({
+        "ra_radians" : [obj1_c1],
+        "dec_radians" : [obj1_c2],
+        "coord1" : [obj2_c1],
+        "coord2" : [obj2_c2]
+    })
 
-# dist
+    expected_df_output = pd.DataFrame({
+        "dist" : [expectedDist]
+    })
+    
+    df_output = ephemeris.dist(input_df)
+
+    assert (
+        np.allclose(df_output["dist"], expected_df_output["dist"], atol=1e-6)
+    )
+
