@@ -116,11 +116,8 @@ class Ephemeris:
 
             # Create Display Calendar Date
             mjd_epoch = datetime(1858, 11, 17)
-            self.dataframe["Display Date"] = self.dataframe["MJD"].apply(
-                lambda x: mjd_epoch + timedelta(days=x)
-            )
-
-            self.dataframe['Display Date'] = self.dataframe['Display Date'].dt.date
+            self.dataframe['display_date'] = self.dataframe['MJD'].apply(lambda x: mjd_epoch + timedelta(days=x))
+            self.dataframe['display_date'] = self.dataframe['display_date'].dt.date
 
             # only build dataframe based on start and end date and reset the index
             self.dataframe = self.dataframe[
@@ -236,13 +233,13 @@ class Ephemeris:
 
         Parameters
         ----------
-        obj1_c1 : float
+        obj1_c1 : float (or numpy array of floats)
             Object one coordinate 1
-        obj2_c2 : float
+        obj2_c2 : float (or numpy array of floats)
             Object one coordinate 2
-        obj2_c1 : float
+        obj2_c1 : float (or numpy array of floats)
             Object two coordinate 1
-        obj2_c2 : float
+        obj2_c2 : float (or numpy array of floats)
             Object two coordinate 2
 
         Returns
@@ -255,7 +252,7 @@ class Ephemeris:
             obj2_c2
         ) * np.sin(obj1_c2)
 
-        return np.arccos(UNIT_LIMIT(x))
+        return np.arccos(np.clip(x, -1, 1))
 
     def calculate_min_max_pa_angles(
         self, dataframe, instrument, aperture=None, angle_name="V3IdlYAngle"
@@ -417,18 +414,10 @@ class Ephemeris:
             Pandas dataframe with updated metadata
         """
 
-        # obj1 = target
-        # obj2 = sun
+        obj1_c1, obj1_c2 = dataframe["ra_radians"], dataframe["dec_radians"] # target
+        obj2_c1, obj2_c2 = dataframe["coord1"], dataframe["coord2"] # sun
 
-        obj1_c1, obj1_c2 = dataframe["ra_radians"], dataframe["dec_radians"]
-        obj2_c1, obj2_c2 = dataframe["coord1"], dataframe["coord2"]
-
-        data = np.cos(obj2_c2) * np.cos(obj1_c2) * np.cos(obj2_c1 - obj1_c1) + np.sin(
-            obj2_c2
-        ) * np.sin(obj1_c2)
-
-        anglar_distance = np.arccos([UNIT_LIMIT(value) for value in data])
-        dataframe["dist"] = anglar_distance
+        dataframe["dist"] = self.angular_sep(obj1_c1, obj1_c2, obj2_c1, obj2_c2)
 
         return dataframe
 
@@ -543,6 +532,8 @@ class Ephemeris:
 
         self.dataframe["ra"] = ra
         self.dataframe["dec"] = dec
+
+        self.ecliptic_lat = self.calculate_ecliptic_latitude(ra, dec)
 
         self.dataframe = self.build_dataframe()
 
