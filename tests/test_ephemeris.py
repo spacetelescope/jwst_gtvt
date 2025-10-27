@@ -331,8 +331,40 @@ def test_normal_pa_no_sunpa(ephemeris, sun_x, sun_y, sun_z, tgt_ra, tgt_dec, exp
     )
 
 
+@pytest.mark.parametrize(
+    "x, y, z, expectedVX, expectedVY, expectedVZ, expectedMag",
+    [
+        (3, 0, 0, -1, 0, 0, 3),
+        (10, 2, -11, -10/15, -2/15, 11/15, 15),
+        (0.347106, -0.812547, 0.563441, -0.331227, 0.775375, -0.537665, 1.047941),
+        (-843.162774, 1659.234981, -247.398215, 0.449076, -0.883724, 0.131767, 1877.548951),
+    ]
+)
+def test_sun_position_vectors(ephemeris, x, y, z, expectedVX, expectedVY, expectedVZ, expectedMag):
+    input_df = pd.DataFrame({
+        "X" : [x],
+        "Y" : [y],
+        "Z" : [z],
+    })
+
+    expected_df_output = pd.DataFrame({
+        "Vsun_mag" : [expectedMag],
+        "Vsun_X" : [expectedVX],
+        "Vsun_Y" : [expectedVY],
+        "Vsun_Z" : [expectedVZ],
+    })
+
+    df_output = ephemeris.sun_position_vectors(input_df)
+
+    assert (
+        np.allclose(df_output["Vsun_mag"], expected_df_output["Vsun_mag"], atol=1e-6)
+        and np.allclose(df_output["Vsun_X"], expected_df_output["Vsun_X"], atol=1e-6)
+        and np.allclose(df_output["Vsun_Y"], expected_df_output["Vsun_Y"], atol=1e-6)
+        and np.allclose(df_output["Vsun_Z"], expected_df_output["Vsun_Z"], atol=1e-6)
+    )
+
+
+
 ### TO TEST ###
 
 # dist
-
-# sun_position_vectors
