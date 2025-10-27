@@ -233,13 +233,13 @@ class Ephemeris:
 
         Parameters
         ----------
-        obj1_c1 : float
+        obj1_c1 : float (or numpy array of floats)
             Object one coordinate 1
-        obj2_c2 : float
+        obj2_c2 : float (or numpy array of floats)
             Object one coordinate 2
-        obj2_c1 : float
+        obj2_c1 : float (or numpy array of floats)
             Object two coordinate 1
-        obj2_c2 : float
+        obj2_c2 : float (or numpy array of floats)
             Object two coordinate 2
 
         Returns
@@ -252,7 +252,7 @@ class Ephemeris:
             obj2_c2
         ) * np.sin(obj1_c2)
 
-        return np.arccos(UNIT_LIMIT(x))
+        return np.arccos(np.clip(x, -1, 1))
 
     def calculate_min_max_pa_angles(
         self, dataframe, instrument, aperture=None, angle_name="V3IdlYAngle"
@@ -414,18 +414,10 @@ class Ephemeris:
             Pandas dataframe with updated metadata
         """
 
-        # obj1 = target
-        # obj2 = sun
+        obj1_c1, obj1_c2 = dataframe["ra_radians"], dataframe["dec_radians"] # target
+        obj2_c1, obj2_c2 = dataframe["coord1"], dataframe["coord2"] # sun
 
-        obj1_c1, obj1_c2 = dataframe["ra_radians"], dataframe["dec_radians"]
-        obj2_c1, obj2_c2 = dataframe["coord1"], dataframe["coord2"]
-
-        data = np.cos(obj2_c2) * np.cos(obj1_c2) * np.cos(obj2_c1 - obj1_c1) + np.sin(
-            obj2_c2
-        ) * np.sin(obj1_c2)
-
-        anglar_distance = np.arccos([UNIT_LIMIT(value) for value in data])
-        dataframe["dist"] = anglar_distance
+        dataframe["dist"] = self.angular_sep(obj1_c1, obj1_c2, obj2_c1, obj2_c2)
 
         return dataframe
 
