@@ -4,7 +4,7 @@ Main driver for moving target support. This script will display and
 generate the figure for 
 
 Usage:
-  jwst_mtvt <desg> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>] [--smallbody] [--silent]
+  jwst_mtvt <desg> [--start_date=<obs_start>] [--end_date=<obs_end>] [--instrument=<inst>] [--write_ephemeris=<write_path>] [--write_plot=<plot_path>][--target_name=<target_name>] [--smallbody] [--interactive] [--silent]
 
 Arguments:
   <desg>    Resolvable name or designation of moving target 
@@ -16,20 +16,29 @@ Options:
   [--write_ephemeris]    File name to write ephemeris to
   [--write_plot]         File name to write plot out to
   [--smallbody]          Boolean to force <desg> to be a minor body designation
+  [--target_name]        User provided name for target (name for output, double-quoted if there are spaces)
+  [--interactive]        Option to display interactive plot
   --silent               Boolean to print results to screen [default: False]
   -h --help              Show this screen.
   --version              Show version.
 """
+
+import os
 
 from astropy.time import Time
 
 from jwst_gtvt.display_results import display_results
 from docopt import docopt
 from jwst_gtvt.jwst_tvt import Ephemeris
-from jwst_gtvt.plotting import plot_visibility
+from jwst_gtvt.plotting import plot_visibility, plot_interactive_visibility
+from jwst_gtvt.utils import check_jwst_instrument_name
 
 
 def main(args):
+    # if instrument name provided, check that it is actually a JWST instrument
+    if args["--instrument"]:
+        check_jwst_instrument_name(args["--instrument"])
+
     if args["--start_date"] and args["--end_date"]:
         start = Time(args["--start_date"])
         end = Time(args["--end_date"])
@@ -46,7 +55,7 @@ def main(args):
         in_FOR_msg = (
             "No position angles in field of regard! "
             "Check constraints for your target and if it is observable with JWST. \n"
-            "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics/jwst-observatory-coordinate-system-and-field-of-regard for more information"
+            "Vist: https://jwst-docs.stsci.edu/jwst-observatory-characteristics-and-performance/jwst-target-viewing-constraints/jwst-field-of-regard-for#gsc.tab=0 for more information"
         )
         raise IndexError(in_FOR_msg)
 
@@ -57,7 +66,29 @@ def main(args):
     if not args["--silent"]:
         display_results(eph)
 
-    plot_visibility(eph, args["--instrument"], write_plot=args["--write_plot"])
+    if args["--target_name"]:
+        target_name = args["--target_name"]
+    else:
+        target_name = eph.target_name
+
+    if args["--interactive"]:
+        if args["--write_plot"]:
+            _, ext = os.path.splitext(args["--write_plot"])
+            assert ext == ".html", "Output filename for interactive plots must have extension '.html'"
+
+        plot_interactive_visibility(
+            eph,
+            args["--instrument"],
+            name=target_name,
+            write_plot=args["--write_plot"],
+        )
+    else:
+        plot_visibility(
+            eph,
+            args["--instrument"],
+            name=target_name,
+            write_plot=args["--write_plot"],
+        )
 
 
 def driver():
