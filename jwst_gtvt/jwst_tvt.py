@@ -618,7 +618,7 @@ class Ephemeris:
                 dataframe["coord1"].values,
                 dataframe["coord2"].values,
             )
-            dataframe["sun_pa"] = self.calculate_sun_pa(
+            dataframe = self.calculate_sun_pa(
                 dataframe, tgt_ra, tgt_dec, sun_coord1, sun_coord2
             )
 
