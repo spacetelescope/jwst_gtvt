@@ -26,22 +26,39 @@ def ephemeris():
 
 ### TESTS ###
 
-# TODO: Refactor to use parameters to create more isolated tests, do in for cols
-def test_in_FOR(ephemeris):
+
+@pytest.mark.parametrize(
+    "angle, expected",
+    [
+        (84.8 * np.pi / 180.0, False),
+        (135.0 * np.pi / 180.0, False),
+        (84.8 * np.pi / 180.0 + 0.000001, True),
+        (135.0 * np.pi / 180.0 - 0.000001, True),
+        (84.8 * np.pi / 180.0 - 0.000001, False),
+        (135.0 * np.pi / 180.0 + 0.000001, False),
+        (1, False),
+        (2, True),
+        (3, False),
+    ]
+)
+def test_in_FOR(ephemeris, angle, expected):
 
     # Copied not imported because they shouldn't change, so we should catch changes
     MIN_SUN_ANGLE = 84.8 * np.pi / 180.0
     MAX_SUN_ANGLE = 135.0 * np.pi / 180.0
 
     original_df = pd.DataFrame({
-        "dist" : [MIN_SUN_ANGLE, MAX_SUN_ANGLE, MIN_SUN_ANGLE + 0.1, MAX_SUN_ANGLE - 0.1, MIN_SUN_ANGLE - 0.1, MAX_SUN_ANGLE + 0.1, 1, 2, 3]
+        "dist" :  [angle]
     })
 
-    result_df = ephemeris.in_FOR(original_df)
+    expected_df_output = pd.DataFrame({
+        "in_FOR" : [expected]
+    })
 
-    expected = pd.Series([False, False, True, True, False, False, False, True, False])
+    df_output = ephemeris.in_FOR(original_df)
     
-    assert "in_FOR" in result_df and result_df["in_FOR"].equals(expected)
+    assert ("in_FOR" in df_output 
+        and df_output["in_FOR"].equals(expected_df_output["in_FOR"]))
 
 
 @pytest.mark.parametrize(
@@ -281,7 +298,6 @@ def test_sun_position_coordinates(ephemeris, sun_x, sun_y, sun_z, expected_coord
     )
 
 
-
 @pytest.mark.parametrize(
     "tgt_ra, tgt_dec, sun_pa, expected_v3pa",
     [
@@ -305,6 +321,7 @@ def test_normal_pa_with_sunpa(ephemeris, tgt_ra, tgt_dec, sun_pa, expected_v3pa)
     assert (
         np.allclose(df_output["V3PA"], expected_df_output["V3PA"], atol=1e-6)
     )
+
 
 @pytest.mark.xfail(reason="Known bug outlined in Issue #107")
 @pytest.mark.parametrize(
