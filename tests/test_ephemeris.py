@@ -347,7 +347,6 @@ def test_normal_pa_with_sunpa(ephemeris, tgt_ra, tgt_dec, sun_pa, expected_v3pa)
     )
 
 
-@pytest.mark.xfail(reason="Known bug outlined in Issue #107")
 @pytest.mark.parametrize(
     "   sun_x,  sun_y,  sun_z,  tgt_ra, tgt_dec,    expected_v3pa",
     [
