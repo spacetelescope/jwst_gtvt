@@ -29,8 +29,8 @@ You can install the tool using `pip` with
 
 Alternatively, you can clone the respository from GitHub and install the tool from inside the resulting directory with:
 
-	$ conda create -n jwst-gtvt-3.12 python=3.12
-	$ conda activate jwst-gtvt-3.12
+	$ conda create -n jwst-gtvt-3.14 python=3.14
+	$ conda activate jwst-gtvt-3.14
 	$ pip install -e .
 
 (The period in the last command is required and is not punctuation.)
