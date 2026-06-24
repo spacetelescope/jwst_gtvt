@@ -25,6 +25,7 @@ from astropy.coordinates import SkyCoord
 from astropy.time import Time
 import astropy.units as u
 from astroquery.jplhorizons import Horizons
+from erfa import ErfaWarning
 from datetime import datetime, timedelta
 import glob
 import pandas as pd
@@ -33,6 +34,9 @@ import numpy as np
 import os
 import re
 import requests
+import warnings
+
+warnings.filterwarnings('ignore', category=ErfaWarning)
 
 from jwst_gtvt.constants import UNIT_LIMIT, URL
 
